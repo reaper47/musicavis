@@ -1,0 +1,58 @@
+#practice-timers-actions {
+  display: flex;
+}
+
+#practice-timers-actions a {
+  flex: 1;
+}
+
+#practice-timers-actions a:last-of-type {
+  float: right;
+}
+
+#metronome-input {
+  height: 14rem;
+}
+
+#timer-container {
+  height: 20.8rem;
+}
+
+#metronome-visuals {
+  height: 8rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.metronome-signature-container {
+  display: flex;
+}
+
+.metronome-signature-container > div {
+  background-color: #f1f1f1;
+  margin: 0.5rem;
+  padding: 1rem;
+  font-size: 1.5rem;
+  border-radius: 2rem;
+}
+
+.highlightBeat,
+.highlightBeat1 {
+  border-radius: 50%;
+  background-color: #fff;
+}
+
+.highlightBeat {
+  box-shadow:
+    0 0 15px 7.5px #fff,
+    0 0 25px 15px #f0f,
+    0 0 35px 22.5px #0ff;
+}
+
+.highlightBeat1 {
+  box-shadow:
+    0 0 15px 7.5px yellow,
+    0 0 25px 15px #f0f,
+    0 0 35px 22.5px #0ff;
+}

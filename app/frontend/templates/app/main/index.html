@@ -1,0 +1,182 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block page_content %}
+{% if not user.is_authenticated %}
+<section class="hero is-info is-fullheight-with-navbar is-big-bottom-border-radius">
+  <div class="hero-body">
+    <div class="container has-text-centered">
+      <h1 class="title">Be more efficient with your music practice sessions.</h1>
+      <h2 class="subtitle">What if you could have a beautiful platform to track your progress outside of a notebook?</h2>
+    </div>
+  </div>
+</section>
+<section class="hero is-dark is-fullheight">
+  <div class="hero-body">
+    <div class="columns is-centered">
+      <div class="column">
+        <img class="border-radius-5" src="{% static 'img/landing/practice_rig.jpg' %}" alt="Practice dashboard. Credit: Madebyvadim">
+      </div>
+      <div class="column center">
+        <h1 class="title">Plan your practice. Reflect upon it.</h1><br>
+        <h2 class="subtitle">
+          The application provides you with a clean interface to plan your practice.<br>
+          Set your goals, what went well, what to improve, and list your exercises.<br>
+          Reflect on what you have done today.
+        </h2>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="hero is-light is-medium is-bold">
+  <div class="hero-body">
+    <div class="columns is-centered">
+      <div class="column center">
+        <h1 class="title">Look back at what you have accomplished.</h1><br>
+        <h2 class="subtitle">
+          You can consult your practices to plan your next ones.<br>
+          Also, you can discuss what you have done with your teacher!
+        </h2>
+      </div>
+      <div class="column">
+        <img class="border-radius-5" src="{% static 'img/landing/consult_practices_rig.jpg' %}"
+             alt="Scrolling endlessly to add your next practice. Credit: Madebyvadim">
+      </div>
+    </div>
+  </div>
+</section>
+<section class="hero is-dark is-fullheight">
+  <div class="hero-body">
+    <div class="tile is-ancestor">
+      <div class="tile is-vertical">
+        <div class="tile">
+          <div class="tile is-parent">
+            <article class="tile is-child">
+              <h1 class="title">Track your progress visually.</h1><br>
+              <h2 class="subtitle">
+                Your dashboard shows the time you invested in practicing over time interactively.<br>
+                It also gives you a table of key metrics to satisfy your curiousity.
+              </h2>
+            </article>
+          </div>
+          <div class="tile is-parent is-vertical">
+            <article class="tile is-child notification is-info">
+              <figure class="image">
+                <img src="{% static 'img/landing/dashboard_graph.png' %}">
+              </figure>
+            </article>
+            <article class="tile is-child notification is-primary">
+              <figure class="image">
+                <img src="{% static 'img/landing/dashboard_stats.png' %}">
+              </figure>
+            </article>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="hero is-warning is-medium">
+  <div class="hero-body">
+    <div class="container has-text-centered">
+      <h1 class="title">Export your practices.</h1>
+      <h2 class="subtitle">The application makes it easy for you to download your practices in a format<sup>*</sup> of your choice.</h2>
+      <img src="{% static 'img/landing/export_practices.gif' %}" alt="A gif demonstrating the export feature.">
+    </div>
+  </div>
+  <div class="hero-foot">
+    <nav class="tabs is-fullwidth is-boxed">
+      <div class="container has-text-cented">
+        <p class="subtitle center"><sup>*</sup><span class="underlined">Possible formats</span></p>
+        <ul class="ul-default-cursor">
+        {% for ext in export_extensions %}
+          <li><a>{{ ext }}</a></li>
+        {% endfor %}
+        </ul>
+      </div>
+    </nav>
+  </div>
+</section>
+<section class="hero is-success is-medium is-bold">
+  <div class="hero-body">
+    <div class="container has-text-centered">
+      <h1 class="title">Give trees some 💕</h1>
+      <h2 class="subtitle">Reduce your paper consumption.<br>Help preserve the enviroment.</h2>
+    </div>
+  </div>
+  <div class="hero-foot">
+    <nav class="tabs">
+      <div class="container">
+        <ul>
+            {% for i in num_love_trees %}
+            <li><img src="{% static '/img/landing/tree.png' %}" alt="A lush tree"></li>
+            {% endfor %}
+        </ul>
+      </div>
+    </nav>
+  </div>
+</section>
+<section class="hero is-danger is-medium is-bold">
+  <div class="hero-body">
+    <div class="columns is-centered">
+      <div class="column is-two-thirds">
+        <h1 class="title">Go beyond the use of spreadsheets.</h1><br>
+        <h2 class="subtitle">They are not tidy in the long run.<br>Scrolling down hundreds or thousands of lines every time you plan a new practice is boring.</h2>
+      </div>
+      <div class="column">
+        <img src="{% static 'img/landing/spreadsheet.gif' %}" alt="Scrolling endlessly to add your next practice.">
+      </div>
+    </div>
+  </div>
+</section>
+<section class="hero is-info is-medium is-bold">
+  <div class="hero-body">
+    <div class="container has-text-centered">
+      <h1 class="title">Add value to the musician inside of you.</h1>
+      <a class="button is-large is-rounded is-warning is-outlined" href="{% url 'app:auth.signup' %}">Sign up today</a>
+    </div>
+  </div>
+</section>
+{% else %}
+<section class="section">
+  <div class="container">
+    <div class="columns">
+      <div class="column is-half">
+        <div class="card">
+          <div class="card-image">
+            <figure class="image is-4by3">
+              <img src="{% static 'img/practice.jpg' %}" alt="New Practice Session image">
+            </figure>
+          </div>
+          <div class="card-content">
+            <div class="content">
+              <p class="home-card-description">Start a new practice session for one of your instruments.</p>
+            </div>
+          </div>
+          <footer class="card-footer">
+            <a href="{% url 'app:practice.new' %}" class="button is-link is-fullwidth is-large">Practice</a>
+          </footer>
+        </div>
+      </div>
+      <div class="column is-half">
+        <div class="card">
+          <div class="card-image">
+            <figure class="image is-4by3">
+              <img src="{% static 'img/consult.jpg' %}" alt="Past Practice Sessions image">
+            </figure>
+          </div>
+          <div class="card-content">
+            <div class="content">
+              <p class="home-card-description">Review your practice sessions to see what you have done previously.</p>
+            </div>
+          </div>
+          <footer class="card-footer">
+            <a href="{% url 'app:practice.list_past_practices' %}" class="button is-link is-fullwidth is-large">Consult Practices</a>
+          </footer>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block page_content %}
+<section class="full-height">
+  <div class="columns is-centered is-centered is-vcentered full-height fit-mobile">
+    <div class="column is-4">
+      <div class="container">
+        <div class="card">
+          <header class="card-header">
+            <p class="card-header-title">Sign Up</p>
+          </header>
+          <form method="post">
+            <div class="card-content">
+              <div class="content">
+                {% csrf_token %}
+                <div class="card-content">
+                  <div class="content">
+                    {% include 'snippets/_form_field.html' with field=form.username %}
+                    {% include 'snippets/_form_field.html' with field=form.email %}
+                    {% include 'snippets/_form_field.html' with field=form.password1 %}
+
+                    {% include 'snippets/_form_field.html' with field=form.password2 %}
+
+                    <hr>
+                    <div class="field is-horizontal">
+                      {% include 'snippets/_form_field.html' with field=form.send_emails field_class=' is-horizontal' %}
+                    </div>
+                    <div class="field is-horizontal">
+                      {% include 'snippets/_form_field.html' with field=form.agree_terms field_class=' is-horizontal' %}
+                    </div>
+                  </div>
+                  {% include 'snippets/_form_errors.html' with form=form %}
+              </div>
+            </div>
+            <button id="submit" name="Submit" value="Sign Up" type="submit" class='button is-primary is-fullwidth'>Sign Up</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

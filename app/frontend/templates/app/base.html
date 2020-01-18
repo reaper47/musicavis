@@ -1,0 +1,139 @@
+{% load render_bundle from webpack_loader %}
+{% load static %}
+
+<!DOCTYPE HTML>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="robots" content="index, follow">
+    <meta name="description" content="The Musicavis application provides musicians and aspiring musicians a platform for them to become more efficient with their practice sessions.">
+    <meta property="og:title" content="Musicavis">
+    <meta property="og:image" content="https://developer.cdn.mozilla.net/static/img/opengraph-logo.dc4e08e2f6af.png">
+    <meta property="og:description" content="The Musicavis application provides musicians and aspiring musicians a platform for them to become more efficient with their practice sessions.">
+    <link rel="shortcut icon" type="image/ico" href="{% static 'favicon.ico' %}"/>
+    {% if title %}<title>{{ title }} | Musicavis</title>{% else %}<title>Welcome to Musicavis</title>{% endif %}
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.7/css/all.css">
+  </head>
+  <body>
+    {% if not hide_nav %}
+    <nav class="navbar has-shadow">
+      <div class="navbar-brand">
+        <a class="navbar-item" href="{% url 'app:main.index' %}">
+          <img src="{% static 'img/musicavis-logo.png'%}" alt="Musicavis" width="130" height="120">
+        </a>
+        <div id="navbarBurger" class="navbar-burger burger" data-target="navbarMenu">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </div>
+      <div id="navbarMenu" class="navbar-menu">
+        <div class="navbar-start">
+          <a class="navbar-item" href="{% url 'app:main.index' %}">Home</a>
+          {% if user.authenticated %}
+          <a class="navbar-item" href="{% url 'app:practice.new' %}">New Practice</a>
+          <a class="navbar-item" href="{% url 'app:practice.list_past_practices' %}">Past Practices</a>
+          <a class="navbar-item" href="{% url 'app:dashboard.index' %}">Dashboard</a>
+          {% else %}
+          <a class="navbar-item" href="{% url 'app:main.features' %}">Features</a>
+          <a class="navbar-item" href="{% url 'app:main.pricing' %}">Pricing</a>
+          {% endif %}
+        </div>
+        <div class="navbar-end">
+          <div class="navbar-item">
+            <div class="buttons">
+              {% if not user.authenticated %}
+              <a class="button is-light" href="{% url 'app:auth.login' %}"><strong>Log in</strong></a>
+              <a class="button is-primary" href="{% url 'app:auth.signup' %}">Sign up</a>
+              {% else %}
+              {% if isSession %}
+              <a class="navbar-item modal-button" data-target="modal-practice-tools"><span class="icon"><i class="fas fa-wrench"></i></span>&nbsp;Tools</a>
+              {% endif %}
+              <div id="notification-bell">
+                <div class="dropdown is-active">
+                  <div class="dropdown-trigger">
+                    <a  class="navbar-item">
+                      <span class="icon"><i class="fas fa-bell"></i></span>
+                      <span id="notification-badge" class="badge hide"></span>
+                    </a>
+                  </div>
+                  <div id="notifications" class="dropdown-menu hide" role="menu">
+                    <div class="arrow-up"></div>
+                    <div class="card">
+                      <header class="card-header">
+                        <p class="card-header-title">Notifications</p>
+                      </header>
+                      <div class="card-content">
+                        <div class="dropdown-content">
+                          <p id="no-notification" class="subtitle has-text-centered">All caught up &#128512;</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <a class="navbar-item" href="{% url 'app:profile.profile' %}">Profile</a>
+              <a class="navbar-item" href="{% url 'app:auth.logout' %}">Logout</a>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </nav>
+    {% endif %}
+    <main>
+      <div class="page-content">
+        {% spaceless %}
+        {% block page_content %}{% endblock %}
+        {% endspaceless %}
+      </div>
+    </main>
+    {% render_bundle 'main' %}
+  </body>
+  {% if not hide_nav %}
+  <footer id="site-footer" class="footer">
+    <div class="container">
+      <div class="columns is-mobile">
+        <div class="column">
+          <h3>Navigation</h3>
+          <hr>
+          <ul>
+            <li><a href="{% url 'app:main.sitemap' %}">Sitemap</a></li>
+            <li><a href="{% url 'app:main.features' %}">Features</a></li>
+            <li><a href="{% url 'app:main.pricing' %}">Pricing</a></li>
+            {% if not user.is_authenticated %}
+            <li><a href="{{ url 'app:auth.login' %}">Login</a>/<a href="{% url 'app:auth.signup' %}">Signup</a></li>
+            {% else %}
+            <li><a href="{% url 'app:auth.logout' %}">Logout</a></li>
+            {% endif %}
+          </ul>
+        </div>
+        <div class="column">
+          <h3>Resources</h3>
+          <hr>
+          <ul>
+            <li><a href="{% url 'app:legal.privacy' %}">Privacy Policy</a></li>
+            <li><a href="{% url 'app:legal.terms' %}">Terms of Use</a></li>
+          <li><a href="{% url 'app:contact.contact_us' %}">Contact Us</a></li>
+          </ul>
+        </div>
+        <div class="column">
+          <h3>Social</h3>
+          <hr>
+          <nav class="level is-mobile">
+            <div class="level-left level-social">
+              <a class="level-item" href="https://www.facebook.com/" target="_blank" rel="noreferrer">F</a>
+              <a class="level-item" href="https://www.instagram.com/" target="_blank" rel="noreferrer">I</a>
+              <a class="level-item" href="https://www.twitter.com/" target="_blank" rel="noreferrer">T</a>
+            </div>
+          </nav>
+        </div>
+      </div>
+      <div class="float-right subtitle is-6">
+        <p>&#169;{{ year }} Musicavis. All Rights Reserved.</p>
+      </div>
+    </div>
+  </footer>
+  {% endif %}
+</html>

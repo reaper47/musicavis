@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block page_content %}
+<div class="columns">
+  <div class="column is-one-quarter"></div>
+    <div class="column">
+      <section class="section has-text-centered">
+        <h1 class="title is-3">Privacy Policy</h1>
+        <time datetime="2019-11-14 18:44">Last updated 18:44 EST November 14 2019</time>
+      </section>
+      <section class="section">
+        <h1 class="title is-4">What information do we collect?</h1>
+        <p>
+          We ask for some information used to identify you as a user when joining <i>Musicavis</i>.
+          This includes your username, password, and email address. No other information is collected from you.
+          It is advised not to use your real name as your username. You can log in with either your username or email address.
+          <br><br>
+          We also collect statistical data based on our users' practice sessions. This information is aggregate. It is not associated with you or your account.
+        </p>
+      </section>
+      <section class="section">
+        <h1 class="title is-4">What do you do with this information?</h1>
+        <p>
+          <i>Musicavis</i> never outsources your personal information to third parties for advertising or promotional purposes.
+          We may need to give your contact information to a third party if we are unable to collect the money you owe to <i>Musicavis</i>.
+          <br><br>
+          We will occasionally use your email address to send you information regarding <i>Musicavis</i> if you consent.
+          These include information related to practicing, product features, and promotions and discounts..
+          All of your data is stored in our database.
+          <br><br>
+          The information we collect on our users' practices is used for analytical purposes to improve our platform and to improve your user experience.
+          We do not provide such information to our advertisers.
+        </p>
+      </section>
+      <section class="section">
+        <h1 class="title is-4">Is my information secure?</h1>
+        <p>
+          We are confident in our ability to keep your information safe. We have taken steps to ensure our databases are secure.
+          <br><br>
+          Your personal information is protected by your password. It is encrypted in our databases to ensure maximum security.
+          Never share this password with anyone.
+          <i>Musicavis</i> will never contact you unsolicited to ask for your password.
+          Please contact us immediately if this event happens.
+        </p>
+      </section>
+      <section class="section">
+        <h1 id="privacy-cookies" class="title is-4">What about cookies?</h1>
+        <p>
+          <i>Musicavis</i> stores a session cookie on your computer to track you while you are on the site.
+          It expires once you close the website.
+          This cookie contains four strings ("words") that are only meaningful to our servers.
+          <br><br>
+          Our platform also stores a cookie on your computer when you accept our GDPR notice regarding cookies.
+          It expires 1 (one) month after its creation.
+          This cookie contains no personal data. It is only used to know whether you accepted the notice.
+          <br><br>
+          The information stored in our cookies can not be used by third parties to gain access to your account information.
+        </p>
+      </section>
+      <section class="section">
+        <h1 class="title is-4">Do you have any question?</h1>
+        <p>
+          We take your privacy very seriously. We realize everyone has a different view of privacy.
+          If you have concerns, or if any aspect of our privacy policy is unclear to you, please <a href="{% url 'app:contact.contact_us' %}">contact us</a>.
+          We will be happy to discuss the matter with you.
+        </p>
+      </section>
+    </div>
+  <div class="column is-one-quarter"></div>
+</div>
+{% endblock %}

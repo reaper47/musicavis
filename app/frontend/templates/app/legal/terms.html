@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+
+{% block page_content %}
+<div class="columns">
+  <div class="column is-one-quarter"></div>
+    <div class="column">
+      <section class="section has-text-centered">
+        <h1 class="title is-3">Terms of Use</h1>
+        <time datetime="2019-11-15 12:08">Last updated 12:08 EST November 15 2019</time>
+      </section>
+      <section class="section">
+        <h1 class="title is-4">General Information</h1>
+        <p>
+          You accept the Terms of Use herein when accessing <i>Musicavis</i>. Otherwise, you should not use the website.
+          These terms apply to all products and services provided by <i>Musicavis</i>, its affiliates, and franchises listed on the website.
+          <br><br>
+          We do not guarantee continuous, uninterrupted access to our platform as our site's operation may be interfered with by factors outside of our control.
+          <br><br>
+          If any provision of this Agreement is held to be invalid or unenforceable, such provision shall be struck and the remaining provisions shall be enforced.
+          Please <a href="{% url 'app:contact.contact_us' %}">contact us</a> for any disputes between you and <i>Musicavis</i> regarding our services.
+        </p>
+      </section>
+      <section class="section">
+        <h1 class="title is-4">Copyright and Trademark Notice</h1>
+        <p>
+          The <i>Musicavis</i> logo and related trademarks are registered and owned by <i>Musicavis</i>.
+          They may not be used or copied without written authorization by <i>Musicavis</i>.
+        </p>
+      </section>
+      <section class="section">
+        <h1 class="title is-4">External Links</h1>
+        <p>
+          Occasionally, our platform redirects the user to third parties via hyperlinks.
+          <i>Musicavis</i> is not responsible for the content of those sites, and nor is it responsible for any damages
+          caused by those links.
+        </p>
+      </section>
+      <section class="section">
+        <h1 class="title is-4">Membership Eligibility</h1>
+        <p>
+          Our services are available to any individual willing to use the platform. Since <i>Musicavis</i> focuses
+          primarily on music, our members have no specific eligibility requirements.
+          You must supply us with a valid email address through which we can contact you at any time.
+        </p>
+      </section>
+      <section class="section">
+        <h1 class="title is-4">Fees and Services</h1>
+        <p>
+          We may adjust fees to some or all of our services at any time.
+          Any change will be announced at least 14 days in advance via a blog post and an email sent to our clients.
+          In case we introduce a new service, the fees for that service are effective at its launch.
+          All fees are quoted in Canadian Dollars unless stated otherwise. You are responsible for paying all fees associated with using our service and
+          our website and all applicable taxes.
+      </section>
+      <section class="section">
+        <h1 class="title is-4">No Warranty</h1>
+        <p>
+          WE PROVIDE OUR WEB SITE AND SERVICES "AS IS" AND WITHOUT ANY WARRANTY OR CONDITION, EXPRESS,
+          IMPLIED OR STATUTORY. WE SPECIFICALLY DISCLAIM ANY IMPLIED WARRANTIES OF TITLE, MERCHANTABILITY,
+          FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT.
+        </p>
+      </section>
+      <section class="section">
+        <h1 class="title is-4">Liability Limit and 30 Day Money-Back Guarantee</h1>
+        <p>
+          In no event shall we nor any of its officers, brokers, employees, or other representatives be liable for lost
+          profits or any special, incidental or consequential damages arising out of or in connection with our site,
+          our services or this agreement.
+          <br><br>
+          Our liability, and the liability of our suppliers, to you or any third parties in any circumstance, is limited
+          to the number of fees paid to <i>Musicavis</i> in the 30 days before the action giving rise to liability.
+        </p>
+      </section>
+      <section class="section">
+        <h1 class="title is-4">Jurisdiction</h1>
+        <p>
+          This website is administered by <i>Musicavis</i> from its offices in Quebec City, Quebec, Canada.
+          It is governed by the laws of the Province of Quebec and Canada.
+          By accessing this Site, you agree and hereby submit to the exclusive jurisdiction and venue of the courts of the Province of Quebec.
+        </p>
+      </section>
+      <section class="section">
+        <h1 class="title is-4">Revisions</h1>
+        <p>
+          The material, information, and other data provided by the platform may be changed at any time.
+          Users will be notified of any changes by email. All users should abide by these Terms of Use.
+        </p>
+      </section>
+      <section class="section">
+        <h1 class="title is-4">Privacy Policy</h1>
+        <p>
+          Please refer to the <a href="{% url 'app:legal.privacy' %}">privacy policy</a> for information regarding
+          <i>Musicavis's</i> privacy policy.
+        </p>
+      </section>
+      <section class="section">
+        <h1 class="title is-4">Personal Information</h1>
+        <p>
+          All of your personal information will be treated as confidential in accordance to our <a href="{% url 'app:legal.privacy' %}">privacy policy</a>.
+        </p>
+      </section>
+    </div>
+  <div class="column is-one-quarter"></div>
+</div>
+{% endblock %}

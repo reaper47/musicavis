@@ -1,0 +1,41 @@
+{
+  "name": "musicavis",
+  "version": "1.0.0",
+  "description": "The Musicavis application provides musicians and aspiring musicians a platform for them to become more efficient with their practice sessions.",
+  "main": "index.js",
+  "repository": "https://github.com/reaper47/pymusical.git",
+  "author": "Marc-André Charland",
+  "license": "MIT",
+  "scripts": {
+    "it": "yarn install && python3 -m venv venv && . venv/bin/activate && pip3 install --upgrade pip && pip3 install --no-cache-dir -vvv -r requirements.txt",
+    "rq": "rq worker musicavis-tasks",
+    "it-pkgs": "rm -rf ./node_modules && yarn install",
+    "build": "webpack --config webpack.config.js --progress --colors",
+    "build-watch": "webpack --config webpack.config.js --progress --colors --watch"
+  },
+  "dependencies": {
+    "@babel/core": "^7.0.0",
+    "animate.css": "^3.7.2",
+    "bulma": "^0.8.0",
+    "bulma-toast": "^1.5.1",
+    "chart.js": "^2.8.0",
+    "chartjs-plugin-colorschemes": "^0.4.0",
+    "howler": "^2.1.2",
+    "moment": "^2.24.0",
+    "table-dragger": "^1.0.3",
+    "zxcvbn": "^4.4.2"
+  },
+  "devDependencies": {
+    "babel": "^6.23.0",
+    "babel-core": "^6.26.3",
+    "babel-loader": "^8.0.6",
+    "css-loader": "^3.4.2",
+    "mini-css-extract-plugin": "^0.9.0",
+    "node-sass": "^4.13.1",
+    "optimize-css-assets-webpack-plugin": "^5.0.3",
+    "sass-loader": "^8.0.2",
+    "webpack": "^4.41.5",
+    "webpack-bundle-tracker": "^0.4.3",
+    "webpack-cli": "^3.3.10"
+  }
+}

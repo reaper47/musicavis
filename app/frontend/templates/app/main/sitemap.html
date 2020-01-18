@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block page_content %}
+<section class="section">
+  <h1 class="title is-4 has-text-centered">Sitemap</h1>
+  <aside class="menu has-text-centered">
+  <p class="menu-label">General</p>
+  <ul class="menu-list">
+    <li><a href="{% url 'app:main.index' %}">Home</a></li>
+    {% if user.authenticated %}
+    <li><a href="{% url 'app:dashboard.index' %}">Dashboard</a></li>
+    <li><a href="{% url 'app:profile.profile' %}">Profile</a></li>
+    {% endif %}
+  </ul>
+  <br>
+  <p class="menu-label">Product</p>
+  <ul class="menu-list">
+    <li><a href="{% url 'app:main.features' %}">Features</a></li>
+    <li><a href="{% url 'app:main.pricing' %}">Pricing</a></li>
+    <li><a href="{% url 'app:main.pricing' %}">Road Map</a></li>
+  </ul>
+  <br>
+  <p class="menu-label">About Us</p>
+  <ul class="menu-list">
+    <li><a href="#">Our team</a></li>
+    <li><a href="{% url 'app:contact.contact_us' %}">Contact us</a></li>
+    <li><a href="#">Careers</a></li>
+    <li><a href="#">News</a></li>
+  </ul>
+  <br>
+  <p class="menu-label">Legal</p>
+  <ul class="menu-list">
+    <li><a href="{% url 'app:legal.privacy' %}">Privacy Policy</a></li>
+    <li><a href="{% url 'app:legal.terms' %}">Terms of Use</a></li>
+  </ul>
+</aside>
+</section>
+{% endblock %}

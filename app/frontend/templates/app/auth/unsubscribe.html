@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block page_content %}
+<section class="section full-height">
+  <div class="columns">
+    <div class="column "></div>
+    <div class="column">
+      {%- if is_unsubscribed -%}
+      <p class="subtitle">You have been unsubscribed successfully. You will no longer receive emails from <i>Musicavis</i>.</p>
+      <p class="subtitle">You can subscribe back anytime in your settings.</p>
+      {%- else -%}
+      <p class="subtitle">The unsubscribe link is invalid or has expired.</p>
+      <p class="subtitle">Please <a href="{{ url_for('contact.contact') }}" target="_blank">contact us</a> if you believe this is an error.</p>
+      {%- endif -%}
+    </div>
+    <div class="column "></div>
+  </div>
+</section>
+{% endblock %}

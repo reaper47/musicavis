@@ -1,0 +1,68 @@
+#dashboard > div {
+  display: grid;
+  margin-left: 4rem;
+  margin-top: 1rem;
+}
+
+#dashboard-no-practices {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  flex-direction: column;
+  justify-content: center;
+  width: 100%;
+}
+
+#dashboard__table-statistics {
+  width: 99%;
+}
+
+#dashboard__practice-container {
+  position: relative;
+  margin: auto;
+  height: 87vh;
+  width: 90vw;
+}
+
+#nav-dashboard {
+  background: rgba(0, 0, 0, 0.85);
+  float: left;
+  height: 100vh;
+  margin-top: -0.85rem;
+  width: 3rem;
+  transition: all .2s;
+}
+
+#nav-dashboard:hover {
+  width: 12rem;
+}
+
+#nav-dashboard nav ul {
+  padding-left: 0;
+}
+
+#nav-dashboard nav ul li {
+  display: flex;
+  align-items: center;
+  list-style-type: none;
+  padding: 0.7rem;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+#nav-dashboard nav ul li span {
+  color: #FFF;
+  padding-left: 1rem;
+  opacity: 0;
+  transition: all 0.2s;
+}
+
+#nav-dashboard:hover nav ul li span {
+  opacity: 1;
+}
+
+#nav-dashboard nav ul li:hover {
+  background-color: #1976D2;
+}

@@ -1,0 +1,39 @@
+const path = require('path');
+const webpack = require('webpack');
+const BundleTracker = require('webpack-bundle-tracker');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+
+
+module.exports = {
+  context: __dirname,
+  entry: './app/frontend/static/app/assets/js/index',
+  output: {
+      path: path.resolve('./app/frontend/static/app/assets/bundles/'),
+      publicPath: '/static/assets/bundles/',
+      filename: "[name].js"
+  },
+  module: {
+    rules: [
+      {
+        test: /\.(sa|sc|c)ss$/,
+        use: [
+          {
+            loader: MiniCssExtractPlugin.loader,
+            options: {
+              hmr: process.env.NODE_ENV === 'development',
+            },
+          },
+          'css-loader',
+          'sass-loader',
+        ],
+      },
+    ],
+  },
+  plugins: [
+    new BundleTracker({filename: './webpack-stats.json'}),
+    new MiniCssExtractPlugin({
+      filename: '[name].css',
+      chunkFilename: '[id].css',
+    })
+  ]
+}

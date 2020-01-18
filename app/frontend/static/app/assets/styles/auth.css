@@ -1,0 +1,31 @@
+#password-strength-meter {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-color: #ecf0f1;
+  height: 0.6rem;
+  width: 100%;
+}
+
+progress,
+#passwords-match {
+  border-radius: 2rem;
+}
+
+progress[value^="1"]::-webkit-progress-value { background-color: #F44336; }
+progress[value^="2"]::-webkit-progress-value { background-color: #FFEB3B; }
+progress[value^="3"]::-webkit-progress-value { background-color: #FF9800; }
+progress[value^="4"]::-webkit-progress-value { background-color: #4CAF50; }
+
+progress[value^="1"]::-moz-progress-bar { background-color: #F44336; }
+progress[value^="2"]::-moz-progress-bar { background-color: #FFEB3B; }
+progress[value^="3"]::-moz-progress-bar { background-color: #FF9800; }
+progress[value^="4"]::-moz-progress-bar { background-color: #4CAF50; }
+
+#passwords-match {
+  display: inline-block;
+  height: 0.6rem;
+}
+
+#passwords-match[checked] { background: #388E3C; }
+#passwords-match[unchecked] { background: #F44336; }

@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block page_content %}
+<section class="section">
+  <div class="container">
+    <div class="columns">
+      <div class="column is-4">
+        <div class="card">
+          <header class="card-header">
+            <p class="card-header-title">Contact Us</p>
+          </header>
+          <form method="post">
+            {% csrf_token %}
+            {{ form }}
+            <button type="submit" class='button is-info is-fullwidth'>Submit</button>
+          </form>
+        </div>
+      </div>
+      <div class="column default-cursor">
+        <div class="card">
+          <header class="card-header">
+            <p class="card-header-title">Our Coordinates</p>
+          </header>
+          <div class="card-content">
+            <div class="content">
+              <div class="columns">
+                <div class="column">
+                  <nav class="panel">
+                    <a class="panel-block is-active cursor-default">
+                      <span class="panel-icon">
+                        <i class="fas fa-location-arrow has-text-black" aria-hidden="true"></i>
+                      </span>
+                      Musicavis Inc.<br>
+                      7517 Laanke Mellom<br>
+                      Hell, Norway
+                    </a>
+                    <a class="panel-block cursor-default" href="mailto:hello@musicavis.com">
+                      <span class="panel-icon">
+                        <i class="fas fa-envelope has-text-black" aria-hidden="true"></i>
+                      </span>
+                      hello@musicavis.ca
+                    </a>
+                    <a class="panel-block cursor-default" href="tel:+14188774320" data-rel="external">
+                      <span class="panel-icon">
+                        <i class="fas fa-phone" aria-hidden="true"></i>
+                      </span>
+                      +1 (418) 877-4320
+                    </a>
+                  </nav>
+                </div>
+                <div class="column">
+                  <div class="tile">
+                    <a class="panel-block cursor-default">
+                      <img src="{% static 'img/hell.png' %}" alt="Musicavis's Location" />
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+

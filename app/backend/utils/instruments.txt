@@ -1,0 +1,44 @@
+Accordion
+Bagpipes
+Banjo
+Bass guitar
+Bassoon
+Bongo
+Cello
+Clarinet
+Cornet
+Drums
+English horn
+Euphonium
+Flute
+French horn
+Glockenspiel
+Guitar (acoustic)
+Guitar (electric)
+Harmonica
+Harp
+Harpsichord
+Hurdy gurdy
+Lute
+Lyre
+Mandolin
+Marimba
+Melodica
+Oboe
+Ocarina
+Octobass
+Organ
+Pan Pipes
+Piano
+Piccolo
+Recorder
+Saxophone
+Sitar
+Trombone
+Trumpet
+Tuba
+Ukulele
+Viola
+Violin
+Xylophone
+Zither

@@ -1,0 +1,40 @@
+
+
+{% extends 'base.html' %}
+
+{% block page_content %}
+<section class="full-height">
+  <div class="columns is-centered is-vcentered full-height fit-mobile">
+    <div class="column is-4 is-two-thirds-tablet is-half-desktop is-one-third-widescreen">
+      <div class="container is-fluid">
+        <div class="card">
+          <header class="card-header">
+            <p class="card-header-title">Log In</p>
+          </header>
+          <form method="post">
+            {% csrf_token %}
+            <div class="card-content">
+              <div class="content">
+                {% include 'snippets/_form_field.html' with field=form.username %}
+                {% include 'snippets/_form_field.html' with field=form.password %}
+                {% include 'snippets/_form_field.html' with field=form.remember_me field_class=' is-horizontal' %}
+              </div>
+              {% include 'snippets/_form_errors.html' with form=form %}
+            </div>
+            <button id="submit" name="Submit" value="Log In" type="submit" class='button is-primary is-fullwidth'>Login</button>
+          </form>
+        </div>
+        <br>
+        <div class="columns">
+          <div class="column">
+            <a href="{% url 'app:auth.password_reset' %}" class="button is-link is-fullwidth">Forgot Password?</a>
+          </div>
+          <div class="column">
+            <a href="{% url 'app:auth.signup' %}" class="button is-link is-fullwidth">Create an Account</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

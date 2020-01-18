@@ -1,0 +1,220 @@
+.practice-ul li {
+  display: flex;
+}
+
+.practice-ul li p:nth-child(1) {
+  padding: 0.4rem;
+}
+
+.practice-ul li p:nth-child(2) {
+  width: 100%;
+}
+
+.short-cell {
+  width: 10vw;
+}
+
+#practice-actions {
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: flex-end;
+  padding: 0 0.3rem;
+}
+
+#practice-actions input {
+  flex-grow: 3;
+}
+
+#delete-practice-button {
+  flex-grow: 1;
+}
+
+#practice-list-actions {
+  display: flex;
+  align-items: flex-end;
+}
+
+.practice-list-action {
+  flex: 1;
+}
+
+#practice-form {
+  min-height: 90vh;
+}
+
+#ul-goals,
+#ul-positives,
+#ul-improvements,
+#practice-notes,
+#ul-exercises {
+  margin-left: 0;
+}
+
+.card-content.not-mobile {
+  padding: 0.5rem 1.5rem !important;
+
+}
+
+.card-header-title.not-mobile {
+  padding: 0 !important;
+    padding-left: 1rem !important;
+}
+
+.practice-ul.not-mobile,
+.practice-ul.mobile {
+  padding-bottom: 0.75rem;
+}
+
+.practice-ul.not-mobile p.control,
+.practice-ul.mobile p.control {
+  margin-bottom: 0.2rem;
+}
+
+/******
+ MOBILE
+*******/
+#practice-tabs-mobile section {
+  padding: 1rem 0rem !important;
+}
+
+#practice-tabs-mobile .tabs:not(:last-child) {
+  margin-bottom: 0;
+}
+
+#practice-tabs-mobile .tab-content {
+  padding: 1rem;
+  display: none;
+}
+
+#practice-tabs-mobile .tab-content.is-active {
+  display: block;
+}
+
+#ul-goals-mobile,
+#ul-positives-mobile,
+#ul-improvements-mobile,
+#practice-notes-mobile,
+#practice-exercises-mobile {
+  margin-left: 0.5rem;
+}
+
+.display-flex-input-container {
+  display: flex;
+  width: 100%;
+  position: relative;
+  padding-bottom: 0.5rem;
+}
+
+.display-flex-input {
+  flex: 1;
+  display: block;
+  border: none;
+  min-width: 0;
+}
+
+.display-flex-input-container div:nth-child(2) {
+  margin-left: 0.2rem;
+  margin-right: 0.2rem;
+}
+
+.display-flex-input-container div {
+  flex: 1;
+}
+
+.display-flex-input-container p {
+  margin: 0 !important;
+  text-align: left;
+  padding-top: 0 !important;
+}
+
+#practice-tools-mobile-hr {
+    visibility: hidden;
+  }
+
+@media (min-width: 320px) and (max-width: 1024px) {
+  #practice-form-mobile {
+    padding-top: 1rem;
+    font-size: 0.85rem;
+    min-height: 90vh;
+  }
+  .card-content.mobile {
+    padding-right: 0.6rem !important;
+    padding-left: 0rem !important;
+    padding-top: 0.4rem !important;
+    padding-bottom: 0.4rem !important;
+  }
+  #ul-goals-mobile,
+  #ul-positives-mobile,
+  #ul-improvements-mobile,
+  #practice-notes-mobile,
+  #practice-exercises-mobile {
+    margin-left: 0.5rem;
+  }
+  .card-header-title.mobile {
+    padding: 0 !important;
+    padding-left: 1rem !important;
+  }
+  #modal-practice-tools header > p {
+    font-size: 1.3rem;
+  }
+  #metronome-visuals {
+    height: 5rem !important;
+  }
+  .metronome-signature-container {
+    height: 4rem;
+  }
+  .metronome-signature-container > div {
+    font-size: 1rem  !important;
+  }
+  #metronome-input {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr;
+    grid-gap: 1rem;
+    height: 11rem !important;
+  }
+  #metronome-input hr {
+    visibility: hidden;
+  }
+  #metronome-input > hr:nth-child(2) {
+    visibility: hidden;
+  }
+  #metronome-input div.fullwidth:nth-child(3) {
+    grid-column: 2 / 3;
+    grid-row: 1 / 2;
+  }
+  #metronome-input div.field:nth-child(5) {
+     grid-column: 2 / 2;
+     grid-row: 2 / 3;
+  }
+  #metronome-input div.field:nth-child(4) {
+     grid-column: 1 / 2;
+     grid-row: 2 / 3;
+  }
+  #practice-tools-mobile-hr {
+    visibility: visible;
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+  #timer-input > div:nth-child(1) {
+     grid-column: 1 / 2;
+     grid-row: 1 / 2;
+  }
+  #timer-input {
+     display: grid;
+     grid-template-columns: 1fr 1fr 1fr;
+     grid-template-rows: 1fr 1fr;
+     grid-gap: 1rem;
+     font-size: 1rem;
+  }
+  #timer-container {
+     height: 6.8rem !important;
+  }
+  section.modal-card-body {
+    overflow: auto;
+    min-height: 63vh;
+  }
+  div.modal-card {
+    width: 95vw;
+  }
+}

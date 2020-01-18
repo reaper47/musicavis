@@ -1,0 +1,13 @@
+Dear {{ user.username.title() }},
+
+To confirm your Musicavis account please click the following link:
+{{ url_for('auth.confirm', token=token, _external=True) }}
+
+You will receive an email following confirmation. Otherwise, the link might have expired.
+Click the following link to receive a fresh account confirmation:
+{{ url_for('auth.resend_confirm', token=token, _external=True) }}
+
+Sincerely,
+The Musicavis Team
+
+Note: replies to this email address are not monitored.
