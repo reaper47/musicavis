@@ -8,9 +8,6 @@ python:
 service:
   - mysql
 
-before_install:
-  - mysql -e 'CREATE DATABASE IF NOT EXISTS musicavis_test;'
-
 install:
   - pip install -r requirements.txt
 
