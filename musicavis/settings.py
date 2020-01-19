@@ -231,7 +231,7 @@ EMAIL_HOST = os.environ.get('MAIL_SERVER', 'smtp.googlemail.com')
 EMAIL_PORT = int(os.environ.get('MAIL_PORT', '587'))
 EMAIL_HOST_USER = os.environ.get('MAIL_USERNAME')
 EMAIL_HOST_PASSWORD = os.environ.get('MAIL_PASSWORD')
-EMAIL_USE_TLS = os.environ.get('MAIL_USE_TLS', True).lower() in ['true', 'on', '1']
+EMAIL_USE_TLS = os.environ.get('MAIL_USE_TLS', True)
 
 MUSICAVIS_ADMIN = os.environ.get('MUSICAVIS_ADMIN', 'macpoule@gmail.com')
 MUSICAVIS_MAIL_SUBJECT_PREFIX = '[Musicavis]'
