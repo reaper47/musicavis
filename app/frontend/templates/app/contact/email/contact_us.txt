@@ -1,0 +1,8 @@
+Hello Musicavis Team,
+
+{% for msg in message %}
+{% if msg %}{{ msg }}{% endif %}
+{% endfor %}
+
+Sincerely,
+{{ name }} [{{ email }}]

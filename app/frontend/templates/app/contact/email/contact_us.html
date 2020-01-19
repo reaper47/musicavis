@@ -1,0 +1,6 @@
+<p>Hello Musicavis Team,</p>
+{% for msg in message %}
+{% if msg %}<p>{{ msg }}</p>{% endif %}
+{% endfor %}
+<p>Sincerely,<br>
+{{ name }} [{{ email }}]</p>

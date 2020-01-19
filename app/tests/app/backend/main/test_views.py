@@ -1,23 +1,21 @@
-import os
 import json
-from unittest import mock
 
 from django.test import TestCase
 from django.urls import reverse
 
 from musicavis.settings import EXPORTS_DIR
-from app.models.user import User
-from app.tests.conftest import create_user, A_USERNAME, A_PASSWORD, is_user_index, is_anonymous_index
-from app.backend.utils.export import FileDeleteWrapper
+from app.tests.conftest import create_user, A_USERNAME, A_PASSWORD, is_user_index, is_anonymous_index, delete_users
 
 
 class MainViewTests(TestCase):
 
     @classmethod
     def setUpClass(cls):
-        User.objects.all().delete()
         cls.a_user = create_user()
-        super(MainViewTests, cls).setUpClass()
+
+    @classmethod
+    def tearDownClass(cls):
+        delete_users()
 
     """
     INDEX
@@ -72,8 +70,8 @@ class MainViewTests(TestCase):
         THEN return the notifications as a JSON payload
         """
         self.client.login(username=A_USERNAME, password=A_PASSWORD)
-        self.a_user.add_notification('test1', {'test': 1})
-        self.a_user.add_notification('test2', {'test': 2})
+        self.a_user.profile.add_notification('test1', {'test': 1})
+        self.a_user.profile.add_notification('test2', {'test': 2})
         payload_expected = {
             'names': ['test1', 'test2'],
             'data': [{'test': 1}, {'test': 2}],
@@ -114,12 +112,12 @@ class MainViewTests(TestCase):
         """
         self.client.login(username=A_USERNAME, password=A_PASSWORD)
         exported_file = export_file('test2.txt')
-        self.a_user.add_notification(f"export_practice_task_{exported_file.split('.')[1]}",
-                                     {'task_id': 'wewedsdf-wewe', 'file_name': exported_file})
+        self.a_user.profile.add_notification(f"export_practice_task_{exported_file.split('.')[1]}",
+                                             {'task_id': 'wewedsdf-wewe', 'file_name': exported_file})
 
         self.client.get(reverse('app:main.export', args=(exported_file,)))
 
-        self.assertEqual(len(self.a_user.notifications.all()), 0)
+        self.assertEqual(len(self.a_user.profile.notifications.all()), 0)
 
 
 def export_file(fname: str):

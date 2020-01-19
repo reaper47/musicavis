@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 import os
 from pathlib import Path
 import mimetypes
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -20,11 +21,13 @@ ROOT = Path(__file__).resolve().parent.parent
 EXPORTS_DIR = f'{ROOT}/app/frontend/static/app/exports'
 BASE_TEMPLATES_DIR = f'{ROOT}/app/frontend/templates/app'
 
+load_dotenv(f'{ROOT}/.env')
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 's=)#kyos2#deu*u(44@(!*3&)(zy=u3j4j$+a@!)df3cbcz!57'
+SECRET_KEY = os.environ.get('SECRET_KEY', 'you-will-never-guess')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -64,10 +67,6 @@ TEMPLATES = [
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
             BASE_TEMPLATES_DIR,
-            f'{BASE_TEMPLATES_DIR}/main',
-            f'{BASE_TEMPLATES_DIR}/auth',
-            f'{BASE_TEMPLATES_DIR}/contact',
-            f'{BASE_TEMPLATES_DIR}/legal',
         ],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -104,7 +103,7 @@ RQ_QUEUES = {
         'HOST': 'localhost',
         'PORT': 6379,
         'DB': 0,
-        #'PASSWORD': 'some-password',
+        # 'PASSWORD': 'some-password',
         'DEFAULT_TIMEOUT': 360,
     },
     'with-sentinel': {
@@ -118,7 +117,7 @@ RQ_QUEUES = {
         },
     },
     'high': {
-        'URL': os.getenv('REDISTOGO_URL', 'redis://localhost:6379/0'), # If you're on Heroku
+        'URL': os.getenv('REDISTOGO_URL', 'redis://localhost:6379/0'),  # If you're on Heroku
         'DEFAULT_TIMEOUT': 500,
     },
     'low': {
@@ -175,7 +174,7 @@ STATICFILES_DIRS = [
 # Session
 #
 
-SESSION_COOKIE_AGE = 60*60*24*30 # One month
+SESSION_COOKIE_AGE = 60*60*24*30  # One month
 
 SESSION_COOKIE_SECURE = False if DEBUG else True
 
@@ -194,8 +193,6 @@ WEBPACK_LOADER = {
     }
 }
 
-#AUTH_USER_MODEL = 'app.User'
-
 LOGIN_URL = '/login/'
 
 LOGIN_REDIRECT_URL = '/'
@@ -208,3 +205,34 @@ MIMETYPES.add_type('application/vnd.openxmlformats-officedocument.wordprocessing
 MIMETYPES.add_type('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', '.xlsx')
 MIMETYPES.add_type('application/vnd.oasis.opendocument.text', '.odt')
 MIMETYPES.add_type('application/vnd.oasis.opendocument.spreadsheet', '.ods')
+
+# Celery
+#
+
+BROKER_URL = 'redis://localhost:6379'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379'
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = TIME_ZONE
+
+CELERY_EMAIL_TASK_CONFIG = {
+    'queue': 'email',
+    'rate_limit': '50/m',
+    'name': 'djcelery_email_send',
+    'ignore_result': True,
+}
+
+# Email
+#
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = os.environ.get('MAIL_SERVER', 'smtp.googlemail.com')
+EMAIL_PORT = int(os.environ.get('MAIL_PORT', '587'))
+EMAIL_HOST_USER = os.environ.get('MAIL_USERNAME')
+EMAIL_HOST_PASSWORD = os.environ.get('MAIL_PASSWORD')
+EMAIL_USE_TLS = os.environ.get('MAIL_USE_TLS', True).lower() in ['true', 'on', '1']
+
+MUSICAVIS_ADMIN = os.environ.get('MUSICAVIS_ADMIN', 'macpoule@gmail.com')
+MUSICAVIS_MAIL_SUBJECT_PREFIX = '[Musicavis]'
+MUSICAVIS_MAIL_SENDER = f'Musicavis Admin <{MUSICAVIS_ADMIN}>'

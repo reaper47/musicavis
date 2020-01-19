@@ -1,8 +1,7 @@
-from django.urls import path, include
+from django.urls import path
 from django.contrib.auth import views as auth_views
 
 from app.backend.contact.views import contact_us
-from app.backend.auth.forms import LoginForm
 from app.backend.auth.views import login_view, signup_view
 from app.backend.main.views import (index_view, sitemap_view, notifications_route, download_file_route,
                                     pricing_view, features_view)
@@ -12,7 +11,6 @@ from app.backend.legal.views import privacy_view, terms_view
 app_name = 'app'
 urlpatterns = [
     path('', index_view, name='main.index'),
-    #path('', include('django.contrib.auth.urls')),
 
     path('export/<fname>/', download_file_route, name='main.export'),
     path('features/', features_view, name='main.features'),

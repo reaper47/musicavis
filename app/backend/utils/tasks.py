@@ -1,5 +1,8 @@
+from typing import List
 from rq import get_current_job
 from django_rq import job
+from celery.decorators import task
+from app.backend.utils.email import Mailer
 
 from app.models.task import Task
 
@@ -41,3 +44,14 @@ def _set_task_file_name(job, task, file_type, file_name=None):
             task.complete = True
 
         task.save()
+
+
+@task(name="Send Emails")
+def send_email(to: List[str], subject: str, template: str, template_args):
+    mail = Mailer()
+    mail.send_messages(
+        subject=subject,
+        template=template,
+        context=template_args,
+        to_emails=['macpoule@gmail.com']
+    )

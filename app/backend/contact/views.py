@@ -1,6 +1,6 @@
 from django.shortcuts import render
 
-from app.backend.contact.forms import ContactForm
+from .forms import ContactForm
 
 
 def contact_us(request):
@@ -12,4 +12,4 @@ def contact_us(request):
         form = ContactForm
 
     args = {'title': 'Contact Us', 'form': form}
-    return render(request, 'contact.html', args)
+    return render(request, 'contact/contact.html', args)

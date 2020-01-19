@@ -4,9 +4,8 @@ from django.test import TestCase
 from django.utils import timezone
 
 from app.backend.practice.dtos import PracticeDTO
-from app.models.user import User
-from app.models.practice import Practice, Instrument, Exercise, Goal, Improvement, Positive
-from app.tests.conftest import create_user, create_complete_practice
+from app.models.practice import Instrument, Exercise, Goal, Improvement, Positive
+from app.tests.conftest import create_user, create_complete_practice, delete_users
 
 A_GOAL = 'A nice goal'
 AN_EXERCISE = 'C-Arpeggio'
@@ -22,8 +21,11 @@ class PracticeDtoTests(TestCase):
 
     @classmethod
     def setUpClass(cls):
-        User.objects.all().delete()
-        super(PracticeDtoTests, cls).setUpClass()
+        cls.a_profile = create_user()
+
+    @classmethod
+    def tearDownClass(cls):
+        delete_users()
 
     def test_json_to_model_full(self):
         """
@@ -80,7 +82,7 @@ class PracticeDtoTests(TestCase):
         toast = 'A very nice message ^^'
         exercises = [Exercise(name=AN_EXERCISE, bpm_start=A_BPM, bpm_end=A_BPM, minutes=SOME_MINUTES),
                      Exercise(name=OTHER_EXERCISE, bpm_start=A_BPM, bpm_end=A_BPM, minutes=SOME_MINUTES)]
-        model = create_complete_practice(create_user(), exercises=exercises, instrument=Instrument(name='piano'),
+        model = create_complete_practice(self.a_profile, exercises=exercises, instrument=Instrument(name='piano'),
                                          goals=[Goal(name=A_GOAL)], improvements=[Improvement(name=AN_IMPROVEMENT)],
                                          positives=[Positive(name=A_POSITIVE)], notes='notes', date=timezone.now())
 
@@ -93,4 +95,3 @@ class PracticeDtoTests(TestCase):
                             {'name': OTHER_EXERCISE, 'bpm_start': A_BPM, 'bpm_end': A_BPM, 'minutes': SOME_MINUTES}],
                         'toast': toast}
         self.assertEqual(obj_expected, jsonable)
-

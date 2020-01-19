@@ -1,8 +1,6 @@
 from django import forms
-from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
-from app.models.user import User
-from django.core.validators import RegexValidator
+from django.contrib.auth.models import User
 from django.utils.safestring import mark_safe
 
 
@@ -30,10 +28,11 @@ class SignupForm(UserCreationForm):
     text = mark_safe('I agree to the <a href="/terms">Terms of Use</a> & <a href="/privacy">Privacy Policy</a>')
     agree_terms = forms.BooleanField(label=text, initial=False)
 
-    email_preferences = forms.IntegerField(widget=forms.HiddenInput())
+    password = forms.CharField(widget=forms.HiddenInput(), required=False)
+    date_joined = forms.CharField(widget=forms.HiddenInput(), required=False)
 
     def __init__(self, *args, **kwargs):
-        super(SignupForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.fields['username'].widget.attrs.update({'class': 'input', 'autofocus': 'autofocus'})
 
         for field in ['email', 'password1', 'password2']:
@@ -45,27 +44,25 @@ class SignupForm(UserCreationForm):
     def clean(self):
         cleaned_data = super().clean()
 
-        username = cleaned_data.get('username')
-        email = cleaned_data.get('email')
-        password = cleaned_data.get('password')
-        repeat_password = cleaned_data.get('repeat_password')
-        agree_terms = cleaned_data.get('agree_terms')
+        for field in ['username', 'email', 'password1', 'password2', 'agree_terms']:
+            if not cleaned_data.get(field):
+                raise forms.ValidationError('You must fill the fields, and agree to the terms of use.')
 
-        if not username or not email or not password or not repeat_password or not agree_terms:
-            raise forms.ValidationError('You must fill the fields, and agree to the terms of use.')
-
+        if User.objects.filter(email=cleaned_data.get('email')).first():
+            raise forms.ValidationError('Email already registerd.')
 
     def save(self, commit=True):
         user = super().save(commit=False)
-        user.email = self.cleaned_data['email']
-
-        if not self.cleaned_data['send_emails']:
-            user.email_preferences.features = False
-            user.email_preferences.practicing = False
-            user.email_preferences.promotions = False
 
         if commit:
             user.save()
+
+            if not self.cleaned_data['send_emails']:
+                user.profile.email_preferences.features = False
+                user.profile.email_preferences.practicing = False
+                user.profile.email_preferences.promotions = False
+                user.profile.email_preferences.save()
+
         return user
 
 

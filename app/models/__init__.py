@@ -1,5 +1,5 @@
-from .practice import *
-from .user import User
-from .notification import Notification
-from .task import Task
-from .email_preferences import EmailPreferences
+from .practice import *                          # noqa
+from .profile import Profile                     # noqa
+from .notification import Notification           # noqa
+from .task import Task                           # noqa
+from .email_preferences import EmailPreferences  # noqa

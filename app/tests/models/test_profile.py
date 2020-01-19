@@ -7,14 +7,13 @@ from django.test import TestCase
 
 from musicavis.settings import EXPORTS_DIR
 from app.models.practice import Instrument, Exercise
-from app.models.user import Profile
 from app.models.email_preferences import EmailPreferences
 from app.models.notification import Notification
 from app.backend.utils.enums import FileType, NewLine
 from app.backend.dashboard.stats import PracticeStats
 from app.tests.conftest import (create_user, create_user_with_a_practice, add_instruments_to_database,
-                                create_task, create_complete_practice, A_USERNAME, OTHER_USERNAME, A_PASSWORD,
-                                OTHER_PASSWORD, AN_EMAIL, OTHER_EMAIL, AN_INSTRUMENT, JobMock)
+                                create_task, create_complete_practice, A_USERNAME, A_PASSWORD,
+                                AN_EMAIL, OTHER_EMAIL, AN_INSTRUMENT, JobMock, delete_users)
 
 instruments = ['Cello', 'Violin']
 instrument1 = Instrument(name=instruments[0])
@@ -27,11 +26,10 @@ exercises3 = [Exercise(name='G', bpm_start=80, bpm_end=75, minutes=40),
               Exercise(name='H', bpm_start=80, bpm_end=75, minutes=60)]
 
 
-class UserModelTests(TestCase):
+class ProfileModelTests(TestCase):
 
     @classmethod
     def setUpClass(cls):
-        User.objects.all().delete()
         cls.a_user = create_user()
         cls.a_user_with_a_practice = create_user_with_a_practice()
 
@@ -40,21 +38,20 @@ class UserModelTests(TestCase):
         files = [f for f in os.listdir(EXPORTS_DIR)]
         for f in files:
             os.remove(f'{EXPORTS_DIR}/{f}')
+        delete_users()
 
     """
     GENERAL
     """
 
-    def test_attributes_are_lowercase(self):
+    def test_attributes_username_is_lowercase(self):
         """
         WHEN a user is created
         THEN it's name should be lowercase so that agent and Agent are the same user
         """
-        user = create_user(A_USERNAME.upper(), AN_EMAIL, A_PASSWORD)
+        self.assertTrue(self.a_user.username.islower())
 
-        self.assertTrue(user.username.islower())
-
-    def test_attributes_are_lowercase(self):
+    def test_attributes_email_is_lowercase(self):
         """
         WHEN a user is created
         THEN it's email should be lowercase
@@ -68,8 +65,8 @@ class UserModelTests(TestCase):
         WHEN a user's password is set
         THEN the password is hashed
         """
-        self.assertTrue(self.a_user.verify_password(A_PASSWORD))
-        self.assertFalse(self.a_user.verify_password(A_PASSWORD + '1234'))
+        self.assertTrue(self.a_user.profile.verify_password(A_PASSWORD))
+        self.assertFalse(self.a_user.profile.verify_password(A_PASSWORD + '1234'))
 
     def test_salts_are_random(self):
         """
@@ -85,17 +82,17 @@ class UserModelTests(TestCase):
         WHEN a user updates its email preferences
         THEN the email preferences are updated
         """
-        before_features = self.a_user.email_preferences.features
-        before_practicing = self.a_user.email_preferences.practicing
-        before_promotions = self.a_user.email_preferences.promotions
+        before_features = self.a_user.profile.email_preferences.features
+        before_practicing = self.a_user.profile.email_preferences.practicing
+        before_promotions = self.a_user.profile.email_preferences.promotions
 
-        self.a_user.update_email_preferences(accept_features=(not before_features),
-                                             accept_practicing=(not before_practicing),
-                                             accept_promotions=(not before_promotions))
+        self.a_user.profile.update_email_preferences(accept_features=(not before_features),
+                                                     accept_practicing=(not before_practicing),
+                                                     accept_promotions=(not before_promotions))
 
-        self.assertEqual(self.a_user.email_preferences.features, not before_features)
-        self.assertEqual(self.a_user.email_preferences.practicing, not before_practicing)
-        self.assertEqual(self.a_user.email_preferences.promotions, not before_promotions)
+        self.assertEqual(self.a_user.profile.email_preferences.features, not before_features)
+        self.assertEqual(self.a_user.profile.email_preferences.practicing, not before_practicing)
+        self.assertEqual(self.a_user.profile.email_preferences.promotions, not before_promotions)
 
     def test_stringify_models(self):
         """
@@ -113,7 +110,7 @@ class UserModelTests(TestCase):
         WHEN a user's gravatar url is assembled
         THEN the url generated is correct
         """
-        actual_digest = self.a_user.avatar(128)
+        actual_digest = self.a_user.profile.avatar(128)
 
         self.assertEqual(
             actual_digest, 'https://www.gravatar.com/avatar/1aedb8d9dc4751e229a335e371db8058?d=identicon&s=128'
@@ -128,12 +125,12 @@ class UserModelTests(TestCase):
         WHEN a practice session is created
         THEN add the new session to the user's list of practices
         """
-        npractices_before = len(self.a_user.practices.all())
+        npractices_before = len(self.a_user.profile.practices.all())
 
-        self.a_user.new_practice(AN_INSTRUMENT)
-        self.a_user.new_practice(AN_INSTRUMENT)
+        self.a_user.profile.new_practice(AN_INSTRUMENT)
+        self.a_user.profile.new_practice(AN_INSTRUMENT)
 
-        self.assertEqual(len(self.a_user.practices.all()), npractices_before + 2)
+        self.assertEqual(len(self.a_user.profile.practices.all()), npractices_before + 2)
 
     def test_add_new_practice_session_instrument_field(self):
         """
@@ -141,7 +138,7 @@ class UserModelTests(TestCase):
         THEN ensure the correct instrument is tied to the session
         """
         instrument = Instrument.objects.filter(name=AN_INSTRUMENT).first()
-        practice = User.objects.filter(username=self.a_user_with_a_practice.username).first().practices.all()[0]
+        practice = self.a_user_with_a_practice.profile.practices.first()
 
         self.assertEqual(practice.instrument_id, instrument.id)
 
@@ -150,12 +147,12 @@ class UserModelTests(TestCase):
         WHEN the practice session is deleted
         THEN ensure it is deleted in the database
         """
-        self.assertEqual(len(self.a_user_with_a_practice.practices.all()), 1)
+        self.assertEqual(len(self.a_user_with_a_practice.profile.practices.all()), 1)
 
-        a_practice = self.a_user_with_a_practice.practices.all()[0]
-        self.a_user_with_a_practice.delete_practice(a_practice)
+        a_practice = self.a_user_with_a_practice.profile.practices.all()[0]
+        self.a_user_with_a_practice.profile.delete_practice(a_practice)
 
-        self.assertEqual(len(self.a_user_with_a_practice.practices.all()), 0)
+        self.assertEqual(len(self.a_user_with_a_practice.profile.practices.all()), 0)
 
     def test_delete_practice_session_bad_user(self):
         """
@@ -163,12 +160,12 @@ class UserModelTests(TestCase):
         WHEN a user attempts to delete the other user's practice
         THEN do not delete the other user's practice session
         """
-        self.a_user.new_practice(AN_INSTRUMENT)
+        self.a_user.profile.new_practice(AN_INSTRUMENT)
 
-        self.a_user.delete_practice(self.a_user_with_a_practice.practices.all()[0])
+        self.a_user.profile.delete_practice(self.a_user_with_a_practice.profile.practices.all()[0])
 
-        self.assertEqual(len(self.a_user.practices.all()), 1)
-        self.assertEqual(len(self.a_user_with_a_practice.practices.all()), 1)
+        self.assertEqual(len(self.a_user.profile.practices.all()), 1)
+        self.assertEqual(len(self.a_user_with_a_practice.profile.practices.all()), 1)
 
     def test_instruments_practiced(self):
         """
@@ -295,7 +292,7 @@ class UserModelTests(TestCase):
         username = self.a_user_with_a_practice.username
         fnames_expected = [f'{username}_practices_{timezone.now():%d%m%y}.{x.value}' for x in FileType]
 
-        fnames = [self.a_user_with_a_practice.export_practices(NewLine.UNIX, x) for x in FileType]
+        fnames = [self.a_user_with_a_practice.profile.export_practices(NewLine.UNIX, x) for x in FileType]
 
         self.assertTrue(all([x == y for x, y in zip(fnames_expected, fnames)]))
 
@@ -305,9 +302,9 @@ class UserModelTests(TestCase):
         WHEN getting its practice stats
         THEN a PracticeStats object is returned
         """
-        stats = self.a_user_with_a_practice.get_practice_stats()
+        stats = self.a_user_with_a_practice.profile.get_practice_stats()
 
-        self.assertTrue(isinstance(stats, PracticeStats))
+        self.assertIsInstance(stats, PracticeStats)
 
     def test_get_practice_stats_no_practice(self):
         """
@@ -315,7 +312,7 @@ class UserModelTests(TestCase):
         WHEN getting its practice stats
         THEN nothing is returned
         """
-        stats = self.a_user.get_practice_stats()
+        stats = self.a_user.profile.get_practice_stats()
 
         self.assertIsNone(stats)
 
@@ -331,7 +328,7 @@ class UserModelTests(TestCase):
         practice2 = create_complete_practice(self.a_user, instrument2, now, exercises2)
         practice3 = create_complete_practice(self.a_user, instrument1, date1, exercises3)
         for practice in [practice1, practice2, practice3]:
-            self.a_user.practices.add(practice)
+            self.a_user.profile.practices.add(practice)
         datasets_expected = {
             instruments[0]: [
                 {'length': 100, 'date': f'{date1:%Y%m%d}'}, {'length': 0, 'date': f'{now - timedelta(days=2):%Y%m%d}'},
@@ -344,11 +341,10 @@ class UserModelTests(TestCase):
         }
         dates_expected = [f'{date1:%Y%m%d}', f'{date1 + timedelta(days=1):%Y%m%d}', f'{date2:%Y%m%d}', f'{now:%Y%m%d}']
 
-        data = self.a_user.practice_graph_data()
+        data = self.a_user.profile.practice_graph_data()
 
         self.assertEqual(data.sets, datasets_expected)
         self.assertEqual(data.dates, dates_expected)
-
 
     """
     NOTIFICATIONS
@@ -359,7 +355,7 @@ class UserModelTests(TestCase):
         WHEN a notification is added to the user
         THEN a notification of the same name is added to the database
         """
-        self.a_user.add_notification('test', {'task_id': 1})
+        self.a_user.profile.add_notification('test', {'task_id': 1})
 
         self.assertEqual(len(Notification.objects.all()), 1)
         self.assertEqual(Notification.objects.all()[0].name, 'test')
@@ -369,8 +365,8 @@ class UserModelTests(TestCase):
         WHEN two notifications of the same name are added to the user
         THEN only the latest one is associated with the user
         """
-        self.a_user.add_notification('test', {'task_id': 1})
-        self.a_user.add_notification('test', {'task_id': 2})
+        self.a_user.profile.add_notification('test', {'task_id': 1})
+        self.a_user.profile.add_notification('test', {'task_id': 2})
 
         self.assertEqual(len(Notification.objects.all()), 1)
         self.assertEqual(Notification.objects.all()[0].name, 'test')
@@ -379,7 +375,7 @@ class UserModelTests(TestCase):
     TASKS
     """
 
-    @mock.patch('app.models.user.export_practices')
+    @mock.patch('app.models.profile.export_practices')
     def test_launch_task_enqueue(self, mock_rq):
         """
         WHEN launching a task
@@ -387,7 +383,7 @@ class UserModelTests(TestCase):
         """
         mock_rq.delay.return_value = JobMock()
 
-        self.a_user.launch_task('name', 'description')
+        self.a_user.profile.launch_task('name', 'description')
 
         self.assertTrue(mock_rq.delay.called)
 
@@ -397,11 +393,11 @@ class UserModelTests(TestCase):
         WHEN getting tasks in progress
         THEN return the tasks in progress
         """
-        progress1 = create_task('ert', 'test1', 'testing1', self.a_user)
-        progress2 = create_task('tre', 'test1', 'testing2', self.a_user)
-        complete = create_task('tyu', 'test2', 'testing2', self.a_user, True)
+        progress1 = create_task('ert', 'test1', 'testing1', self.a_user.profile)
+        progress2 = create_task('tre', 'test1', 'testing2', self.a_user.profile)
+        complete = create_task('tyu', 'test2', 'testing2', self.a_user.profile, True)  # noqa
 
-        tasks = self.a_user.get_tasks_in_progress()
+        tasks = self.a_user.profile.get_tasks_in_progress()
 
         self.assertEqual(len(tasks), 2)
         self.assertTrue(all([x in tasks for x in [progress1, progress2]]))
@@ -412,10 +408,10 @@ class UserModelTests(TestCase):
         WHEN getting a task in progress
         THEN return the first task in progress
         """
-        progress1 = create_task('ert', 'test1', 'testing1', self.a_user)
-        progress2 = create_task('tre', 'test1', 'testing2', self.a_user)
-        complete = create_task('tyu', 'test2', 'testing2', self.a_user, True)
+        progress1 = create_task('ert', 'test1', 'testing1', self.a_user.profile)
+        progress2 = create_task('tre', 'test1', 'testing2', self.a_user.profile)       # noqa
+        complete = create_task('tyu', 'test2', 'testing2', self.a_user.profile, True)  # noqa
 
-        task = self.a_user.get_task_in_progress('test1')
+        task = self.a_user.profile.get_task_in_progress('test1')
 
-        assert task == progress1
+        self.assertEqual(task, progress1)

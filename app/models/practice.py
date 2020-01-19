@@ -5,7 +5,7 @@ from django.utils import timezone
 
 
 class Practice(models.Model):
-    user_object = models.ForeignKey('User', on_delete=models.CASCADE)
+    user_profile = models.ForeignKey('Profile', on_delete=models.CASCADE)
     date = models.DateTimeField(default=timezone.now)
     instrument = models.ForeignKey('Instrument', on_delete=models.CASCADE)
     goals = models.ManyToManyField('Goal')

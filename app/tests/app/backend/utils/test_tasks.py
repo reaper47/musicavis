@@ -1,17 +1,17 @@
 from django.test import TestCase
 
-from app.models.user import User
-from app.backend.utils.tasks import export_practices
+from app.tests.conftest import create_user, delete_users
 
 
-class PracticeModelTests(TestCase):
+class TasksModelTests(TestCase):
 
     @classmethod
     def setUpClass(cls):
-        for user in User.objects.all():
-            user.delete()
-        cls.a_user = create_user()
-        super(UserModelTests, cls).setUpClass()
+        cls.a_profile = create_user()
+
+    @classmethod
+    def tearDownClass(cls):
+        delete_users()
 
     '''
     @mock.patch('polls.models.user.export_practices')

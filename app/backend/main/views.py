@@ -1,13 +1,12 @@
 import os
-import tempfile
 
 from django.shortcuts import render
 from django.contrib.auth.models import AnonymousUser
 from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse, FileResponse, StreamingHttpResponse
+from django.http import JsonResponse, StreamingHttpResponse
 
 from musicavis.settings import EXPORTS_DIR, MIMETYPES
-from app.models.notification import Notification
+from app.models.profile import get_profile_from_user
 from app.backend.utils.export import FileDeleteWrapper
 
 
@@ -20,28 +19,29 @@ def index_view(request):
     else:
         args = {'title': 'Home'}
 
-    return render(request, 'index.html', args)
+    return render(request, 'main/index.html', args)
 
 
 def sitemap_view(request):
     args = {'title': 'Sitemap Map'}
-    return render(request, 'sitemap.html', args)
+    return render(request, 'main/sitemap.html', args)
 
 
 def pricing_view(request):
     args = {'title': 'Pricing'}
-    return render(request, 'pricing.html', args)
+    return render(request, 'main/pricing.html', args)
 
 
 def features_view(request):
     args = {'title': 'Product Features'}
-    return render(request, 'features.html', args)
+    return render(request, 'main/features.html', args)
 
 
 @login_required
 def notifications_route(request):
     since = request.GET.get('since', 0.0)
-    all_notifications = (request.user.notifications
+    profile = get_profile_from_user(request.user)
+    all_notifications = (profile.notifications
                          .filter(timestamp__gte=since)
                          .order_by('timestamp'))
 
@@ -56,7 +56,8 @@ def notifications_route(request):
 @login_required
 def download_file_route(request, fname):
     name = f"export_practice_task_{fname.split('.')[1]}"
-    request.user.notifications.filter(name=name).delete()
+    profile = get_profile_from_user(request.user)
+    profile.notifications.filter(name=name).delete()
 
     filepath = f'{EXPORTS_DIR}/{fname}'
     chunksize = 16384

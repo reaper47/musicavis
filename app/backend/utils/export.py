@@ -100,8 +100,8 @@ class ExportPractices:
                 header = f'{practice.date},{practice.instrument.name.title()}'
                 goals = 'goals: ' + ','.join([x.name for x in practice.goals.all()])
                 exercises = 'exercises: ' + f',{self.newline}\t\t\t'.join([(f'{x.name},{x.bpm_start}bpm,{x.bpm_end}'
-                                                                      f'bpm,{x.minutes}m')
-                                                                     for x in practice.exercises.all()])
+                                                                            f'bpm,{x.minutes}m')
+                                                                           for x in practice.exercises.all()])
                 improvements = 'improvements: ' + ','.join([x.name for x in practice.improvements.all()])
                 positives = 'positives: ' + ','.join([x.name for x in practice.positives.all()])
 

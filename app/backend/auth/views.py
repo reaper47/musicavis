@@ -9,9 +9,11 @@ from django.shortcuts import render
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.cache import never_cache
 from django.urls import reverse
+from django.utils import timezone
 
 from musicavis.settings import LOGIN_REDIRECT_URL
-from app.backend.auth.forms import LoginForm, SignupForm
+from .forms import LoginForm, SignupForm
+from app.backend.main.views import index_view
 
 
 @csrf_protect
@@ -53,24 +55,27 @@ def login_view(request, redirect_field_name=REDIRECT_FIELD_NAME, login_form=Logi
         'site': current_site,
         'site_name': current_site.name
     }
-    return render(request, 'login.html', args)
+    return render(request, 'auth/login.html', args)
 
 
 @csrf_protect
 @never_cache
 def signup_view(request):
+    if request.user.is_authenticated:
+        return HttpResponseRedirect(reverse('app:main.index'))
+
     form = SignupForm()
     if request.method == 'POST':
-        form = SignupForm(data=request.POST)
-        print(form.errors)
+        data = request.POST.copy()
+        data['date_joined'] = timezone.now()
+        data['password'] = data['password1']
+
+        form = SignupForm(data=data)
         if form.is_valid():
-            print('fuck')
             user = form.save()
-            print(user.email_preferences)
-
-            #user.refresh_from_db()
-
-            return HttpResponseRedirect(reverse('app:main.index'))
+            user.refresh_from_db()
+            login(request, user)
+            return index_view(request)
 
     args = {'title': 'Sign Up', 'hide_nav': True, 'form': form}
-    return render(request, 'signup.html', args)
+    return render(request, 'auth/signup.html', args)

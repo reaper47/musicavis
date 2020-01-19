@@ -2,18 +2,19 @@ from django.test import TestCase
 
 import app.tests.app.backend.practice.test_dtos as dtos
 from app.backend.practice.dtos import PracticeDTO
-from app.models.user import User
 from app.models.practice import Goal, Improvement, Positive, Exercise, Practice
-from app.tests.conftest import create_practice, create_user_with_a_practice, AN_INSTRUMENT
+from app.tests.conftest import create_user, create_user_with_a_practice, AN_INSTRUMENT, delete_users
 
 
 class PracticeModelTests(TestCase):
 
     @classmethod
     def setUpClass(cls):
-        User.objects.all().delete()
         cls.a_user_with_a_practice = create_user_with_a_practice()
-        super(PracticeModelTests, cls).setUpClass()
+
+    @classmethod
+    def tearDownClass(cls):
+        delete_users()
 
     def test_models_equality_name_property(self):
         """
@@ -40,7 +41,7 @@ class PracticeModelTests(TestCase):
         exercises = [Exercise(name=chr(ord('A') + i), bpm_start=i, bpm_end=i, minutes=25) for i in range(5)]
         for exercise in exercises:
             exercise.save()
-        practice = create_practice()
+        practice = create_user().profile.new_practice(AN_INSTRUMENT)
         practice.exercises.add(*exercises)
         formatted_time_expected = '2h05'
 
@@ -54,7 +55,7 @@ class PracticeModelTests(TestCase):
         WHEN the total practice time is formatted
         THEN the time is formatted but null
         """
-        practice = create_practice()
+        practice = create_user().profile.new_practice(AN_INSTRUMENT)
         formatted_time_expected = '0h00'
 
         formatted_time_actual = practice.format_total_practice_time()
@@ -67,7 +68,7 @@ class PracticeModelTests(TestCase):
         WHEN the practice session in the database is updated with the model
         THEN update the practice correctly
         """
-        old_model = Practice.objects.filter(user_object=self.a_user_with_a_practice).first()
+        old_model = self.a_user_with_a_practice.profile.practices.first()
         new_practice = PracticeDTO(
             [Goal(name=dtos.A_GOAL)],
             [Exercise(name=dtos.AN_EXERCISE, bpm_start=dtos.A_BPM, bpm_end=dtos.A_BPM, minutes=dtos.SOME_MINUTES)],
@@ -93,7 +94,7 @@ class PracticeModelTests(TestCase):
         WHEN each model is stringified
         THEN each model is formatted as intended
         """
-        practice = self.a_user_with_a_practice.practices.first()
+        practice = self.a_user_with_a_practice.profile.practices.first()
         models = [(practice, f'#{practice.pk} - {practice.date}'),
                   (Exercise(name='test'), f'test - [None,None] (None)'),
                   (practice.instrument, f'{practice.instrument.name}'),
@@ -106,18 +107,18 @@ class PracticeModelTests(TestCase):
 
     def test_total_practice_time(self):
         """
-        GIVEN a user with 2 exercises,
+        GIVEN a profile with 2 exercises,
         WHEN the 'total_practice_time' property is accessed
         THEN the total practice time is summed
         """
         length1, length2 = 50, 70
-        practice = self.a_user_with_a_practice.practices.first()
+        practice = self.a_user_with_a_practice.profile.practices.first()
         exercises = [('C', 80, 75, length1), ('D', 95, 70, length2)]
         for name, start, end, min in exercises:
             exercise = Exercise(name=name, bpm_start=start, bpm_end=end, minutes=min)
             exercise.save()
             practice.exercises.add(exercise)
 
-        length = self.a_user_with_a_practice.practices.first().length
+        length = self.a_user_with_a_practice.profile.practices.first().length
 
         self.assertEqual(length, length1 + length2)

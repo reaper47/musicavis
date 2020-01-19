@@ -16,7 +16,6 @@ class LegalViewsTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTrue(all([x.encode() in response.content for x in data]))
 
-
     def test_terms(self):
         """
         WHEN requesting the terms of use

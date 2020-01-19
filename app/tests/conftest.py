@@ -1,5 +1,6 @@
+from django.contrib.auth.models import User
+
 from app.models.practice import Practice, Instrument
-from app.models.user import User
 from app.models.task import Task
 
 A_USERNAME = 'test'
@@ -13,18 +14,22 @@ AN_INSTRUMENT = 'Piano'
 
 
 """
-USER
+PROFILE
 """
 
 
-def create_user(username=A_USERNAME, email=AN_EMAIL, password=A_PASSWORD) -> User:
-    return User.objects.create_user(username=username, email=email, password=password)
+def delete_users():
+    User.objects.all().delete()
 
 
-def create_user_with_a_practice() -> User:
-    user = create_user(OTHER_USERNAME, OTHER_EMAIL, OTHER_PASSWORD)
-    practice = create_practice(user)
-    user.practices.add(practice)
+def create_user(username=A_USERNAME, email=AN_EMAIL, password=A_PASSWORD):
+    return User.objects.create_user(username, email, password)
+
+
+def create_user_with_a_practice():
+    user = User.objects.create_user(OTHER_USERNAME, OTHER_EMAIL, OTHER_PASSWORD)
+    practice = create_practice(user=user)
+    user.profile.practices.add(practice)
     return user
 
 
@@ -32,10 +37,11 @@ def create_user_with_a_practice() -> User:
 PRACTICE
 """
 
+
 def create_practice(user=None) -> Practice:
     user = user if user else create_user(A_USERNAME, AN_EMAIL, A_PASSWORD)
     instrument = create_instrument(AN_INSTRUMENT)
-    practice = Practice(user_object=user, instrument=instrument)
+    practice = Practice(user_profile=user.profile, instrument=instrument)
     practice.save()
     return practice
 
@@ -44,7 +50,7 @@ def create_complete_practice(user, instrument, date, exercises=None, goals=None,
                              improvements=None, positives=None, notes=''):
     instrument.save()
 
-    practice = Practice(user_object=user, date=date, instrument=instrument, notes=notes)
+    practice = Practice(user_profile=user.profile, date=date, instrument=instrument, notes=notes)
     practice.save()
 
     if exercises:
@@ -83,9 +89,11 @@ def add_instruments_to_database():
         instrument = Instrument(name=name)
         instrument.save()
 
+
 """
 TASKS
 """
+
 
 class JobMock:
 
@@ -96,8 +104,8 @@ class JobMock:
         return self.id
 
 
-def create_task(id, name, description, user, complete=False):
-    task = Task(id=id, name=name, description=description, user_object=user, complete=complete)
+def create_task(id, name, description, profile, complete=False):
+    task = Task(id=id, name=name, description=description, user_profile=profile, complete=complete)
     task.save()
     return task
 

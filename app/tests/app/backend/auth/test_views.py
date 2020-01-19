@@ -1,9 +1,10 @@
 from django.test import TestCase
 from django.urls import reverse
+from django.contrib.auth.models import User
 
-from app.models.user import User
+from app.models.email_preferences import EmailPreferences
 from app.tests.conftest import (create_user, A_USERNAME, A_PASSWORD, OTHER_USERNAME, OTHER_EMAIL,
-                                is_user_index, is_login_form, is_signup_form)
+                                is_user_index, is_login_form, is_signup_form, delete_users)
 from app.tests.app.backend.auth.utils import login_post, register_post
 
 
@@ -11,9 +12,11 @@ class AuthViewsTests(TestCase):
 
     @classmethod
     def setUpClass(cls):
-        User.objects.all().delete()
         cls.a_user = create_user()
-        super(AuthViewsTests, cls).setUpClass()
+
+    @classmethod
+    def tearDownClass(cls):
+        delete_users()
 
     """
     LOGIN TESTS
@@ -84,9 +87,10 @@ class AuthViewsTests(TestCase):
         THEN create a new account
         AND the user is logged in
         """
-        response = register_post(self.client, OTHER_USERNAME, OTHER_EMAIL, A_PASSWORD, A_PASSWORD)
+        response = register_post(self.client, OTHER_USERNAME, OTHER_EMAIL, A_PASSWORD, A_PASSWORD, send_emails=False)
 
         self.assertEqual(response.status_code, 200)
+
         self.assertTrue(is_user_index(response))
 
     def test_register_disagree_terms(self):
@@ -99,19 +103,19 @@ class AuthViewsTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.request['PATH_INFO'], reverse('app:auth.signup'))
 
-    '''
-    def test_register_disagree_emails(test_client, init_database):
+    def test_register_disagree_emails(self):
         """
         WHEN a user does not agree to receiving emails
         THEN the user's email preferences are all null
         """
-        response = register(test_client, OTHER_USERNAME, OTHER_EMAIL, A_PASSWORD, A_PASSWORD, send_emails=False)
+        response = register_post(self.client, OTHER_USERNAME, 'boo@ah.oops', A_PASSWORD, A_PASSWORD, send_emails=False)
 
-        user = User.query.filter_by(username=OTHER_USERNAME).first()
-        assert response.status_code == 200
-        assert user.email_preferences == EmailPreferences(False, False, False)
+        user = User.objects.get(username=OTHER_USERNAME)
+        email_preferences_expected = EmailPreferences(features=False, practicing=False, promotions=False)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(user.profile.email_preferences, email_preferences_expected)
 
-
+    '''
     @mock.patch(MOCK_CONFIRM_EMAIL)
     def test_register_new_user_send_confirmation_email(mock_email, test_client, init_database):
         """
@@ -122,24 +126,25 @@ class AuthViewsTests(TestCase):
 
         assert mock_email.called
         assert b'account confirmation' in response.data
+    '''
 
-
-    def test_register_if_already_logged_in(test_client, a_user_logged_in):
+    def test_register_if_already_logged_in(self):
         """
         WHEN the user attempts to access the register page
         THEN the user is redirected
         """
-        response = test_client.get('/signup')
+        self.client.login(username=A_USERNAME, password=A_PASSWORD)
 
-        assert response.status_code == 302
-        assert is_index(response)
+        response = self.client.get(reverse('app:auth.signup'))
 
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(response.url, reverse('app:main.index'))
 
     """
     LOGOUT TESTS
     """
 
-
+    '''
     def test_logout(test_client, a_user_logged_in):
         """
         WHEN the user logouts

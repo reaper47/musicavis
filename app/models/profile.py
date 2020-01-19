@@ -7,9 +7,9 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.contrib.auth.hashers import check_password
 from django.utils import timezone
-import django_rq
+from django.dispatch import receiver
+from django.db.models.signals import post_save
 
-from .validators import UsernameValidator
 from .practice import Practice, Instrument
 from .email_preferences import EmailPreferences
 from .notification import Notification
@@ -21,19 +21,24 @@ from ..backend.dashboard.stats import PracticeStats
 from ..backend.utils.namedtuples import PracticeGraphData
 
 
+def get_profile_from_user(user: User):
+    return Profile.objects.get(user=user)
+
+
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     practices = models.ManyToManyField('Practice')
     email_preferences = models.ForeignKey('EmailPreferences', on_delete=models.CASCADE)
     notifications = models.ManyToManyField('Notification')
+    is_confirmed = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
-        self.username = self.username.lower()
-        self.email = self.email.lower()
+        if not hasattr(self, 'email_preferences'):
+            self.user.email = self.user.email.lower()
 
-        email_preferences = EmailPreferences(features=True, practicing=True, promotions=True)
-        email_preferences.save()
-        self.email_preferences = email_preferences
+            email_preferences = EmailPreferences(features=True, practicing=True, promotions=True)
+            email_preferences.save()
+            self.email_preferences = email_preferences
 
         return super().save(*args, **kwargs)
 
@@ -42,7 +47,7 @@ class Profile(models.Model):
     """
 
     def verify_password(self, password: str) -> bool:
-        return check_password(password, self.password)
+        return check_password(password, self.user.password)
 
     def update_email_preferences(self, accept_features: bool, accept_practicing: bool, accept_promotions: bool):
         self.email_preferences.features = accept_features
@@ -50,18 +55,18 @@ class Profile(models.Model):
         self.email_preferences.promotions = accept_promotions
 
     def avatar(self, size):
-        digest = md5(self.email.lower().encode('utf-8')).hexdigest()
+        digest = md5(self.user.email.encode('utf-8')).hexdigest()
         return f'https://www.gravatar.com/avatar/{digest}?d=identicon&s={size}'
 
     def add_notification(self, name, data):
         self.notifications.all().filter(name=name).delete()
-        notification = Notification(name=name, payload_json=json.dumps(data), user_object=self)
+        notification = Notification(name=name, payload_json=json.dumps(data), user_profile=self)
         notification.save()
         self.notifications.add(notification)
         return notification
 
     def __str__(self):
-        return self.username
+        return self.user.username
 
     """
     PRACTICE
@@ -73,17 +78,17 @@ class Profile(models.Model):
             instrument = Instrument(name=instrument_name)
             instrument.save()
 
-        practice = Practice(user_object=self, instrument=instrument)
+        practice = Practice(user_profile=self, instrument=instrument)
         practice.save()
         self.practices.add(practice)
         return practice
 
     def delete_practice(self, practice: Practice):
-        if practice.user_object == self:
+        if practice.user_profile == self:
             practice.delete()
 
     def export_practices(self, os: NewLine, filetype: FileType):
-        export_practices = ExportPractices(self.username, self.practices.all(), os)
+        export_practices = ExportPractices(self.user.username, self.practices.all(), os)
         return export_practices.export(filetype)
 
     def get_practice_stats(self):
@@ -120,7 +125,20 @@ class Profile(models.Model):
         export_practices.delay(self, name, description)
 
     def get_tasks_in_progress(self):
-        return Task.objects.filter(user_object=self, complete=False).all()
+        return Task.objects.filter(user_profile=self, complete=False).all()
 
     def get_task_in_progress(self, name):
-        return Task.objects.filter(name=name, user_object=self, complete=False).first()
+        return Task.objects.filter(name=name, user_profile=self, complete=False).first()
+
+
+@receiver(post_save, sender=User)
+def update_profile_signal(sender, instance, created, **kwargs):
+    if created:
+        Profile.objects.create(user=instance)
+        instance.email = instance.email.lower()
+
+        email_preferences = EmailPreferences(features=True, practicing=True, promotions=True)
+        email_preferences.save()
+        instance.email_preferences = email_preferences
+
+    instance.profile.save()

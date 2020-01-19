@@ -1,13 +1,15 @@
 from django.test import TestCase
+from django.contrib.auth.models import User
 
 from app.backend.auth.forms import SignupForm
+from app.tests.conftest import create_user
 
 
 class AuthFormsTests(TestCase):
 
     def setUp(self):
-        self.data = dict(username='username', email='email@email.com', password1='password',
-                         password2='password', send_emails=False, agree_terms=True)
+        self.data = dict(username='username', email='email@email.com', password1='helloworld!',
+                         password2='helloworld!', send_emails=False, agree_terms=True)
 
     """
     SIGN UP
@@ -31,3 +33,21 @@ class AuthFormsTests(TestCase):
 
         for form in forms:
             self.assertFalse(form.is_valid())
+
+    def test_signup_form_email_registered(self):
+        """
+        GIVEN a registed user
+        WHEN a new user registers with a registered email address
+        THEN the form is not valid
+        AND the user has no account
+        """
+        user = create_user()
+        username = user.username + 'a'
+        data = self.data.copy()
+        data['username'] = username
+        data['email'] = user.email
+
+        form = SignupForm(data=data)
+
+        self.assertFalse(form.is_valid())
+        self.assertIsNone(User.objects.filter(username=username).first())

@@ -9,16 +9,13 @@ class EnumsTests(TestCase):
 
         self.assertEqual(file_types_expected, [x for x in FileType])
 
-
     def test_filetype_fromstring_not_implemented(self):
         with self.assertRaises(NotImplementedError):
             FileType.from_string('gif')
 
-
     def test_filetype_description_not_implemented(self):
         with self.assertRaises(NotImplementedError):
             FileType.description('gif')
-
 
     def test_newline_fromstring(self):
         unix = ['linux', 'mac', 'x11']
