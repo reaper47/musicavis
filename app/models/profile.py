@@ -9,13 +9,16 @@ from django.contrib.auth.hashers import check_password
 from django.utils import timezone
 from django.dispatch import receiver
 from django.db.models.signals import post_save
+from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
+from itsdangerous.exc import BadSignature
 
+from musicavis.settings import SECRET_KEY
 from .practice import Practice, Instrument
 from .email_preferences import EmailPreferences
 from .notification import Notification
 from .task import Task
 from ..backend.utils.tasks import export_practices
-from ..backend.utils.enums import FileType, NewLine
+from ..backend.utils.enums import FileType, NewLine, TokenType
 from ..backend.utils.export import ExportPractices
 from ..backend.dashboard.stats import PracticeStats
 from ..backend.utils.namedtuples import PracticeGraphData
@@ -53,6 +56,7 @@ class Profile(models.Model):
         self.email_preferences.features = accept_features
         self.email_preferences.practicing = accept_practicing
         self.email_preferences.promotions = accept_promotions
+        self.email_preferences.save()
 
     def avatar(self, size):
         digest = md5(self.user.email.encode('utf-8')).hexdigest()
@@ -129,6 +133,43 @@ class Profile(models.Model):
 
     def get_task_in_progress(self, name):
         return Task.objects.filter(name=name, user_profile=self, complete=False).first()
+
+    """
+    TOKENS
+    """
+
+    def generate_token(self, token_type: TokenType, expires_in=600) -> str:
+        serializer = Serializer(SECRET_KEY, expires_in)
+        return serializer.dumps({token_type.value: self.user.pk}).decode('utf-8')
+
+    @staticmethod
+    def reset_password(token: str, new_password: str) -> bool:
+        user = get_user_from_token(token, TokenType.RESET)
+        if not user:
+            return False
+
+        user.set_password(new_password)
+        user.save()
+        return True
+
+    def confirm(self, token: str) -> bool:
+        user = get_user_from_token(token, TokenType.CONFIRM)
+        if not user or user.pk != self.user.pk:
+            return False
+
+        user.is_active = True
+        user.save()
+        return True
+
+
+def get_user_from_token(token: str, token_type: TokenType) -> User:
+    try:
+        serializer = Serializer(SECRET_KEY)
+        data = serializer.loads(token.encode('utf-8'))
+        user_pk = data.get(token_type.value)
+        return User.objects.get(pk=user_pk) if user_pk else None
+    except BadSignature:
+        return None
 
 
 @receiver(post_save, sender=User)

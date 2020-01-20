@@ -5,7 +5,18 @@ import '../styles/dropdown.css'
 import '../styles/practice.css'
 import '../styles/profile.css'
 import '../styles/tools.css'
-const bulma = require('bulma')
+require('animate.css')
+
+const bulma = require('bulma');
+import { toast } from 'bulma-toast';
 
 
-console.log("Welcome! Greetings from app.js. Let's learn Webpack2");
+function hi() {
+    console.log("I am damn called!");
+}
+
+export {
+    hi,
+    toast
+}
+

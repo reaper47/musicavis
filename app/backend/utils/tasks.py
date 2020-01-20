@@ -2,8 +2,8 @@ from typing import List
 from rq import get_current_job
 from django_rq import job
 from celery.decorators import task
-from app.backend.utils.email import Mailer
 
+from app.backend.utils.email import Mailer
 from app.models.task import Task
 
 

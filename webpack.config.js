@@ -6,11 +6,14 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 module.exports = {
   context: __dirname,
-  entry: './app/frontend/static/app/assets/js/index',
+  entry: {
+    main: ['@babel/polyfill', './app/frontend/static/app/assets/js/index']
+  },
   output: {
       path: path.resolve('./app/frontend/static/app/assets/bundles/'),
       publicPath: '/static/assets/bundles/',
-      filename: "[name].js"
+      filename: "[name].js",
+      libraryTarget: "global"
   },
   module: {
     rules: [
@@ -27,6 +30,14 @@ module.exports = {
           'sass-loader',
         ],
       },
+      {
+        test: /\.js?$/,
+        exclude: /node_modules/,
+        loader: 'babel-loader',
+        query: {
+          presets: ['@babel/preset-env']
+        }
+      }
     ],
   },
   plugins: [
@@ -34,6 +45,6 @@ module.exports = {
     new MiniCssExtractPlugin({
       filename: '[name].css',
       chunkFilename: '[id].css',
-    })
+    }),
   ]
 }

@@ -145,7 +145,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
 
@@ -236,3 +235,8 @@ EMAIL_USE_TLS = os.environ.get('MAIL_USE_TLS', True)
 MUSICAVIS_ADMIN = os.environ.get('MUSICAVIS_ADMIN', 'macpoule@gmail.com')
 MUSICAVIS_MAIL_SUBJECT_PREFIX = '[Musicavis]'
 MUSICAVIS_MAIL_SENDER = f'Musicavis Admin <{MUSICAVIS_ADMIN}>'
+
+if DEBUG:
+    BASE_URL = 'http://127.0.0.1:8000'
+else:
+    BASE_URL = 'https://www.musicavis.ca'

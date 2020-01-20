@@ -1,11 +1,11 @@
-Dear {{ user.username.title() }},
+Dear {{ username }},
 
 You have requested a new confirmation link. To confirm your account, please click the following link:
-{{ url_for('auth.confirm', token=token, _external=True) }}
+{{ confirm_url }}
 
 You will receive an email following confirmation. Otherwise, the link might have expired.
 Click the following link to receive a fresh account confirmation:
-{{ url_for('auth.resend_confirm', token=token, _external=True) }}
+{{ resend_url }}
 
 Sincerely,
 The Musicavis Team

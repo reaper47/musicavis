@@ -1,6 +1,6 @@
-<p>Dear {{ user.username.title() }},</p>
-<p>You have requested a new confirmation link. To confirm your account, please <a href="{{ url_for('auth.confirm', token=token, _external=True) }}">click here</a>.</p>
+<p>Dear {{ username }},</p>
+<p>You have requested a new confirmation link. To confirm your account, please <a href="{{ confirm_url }}" target="_blank">click here</a>.</p>
 <p>You will receive an email following confirmation. Otherwise, the link might have expired.<br>
-Please <a href="{{ url_for('auth.resend_confirm', token=token, _external=True) }}">click here</a> to send a fresh account confirmation.</p>
+Please <a href="{{ resend_url }}" target="_blank">click here</a> to send a fresh account confirmation.</p>
 <p>Sincerely,<br>The Musicavis Team</p>
 <p><small>Note: replies to this email address are not monitored.</small></p>

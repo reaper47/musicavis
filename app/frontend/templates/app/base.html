@@ -31,7 +31,7 @@
       <div id="navbarMenu" class="navbar-menu">
         <div class="navbar-start">
           <a class="navbar-item" href="{% url 'app:main.index' %}">Home</a>
-          {% if user.authenticated %}
+          {% if user.is_authenticated %}
           <a class="navbar-item" href="{% url 'app:practice.new' %}">New Practice</a>
           <a class="navbar-item" href="{% url 'app:practice.list_past_practices' %}">Past Practices</a>
           <a class="navbar-item" href="{% url 'app:dashboard.index' %}">Dashboard</a>
@@ -43,7 +43,7 @@
         <div class="navbar-end">
           <div class="navbar-item">
             <div class="buttons">
-              {% if not user.authenticated %}
+              {% if not user.is_authenticated %}
               <a class="button is-light" href="{% url 'app:auth.login' %}"><strong>Log in</strong></a>
               <a class="button is-primary" href="{% url 'app:auth.signup' %}">Sign up</a>
               {% else %}
@@ -136,4 +136,52 @@
     </div>
   </footer>
   {% endif %}
+  <script defer>
+    document.addEventListener('DOMContentLoaded', () => {
+      //cookieNotice();
+
+      {% if messages %}
+      {% for message in messages %}
+      toast({
+        'message': '{{ message }}',
+        'duration': 3000,
+        'type': 'is-info',
+        'animate': {'in': 'fadeIn', 'out': 'fadeOut'}
+      })
+      {% endfor %}
+      {% endif %}
+
+      const burgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
+      burgers.forEach(el => {
+        el.addEventListener('click', () => {
+          const target = document.getElementById(el.dataset.target);
+          el.classList.toggle('is-active');
+          target.classList.toggle('is-active');
+        });
+      });
+      /*
+      {% if request.uuser.is_authenticated %}
+      const notificationsArea = document.getElementById('notifications');
+      document.addEventListener('mousedown', (event) => {
+        let el = event.target;
+        while (el && !el.id.includes('notification-bell')) {
+          if (el.id.includes('notifications')) {
+            notificationsArea.classList.remove('hide');
+            return;
+          }
+          el = el.parentElement;
+        }
+        el ? notificationsArea.classList.toggle('hide') : notificationsArea.classList.add('hide');
+      });
+
+      const notificationsList = notificationsArea.lastElementChild.lastElementChild.firstElementChild;
+      const notificationBadge = document.getElementById('notification-badge');
+      const noNotificationMessage = document.getElementById('no-notification');
+      updateNotifications(since, notificationBadge, notificationsList, noNotificationMessage);
+      var since = 0;
+      setInterval(() => updateNotifications(since, notificationBadge, notificationsList, noNotificationMessage), 10000);
+      {% endif %}
+      */
+    });
+  </script>
 </html>

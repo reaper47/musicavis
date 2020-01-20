@@ -5,8 +5,8 @@ from app.models.task import Task
 
 A_USERNAME = 'test'
 OTHER_USERNAME = 'PuertoRico'
-AN_EMAIL = 'test@gmail.com'
-OTHER_EMAIL = 'puertorico@gmail.com'
+AN_EMAIL = 'test@test.ssh'
+OTHER_EMAIL = 'puertorico@test.ssh'
 A_PASSWORD = 'helloworld!'
 OTHER_PASSWORD = 'goodbyeworld!'
 SOME_INSTRUMENTS = ['Violin', 'Drums']
@@ -133,6 +133,16 @@ def is_login_form(response):
 def is_signup_form(response):
     components = ['Username', 'Email', 'Password', 'Password confirmation', 'Sign Up',
                   'emails', 'Terms of Use', 'Privacy Policy']
+    return all_equal(response, components)
+
+
+def is_password_reset_form(response):
+    components = ['Email', 'Reset Password', 'Password Reset Request']
+    return all_equal(response, components)
+
+
+def is_reset_password_form(response):
+    components = ['Reset Your Password', 'New Password', 'Confirm Password']
     return all_equal(response, components)
 
 

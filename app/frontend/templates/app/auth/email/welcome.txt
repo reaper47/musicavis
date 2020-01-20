@@ -12,15 +12,15 @@ Check what you have done yesterday to improve your planning of today. You can ev
 Analyse:
 View your progress visually with the help of graphs and statistics.
 
-Feel free to contact us through the website ({{ url_for('contact.contact', _external=True)}}) or by email ({{ config['MUSICAVIS_ADMIN'] }}) for any inquiries.
+Feel free to contact us through the website ({{ contact_url }}) or by email ({{ admin }}) for any inquiries.
 
 You can update your email preferences at any time by clicking the following link:
-{{ url_for('profile.settings_profile') }}
+{{ profile_settings_url }}
 
 View this email online:
-Privacy Notice: {{ url_for('legal.privacy', _external=True) }}
-Terms of Service: {{ url_for('legal.terms', _external=True) }}
-Unsubscribe: {{ url_for('auth.unsubscribe', token=unsubscribe_token, _external=True) }}
+Privacy Notice: {{ privacy_url }}
+Terms of Service: {{ terms_url }}
+Unsubscribe: {{ unsubscribe_url }}
 
-© {{ now.year }} Musicavis. All Rights Reserved.
+© {{ year }} Musicavis. All Rights Reserved.
 1920 rue Victor-L-Laurin, L'Ancienne-Lorette, Quebec, Canada

@@ -1,19 +1,22 @@
 import os
+import time
 from datetime import timedelta
 from unittest import mock
 
 from django.utils import timezone
 from django.test import TestCase
+from django.contrib.auth.models import User
 
 from musicavis.settings import EXPORTS_DIR
 from app.models.practice import Instrument, Exercise
+from app.models.profile import Profile
 from app.models.email_preferences import EmailPreferences
 from app.models.notification import Notification
-from app.backend.utils.enums import FileType, NewLine
+from app.backend.utils.enums import FileType, NewLine, TokenType
 from app.backend.dashboard.stats import PracticeStats
 from app.tests.conftest import (create_user, create_user_with_a_practice, add_instruments_to_database,
                                 create_task, create_complete_practice, A_USERNAME, A_PASSWORD,
-                                AN_EMAIL, OTHER_EMAIL, AN_INSTRUMENT, JobMock, delete_users)
+                                OTHER_PASSWORD, AN_EMAIL, OTHER_EMAIL, AN_INSTRUMENT, JobMock, delete_users)
 
 instruments = ['Cello', 'Violin']
 instrument1 = Instrument(name=instruments[0])
@@ -24,6 +27,8 @@ exercises2 = [Exercise(name='E', bpm_start=80, bpm_end=75, minutes=50),
               Exercise(name='F', bpm_start=80, bpm_end=75, minutes=20)]
 exercises3 = [Exercise(name='G', bpm_start=80, bpm_end=75, minutes=40),
               Exercise(name='H', bpm_start=80, bpm_end=75, minutes=60)]
+
+A_WEEK = 604800  # in seconds
 
 
 class ProfileModelTests(TestCase):
@@ -113,7 +118,7 @@ class ProfileModelTests(TestCase):
         actual_digest = self.a_user.profile.avatar(128)
 
         self.assertEqual(
-            actual_digest, 'https://www.gravatar.com/avatar/1aedb8d9dc4751e229a335e371db8058?d=identicon&s=128'
+            actual_digest, 'https://www.gravatar.com/avatar/b682f93ed660ecda33e9adb4e514aa2f?d=identicon&s=128'
         )
 
     """
@@ -185,72 +190,75 @@ class ProfileModelTests(TestCase):
     """
     TOKENS
     """
-    '''
-    def test_valid_token(a_user):
+
+    def test_valid_token(self):
         """
         WHEN a user changes his or her password with a valid token
         THEN the new password is set
         """
-        token = a_user.generate_token(TokenType.RESET)
-        is_password_changed = User.reset_password(token, OTHER_PASSWORD)
+        token = self.a_user.profile.generate_token(TokenType.RESET)
+        is_password_changed = Profile.reset_password(token, OTHER_PASSWORD)
 
-        assert is_password_changed
-        assert a_user.verify_password(OTHER_PASSWORD)
+        user = User.objects.get(pk=self.a_user.pk)
+        self.assertTrue(is_password_changed)
+        self.assertTrue(user.check_password(OTHER_PASSWORD))
 
-
-    def test_expired_token(a_user):
+    def test_expired_token(self):
         """
         WHEN a user changes his or her password with an invalid token
         THEN the password remains the same
         """
-        token = a_user.generate_token(TokenType.RESET, 0.5)
+        token = self.a_user.profile.generate_token(TokenType.RESET, 0.5)
         time.sleep(1)
-        is_password_changed = User.reset_password(token, OTHER_PASSWORD)
+        is_password_changed = Profile.reset_password(token, OTHER_PASSWORD)
 
-        assert not is_password_changed
-        assert not a_user.verify_password(OTHER_PASSWORD)
+        user = User.objects.get(pk=self.a_user.pk)
+        self.assertFalse(is_password_changed)
+        self.assertFalse(user.check_password(OTHER_PASSWORD))
 
-
-    def test_invalid_token(a_user):
+    def test_invalid_token(self):
         """
         GIVEN an invalid password reset token
         WHEN resetting the user's password
         THEN the second user's password remains the same
         """
-        token = a_user.generate_token(TokenType.RESET) + 'a'
+        token = self.a_user.profile.generate_token(TokenType.RESET) + 'a'
 
-        is_password_changed = a_user.reset_password(token, OTHER_PASSWORD)
+        is_password_changed = Profile.reset_password(token, OTHER_PASSWORD)
 
-        assert not is_password_changed
-        assert not a_user.verify_password(OTHER_PASSWORD)
+        user = User.objects.get(pk=self.a_user.pk)
+        self.assertFalse(is_password_changed)
+        self.assertFalse(user.check_password(OTHER_PASSWORD))
 
-
-    def test_confirm_account_valid_token(a_user):
+    def test_confirm_account_valid_token(self):
         """
         GIVEN a confirmation token
         WHEN the user confirms the account
         THEN the account is confirmed
         """
-        token = a_user.generate_token(TokenType.CONFIRM, A_WEEK)
+        token = self.a_user.profile.generate_token(TokenType.CONFIRM, A_WEEK)
 
-        is_account_confirmed = a_user.confirm(token)
+        is_account_confirmed = self.a_user.profile.confirm(token)
 
-        assert is_account_confirmed
+        user = User.objects.get(pk=self.a_user.pk)
+        self.assertTrue(is_account_confirmed)
+        self.assertTrue(user.is_active)
 
-
-    def test_confirm_account_invalid_token(a_user, other_user):
+    def test_confirm_account_invalid_token(self):
         """
         GIVEN an invalid confirmation token
         AND another user
         WHEN the user confirms the account with the other user's token
         THEN the account is not confirmed
         """
-        other_token = other_user.generate_token(TokenType.CONFIRM, A_WEEK)
+        other_user = create_user('Bob', OTHER_EMAIL, OTHER_PASSWORD)
+        other_token = other_user.profile.generate_token(TokenType.CONFIRM, A_WEEK)
 
-        is_account_confirmed = a_user.confirm(other_token)
+        is_account_confirmed = self.a_user.profile.confirm(other_token)
 
-        assert not is_account_confirmed
-    '''
+        user = User.objects.get(pk=self.a_user.pk)
+        self.assertFalse(is_account_confirmed)
+        self.assertTrue(user.is_active)
 
     """
     PAGINATION

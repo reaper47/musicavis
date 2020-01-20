@@ -55,6 +55,7 @@ class SignupForm(UserCreationForm):
         user = super().save(commit=False)
 
         if commit:
+            user.is_active = True
             user.save()
 
             if not self.cleaned_data['send_emails']:
@@ -66,9 +67,19 @@ class SignupForm(UserCreationForm):
         return user
 
 
-class ResetPasswordRequestRequest(forms.Form):
-    pass
+class ResetPasswordRequestForm(forms.Form):
+    email = forms.EmailField(label='Email address')
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['email'].widget.attrs.update({'class': 'input', 'autofocus': 'autofocus'})
 
 
 class ResetPasswordForm(forms.Form):
-    pass
+    password1 = forms.CharField(label='New Password', widget=forms.PasswordInput())
+    password2 = forms.CharField(label='Confirm Password', widget=forms.PasswordInput())
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['password1'].widget.attrs.update({'class': 'input', 'autofocus': 'autofocus'})
+        self.fields['password2'].widget.attrs.update({'class': 'input'})
