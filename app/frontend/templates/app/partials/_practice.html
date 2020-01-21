@@ -1,0 +1,28 @@
+<div class="container">
+  <div class="tile is-ancestor is-vertical">
+    {%- for practice in practices -%}
+    {%- if loop.index % 4 == 1 -%}<div class="tile is-parent">{%- endif -%}
+    <div class="tile">
+      <div class="ppractice-list-item card">
+        <header class="card-header">
+          <p class="card-header-title title is-4">
+            {{ practice.instrument.name.title() }}
+          </p>
+        </header>
+        <div class="card-content">
+          <div class="content">
+            <p class="subtitle is-4">{{ practice.format_total_practice_time() }}</p>
+            <p class="list-item-practice-date subtitle is-4">{{ practice.date }}</p>
+          </div>
+        </div>
+        <footer class="card-footer">
+          <a class="card-footer-item button is-link is-outlined" href="/practice/{{ practice.id }}">
+          View &nbsp;<span class="icon is-left"><i class="fas fa-edit"></i></span>
+          </a>
+        </footer>
+      </div>
+    </div>
+    {%- if loop.index % 4 == 0 -%}</div>{%- endif -%}
+    {%- endfor -%}
+  </div>
+</div>

@@ -22,5 +22,5 @@ Privacy Notice: {{ privacy_url }}
 Terms of Service: {{ terms_url }}
 Unsubscribe: {{ unsubscribe_url }}
 
-© {{ year }} Musicavis. All Rights Reserved.
+© {{ now "Y" }} Musicavis. All Rights Reserved.
 1920 rue Victor-L-Laurin, L'Ancienne-Lorette, Quebec, Canada

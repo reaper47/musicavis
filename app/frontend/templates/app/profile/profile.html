@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block page_content %}
+<section class="section">
+  <div id="container-profile" class="container box">
+    <div class="tile is-ancestor">
+      <div class="tile is-vertical-8">
+        <div class="tile is-parent no-select">
+          <article class="tile is-child">
+            <img src="{{ avatar }}" alt="{{ user.username }}'s gravatar">
+          </article>
+        </div>
+        <div class="tile">
+          <div class="tile is-parent is-vertical">
+            <article class="tile is-child notification is-success">
+              <p class="title is-5">Instruments Practiced:</p>
+              <p class="subtitle">{{ instruments_played|safe }}</p>
+            </article>
+            <article class="tile is-child">
+              <a class="button is-fullwidth is-link is-medium" href="{{ url_settings }}">Settings</a>
+            </article>
+            <article class="tile is-child notificatin is-warning">
+              <a class="button is-fullwidth is-warning is-medium modal-button" data-target="modal-export-practices">Export Practices</a>
+            </article>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% include 'partials/_dialog_export_practices.html' %}
+{% endblock %}

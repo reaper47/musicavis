@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block page_content %}
+<section class="section">
+  <div class="columns is-centered">
+    <div class="column is-4">
+      <div class="container">
+        <div id="card__default-instrument" class="card overflow">
+          <header class="card-header">
+            <p class="card-header-title">Practiced Instruments</p>
+          </header>
+          <form method="post" name="settings_practice_form">
+            {% csrf_token %}
+            <div class="card-content overflow">
+              <div class="content">
+                <div class="dropdown-container no-style">
+                  {% include 'snippets/_form_field.html' with field=form.instruments %}
+                </div>
+                <div id="instrument-not-listed">
+                  <p>Instrument is not listed?</p>
+                  <a id="confirm-add-instrument" class="button is-rounded is-warning hide">Add</a>
+                  <a id="add-instrument" class="button is-rounded">Add instrument</a>
+                  <input id="new-instrument" class="input hide" name="new-instrument" placeholder="Add instrument name..." size="32" type="text" value="">
+                </div>
+              </div>
+            </div>
+            <button type="submit" class='button is-info is-fullwidth'>Save</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<script>
+window.onload = () => {
+  const searchableDropDown = makeSearchableDropDown('id_instruments', 'Search for an instrument...', true);
+
+  const confirmAddInstrument = document.getElementById('confirm-add-instrument');
+  const addInstrument = document.getElementById('add-instrument');
+  const newInstrumentInput = document.getElementById('new-instrument');
+
+  newInstrumentInput.addEventListener('keydown', (event) => {
+    if (event.code === 'Enter') {
+      event.preventDefault();
+      pushNewInstrument(newInstrumentInput, confirmAddInstrument, addInstrument, searchableDropDown);
+    }
+  })
+
+  addInstrument.addEventListener('click', () => {
+    confirmAddInstrument.classList.remove('hide');
+    addInstrument.classList.add('hide');
+    newInstrumentInput.classList.remove('hide');
+    newInstrumentInput.focus();
+  });
+
+  confirmAddInstrument.addEventListener('click', () => pushNewInstrument(newInstrumentInput, confirmAddInstrument, addInstrument, searchableDropDown));
+}
+</script>
+{% endblock %}

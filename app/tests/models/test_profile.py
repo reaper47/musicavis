@@ -121,6 +121,35 @@ class ProfileModelTests(TestCase):
             actual_digest, 'https://www.gravatar.com/avatar/b682f93ed660ecda33e9adb4e514aa2f?d=identicon&s=128'
         )
 
+    def test_html_list_instruments_practiced_many_instruments(self):
+        """
+        GIVEN three instrument practiced
+        WHEN the instruments practiced are formatted as an HTML list
+        THEN the list is formatted correctly
+        """
+        name1, name2, name3 = 'red', 'green', 'blue'
+        for name in [name1, name2, name3]:
+            instrument = Instrument(name=name)
+            instrument.save()
+            self.a_user.profile.instruments_practiced.add(instrument)
+        format_expected = '- Red<br>- Green<br>- Blue'
+
+        format_actual = self.a_user.profile.list_instruments_practiced_html()
+
+        self.assertEqual(format_actual, format_expected)
+
+    def test_html_list_instruments_practiced_no_instruments(self):
+        """
+        GIVEN no instruments practiced
+        WHEN the instruments practiced are formatted as an HTML list
+        THEN the list is formatted correctly
+        """
+        format_expected = 'None'
+
+        format_actual = self.a_user.profile.list_instruments_practiced_html()
+
+        self.assertEqual(format_actual, format_expected)
+
     """
     PRACTICE
     """

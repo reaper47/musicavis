@@ -1,22 +1,23 @@
-import '../styles/main.css'
-import '../styles/auth.css'
-import '../styles/dashboard.css'
-import '../styles/dropdown.css'
-import '../styles/practice.css'
-import '../styles/profile.css'
-import '../styles/tools.css'
-require('animate.css')
+require('./all_css.js')
 
-const bulma = require('bulma');
-import { toast } from 'bulma-toast';
+import { toast } from 'bulma-toast'
+import Main from './main.js'
+import { makeSearchableDropDown, SearchableDropdown } from './dropdown.js'
+import { Timer, Metronome } from './tools.js'
+import pushNewInstrument from './profile.js'
+import Practice from './practice.js'
 
-
-function hi() {
-    console.log("I am damn called!");
+String.prototype.capitalize = function() {
+    return this.charAt(0).toUpperCase() + this.slice(1);
 }
 
+
 export {
-    hi,
-    toast
+    toast,
+    Main,
+    makeSearchableDropDown, SearchableDropdown,
+    Timer, Metronome,
+    pushNewInstrument,
+    Practice
 }
 

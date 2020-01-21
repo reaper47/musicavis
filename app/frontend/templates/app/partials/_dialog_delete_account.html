@@ -1,0 +1,47 @@
+<div id="modal-delete-account" class="modal">
+  <div class="modal-background"></div>
+  <div class="modal-card">
+    <header class="modal-card-head">
+      <p class="modal-card-title">Goodbye, {{ username }}</p>
+      <button class="delete" aria-label="close"></button>
+    </header>
+    <form id="delete-account-form">
+      <section class="modal-card-body is-clipped">
+        <p class="subtitle is-4">Are you sure you want to delete your account?</p>
+        <p class="subtitle is-6">This action is irreversible. You will lose all your data. Please export all of what you have done before proceeding.</p>
+        {% include 'snippets/_form_field.html' with field=password_form.current_password %}
+      </section>
+      <footer class="modal-card-foot">
+        <a class="button is-fullwidth">Cancel</a>
+        <button id="submit-delete-account" class="is-danger" type="submit">Proceed</button>
+      </footer>
+    </form>
+  </div>
+</div>
+<script>
+  window.onload = () => {
+    document.getElementById('delete-account-form').addEventListener('submit', (event) => {
+      event.preventDefault()
+
+      const xhr = new XMLHttpRequest()
+      xhr.onreadystatechange = () => {
+        if (xhr.readyState === XMLHttpRequest.DONE) {
+          if (xhr.status === 200) {
+            window.location.replace(xhr.responseText)
+          } else {
+            toast({
+              'message': 'Error deleting your account. Your password might be wrong.',
+              'duration': 3000,
+              'type': 'is-info',
+              'animate': {'in': 'fadeIn', 'out': 'fadeOut'}
+            })
+          }
+        }
+      }
+
+      xhr.open('POST', "{{ url_delete_account }}")
+      xhr.setRequestHeader('Content-Type', 'application/json')
+      xhr.send(JSON.stringify({password: document.getElementById('delete-account-password').value}))
+    })
+  }
+</script>

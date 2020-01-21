@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block page_content %}
+<section id="settings-profile" class="section">
+  <div class="columns is-centered">
+    <div class="column is-4">
+      <div class="container">
+        <div class="card__email_preferences card">
+          <header class="card-header">
+            <p class="card-header-title">Email Preferences</p>
+          </header>
+          <form method="post" name="settings_profile_form">
+            {% csrf_token %}
+            <div class="card-content">
+              <div class="content">
+                <p class="subtitle">I agree to receive emails on:</p>
+                <div class="field is-horizontal">
+                  {% include 'snippets/_form_field.html' with field=form.practicing field_class=' is-horizontal' %}
+                </div>
+                <div class="field is-horizontal">
+                  {% include 'snippets/_form_field.html' with field=form.promotions field_class=' is-horizontal' %}
+                </div>
+                <div class="field is-horizontal">
+                  {% include 'snippets/_form_field.html' with field=form.features field_class=' is-horizontal' %}
+                </div>
+              </div>
+            </div>
+            <button type="submit" class='button is-info is-fullwidth'>Save</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<script>window.onload = () => submitFormOnEnter(document.settings_profile_form)</script>
+{% endblock %}

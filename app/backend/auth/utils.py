@@ -1,5 +1,4 @@
 from django.urls import reverse
-from django.utils import timezone
 
 from musicavis.settings import BASE_URL, MUSICAVIS_ADMIN
 from app.backend.utils.tasks import send_email
@@ -43,7 +42,6 @@ def __send_account_confirmed_email(username, email, token):
     args = dict(
         username=username,
         add_unsubscribe=True,
-        year=timezone.now().year,
         contact_url=BASE_URL + reverse('app:contact.contact_us'),
         privacy_url=BASE_URL + reverse('app:legal.privacy'),
         terms_url=BASE_URL + reverse('app:legal.terms'),

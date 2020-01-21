@@ -34,6 +34,7 @@ class Profile(models.Model):
     email_preferences = models.ForeignKey('EmailPreferences', on_delete=models.CASCADE)
     notifications = models.ManyToManyField('Notification')
     is_confirmed = models.BooleanField(default=False)
+    instruments_practiced = models.ManyToManyField('Instrument')
 
     def save(self, *args, **kwargs):
         if not hasattr(self, 'email_preferences'):
@@ -52,11 +53,32 @@ class Profile(models.Model):
     def verify_password(self, password: str) -> bool:
         return check_password(password, self.user.password)
 
+    def update_password(self, new_password: str):
+        self.user.set_password(new_password)
+        self.user.save()
+
+    def update_email(self, new_email: str):
+        self.user.email = new_email
+        self.user.save()
+
+    def update_username(self, new_username: str):
+        self.user.username = new_username
+        self.user.save()
+
     def update_email_preferences(self, accept_features: bool, accept_practicing: bool, accept_promotions: bool):
         self.email_preferences.features = accept_features
         self.email_preferences.practicing = accept_practicing
         self.email_preferences.promotions = accept_promotions
         self.email_preferences.save()
+
+    def update_instruments_practiced(self, instruments):
+        for instrument in self.instruments_practiced.all():
+            self.instruments_practiced.remove(instrument)
+
+        for instrument in instruments:
+            self.instruments_practiced.add(instrument)
+
+        self.save()
 
     def avatar(self, size):
         digest = md5(self.user.email.encode('utf-8')).hexdigest()
@@ -68,6 +90,12 @@ class Profile(models.Model):
         notification.save()
         self.notifications.add(notification)
         return notification
+
+    def list_instruments_practiced_html(self) -> str:
+        instruments = self.instruments_practiced.all()
+        html = '<br>- '.join([x.name.title() for x in instruments])
+        html = f'- {html}' if instruments else 'None'
+        return html
 
     def __str__(self):
         return self.user.username

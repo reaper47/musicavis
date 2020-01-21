@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{%- block page_content -%}
+{%- if practices -%}
+<section class="section full-height" id="practice-list-grid">
+  {%- include 'partials/_practice.html' -%}
+</section>
+<section id="practice-list-actions">
+  <div class="practice-list-action">
+    <a class="button is-fullwidth" href="{% if prev_url %}{{ prev_url }}{% endif %}" {% if prev_url is none %}disabled{% endif %}>
+      <i class="fas fa-long-arrow-alt-left"></i>&nbsp;More Recent
+    </a>
+  </div>
+  <div class="practice-list-action">
+    <a class="button is-fullwidth" href="{% if next_url %}{{ next_url }}{% endif %}" {% if next_url is none %}disabled{% endif %}>
+      Older&nbsp;<i class="fas fa-long-arrow-alt-right"></i>
+    </a>
+  </div>
+</section>
+{%- else -%}
+{%- include 'partials/_start_practicing.html' -%}
+{%- endif -%}
+<script>
+window.onload = () => {
+  document.addEventListener('keydown', (event) => {
+    const rightArrow = 39
+    const leftArrow = 37
+    let xhr = new XMLHttpRequest();
+
+    if (event.keyCode === rightArrow) {
+      xhr.open('GET', '{{ next_url }}')
+      xhr.send()
+    } else if (event.keyCode === leftArrow) {
+      xhr.open('GET', '{{ prev_url }}')
+      xhr.send()
+    }
+
+    xhr.onreadystatechange = () => {
+      if (xhr.readyState == XMLHttpRequest.DONE && xhr.status === 200) {
+        window.location.replace(xhr.responseURL)
+        document.getElementById("practice-list-grid").focus();
+      } else {
+        console.log("Error: ", xhr)
+      }
+    }
+
+    xhr.onerror = () => location.reload()
+  })
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const practiceDates = Array.from(document.getElementsByClassName('list-item-practice-date'))
+  practiceDates.forEach(span => span.textContent = moment(new Date(span.textContent)).format('LL'))
+})
+</script>
+{%- endblock -%}

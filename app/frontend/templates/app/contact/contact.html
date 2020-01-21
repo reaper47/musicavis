@@ -12,8 +12,18 @@
           </header>
           <form method="post">
             {% csrf_token %}
-            {{ form }}
-            <button type="submit" class='button is-info is-fullwidth'>Submit</button>
+            <div class="card-content">
+              <div class="content">
+                {% include 'snippets/_form_field.html' with field=form.first_name %}
+                {% if not user.is_authenticated %}
+                {% include 'snippets/_form_field.html' with field=form.email_address %}
+                {% endif %}
+                {% include 'snippets/_form_field.html' with field=form.subject %}
+                {% include 'snippets/_form_field.html' with field=form.message %}
+              </div>
+              {% include 'snippets/_form_errors.html' with form=form %}
+            </div>
+            <button type="submit" class='button is-info is-fullwidth'>Send</button>
           </form>
         </div>
       </div>
@@ -51,7 +61,7 @@
                 </div>
                 <div class="column">
                   <div class="tile">
-                    <a class="panel-block cursor-default">
+                    <a class="panel-block cursor-default frame">
                       <img src="{% static 'img/hell.png' %}" alt="Musicavis's Location" />
                     </a>
                   </div>

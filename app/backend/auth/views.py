@@ -57,7 +57,7 @@ def login_view(request, redirect_field_name=REDIRECT_FIELD_NAME, login_form=Logi
 @login_required
 def logout_view(request):
     logout(request)
-    messages.add_message(request, messages.INFO, 'You have been logged out.')
+    messages.info(request, 'You have been logged out.')
     return redirect(reverse('app:main.index'))
 
 
@@ -77,8 +77,7 @@ def signup_view(request):
             user = authenticate(username=form.cleaned_data['username'], password=form.cleaned_data['password1'])
             login(request, user)
             send_email_to_user(user, TokenType.CONFIRM)
-            message = 'Sign up complete. An account confirmation has been sent to you by email.'
-            messages.add_message(request, messages.INFO, message)
+            messages.info(request, 'Sign up complete. An account confirmation has been sent to you by email.')
             return redirect(reverse('app:auth.login'))
 
     args = {'title': 'Sign Up', 'hide_nav': True, 'form': form}
@@ -98,7 +97,7 @@ def account_confirm(request, token):
         send_email_to_user(user, TokenType.UNSUBSCRIBE)
         message = f'Thank you {user.username}! Your account has been confirmed.'
 
-    messages.add_message(request, messages.INFO, message)
+    messages.info(request, message)
     return redirect(reverse('app:main.index'))
 
 
@@ -115,7 +114,7 @@ def resend_account_confirm(request, token):
         message = 'A new account confirmation has been sent to you by email.'
         send_email_to_user(user, TokenType.CONFIRM, resend=True)
 
-    messages.add_message(request, messages.INFO, message)
+    messages.info(request, message)
     return redirect(reverse('app:main.index'))
 
 
@@ -131,8 +130,7 @@ def request_password_reset_view(request):
             if user:
                 send_email_to_user(user, TokenType.RESET)
 
-            message = 'An email with instructions to reset your password has been sent to you'
-            messages.add_message(request, messages.INFO, message)
+            messages.info(request, 'An email with instructions to reset your password has been sent to you')
             return redirect(reverse('app:auth.login'))
 
     form = ResetPasswordRequestForm()
@@ -149,8 +147,7 @@ def password_reset_view(request, token):
         form = ResetPasswordForm(data=data)
         if form.is_valid():
             if Profile.reset_password(token, data['password1']):
-                message = 'Your password has been updated.'
-                messages.add_message(request, messages.INFO, message)
+                messages.info(request, 'Your password has been updated.')
                 return redirect(reverse('app:auth.login'))
             else:
                 return redirect(reverse('app:main.index'))

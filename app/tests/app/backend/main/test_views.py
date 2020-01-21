@@ -12,6 +12,7 @@ class MainViewTests(TestCase):
     @classmethod
     def setUpClass(cls):
         cls.a_user = create_user()
+        cls.url_index = reverse('app:main.index')
 
     @classmethod
     def tearDownClass(cls):
@@ -26,7 +27,7 @@ class MainViewTests(TestCase):
         WHEN an anonymous user accesses the website
         THEN display the website of the product
         """
-        response = self.client.get(reverse('app:main.index'), follow=True)
+        response = self.client.get(self.url_index, follow=True)
 
         self.assertEqual(response.status_code, 200)
         self.assertTrue(is_anonymous_index(response))
@@ -38,7 +39,7 @@ class MainViewTests(TestCase):
         """
         self.client.login(username=A_USERNAME, password=A_PASSWORD)
 
-        response = self.client.get(reverse('app:main.index'), follow=True)
+        response = self.client.get(self.url_index, follow=True)
 
         self.assertEqual(response.status_code, 200)
         self.assertTrue(is_user_index(response))

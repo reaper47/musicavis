@@ -131,14 +131,15 @@
         </div>
       </div>
       <div class="float-right subtitle is-6">
-        <p>&#169;{{ year }} Musicavis. All Rights Reserved.</p>
+        <p>&#169;{% now "Y" %} Musicavis. All Rights Reserved.</p>
       </div>
     </div>
   </footer>
   {% endif %}
+  {% include 'partials/_gdpr_notice.html' %}
   <script defer>
     document.addEventListener('DOMContentLoaded', () => {
-      //cookieNotice();
+      main = new Main(document);
 
       {% if messages %}
       {% for message in messages %}
@@ -160,7 +161,7 @@
         });
       });
       /*
-      {% if request.uuser.is_authenticated %}
+      {% if request.user.is_authenticated %}
       const notificationsArea = document.getElementById('notifications');
       document.addEventListener('mousedown', (event) => {
         let el = event.target;

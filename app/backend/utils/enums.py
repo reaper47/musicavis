@@ -75,3 +75,20 @@ class NewLine(Enum):
             return NewLine.UNIX
         else:
             return NewLine.WINDOWS
+
+
+class FormType(Enum):
+    NONE = 0
+    CHANGE_PASSWORD = 1
+    CHANGE_EMAIL = 2
+    CHANGE_USERNAME = 3
+
+    @staticmethod
+    def get_form_type(keys):
+        if 'new_password' in keys:
+            return FormType.CHANGE_PASSWORD
+        elif 'new_email' in keys:
+            return FormType.CHANGE_EMAIL
+        elif 'new_username' in keys:
+            return FormType.CHANGE_USERNAME
+        return FormType.NONE

@@ -12,10 +12,10 @@ from app.backend.utils.export import FileDeleteWrapper
 
 def index_view(request):
     if isinstance(request.user, AnonymousUser):
-        args = {
-            'export_extensions': ['pdf', 'docx', 'xlsx', 'csv', 'txt', 'json', 'xml', 'odt', 'ods'],
-            'num_love_trees': range(6),
-        }
+        args = dict(
+            export_extensions=['pdf', 'docx', 'xlsx', 'csv', 'txt', 'json', 'xml', 'odt', 'ods'],
+            num_love_trees=range(6),
+        )
     else:
         args = {'title': 'Home'}
 

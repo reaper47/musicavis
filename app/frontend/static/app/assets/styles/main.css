@@ -128,6 +128,13 @@ a {
   padding: 0 !important;
 }
 
+.frame {
+  border-bottom: 1px solid #dbdbdb;
+  border-left: 1px solid #dbdbdb;
+  border-right: 1px solid #dbdbdb;
+  border-top: 1px solid #dbdbdb;
+}
+
 .no-select, i {
   -webkit-user-select: none;
   -moz-user-select: none;

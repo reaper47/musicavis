@@ -1,0 +1,300 @@
+<div id="modal-practice-tools" class="modal">
+  <div class="modal-background"></div>
+  <div class="modal-card">
+    <header class="modal-card-head has-background-white-bis has-text-centered">
+      <p class="modal-card-title">Practice Tools</p>
+      <button class="delete" aria-label="close"></button>
+    </header>
+    <section class="modal-card-body">
+      <div class="tile is-ancestor">
+        <div class="tile is-vertical">
+          <div class="tile">
+            <div class="tile is-parent is-vertical">
+              <article class="tile is-child">
+                <p class="subtitle has-text-centered no-margin-bottom">Metronome</p>
+                <div class="content">
+                  <div id="metronome-container">
+                    <div id="metronome-visuals">
+                      <div id="metronome-signature-2/4" class="metronome-signature-container hide">
+                        <div>1</div>
+                        <div>2</div>
+                      </div>
+                      <div id="metronome-signature-3/4" class="metronome-signature-container hide">
+                        <div>1</div>
+                        <div>2</div>
+                        <div>3</div>
+                      </div>
+                      <div id="metronome-signature-4/4" class="metronome-signature-container">
+                        <div>1</div>
+                        <div>2</div>
+                        <div>3</div>
+                        <div>4</div>
+                      </div>
+                      <div id="metronome-signature-6/8" class="metronome-signature-container hide">
+                        <div>1</div>
+                        <div>2</div>
+                      </div>
+                      <div id="metronome-signature-9/8" class="metronome-signature-container hide">
+                        <div>1</div>
+                        <div>2</div>
+                        <div>3</div>
+                      </div>
+                      <div id="metronome-signature-12/8" class="metronome-signature-container hide">
+                        <div>1</div>
+                        <div>2</div>
+                        <div>3</div>
+                        <div>4</div>
+                      </div>
+                    </div>
+                    <div id="metronome-input">
+                      <div class="field is-horizontal">
+                        <div class="field-label is-normal text-align-left">
+                          <label class="label">Bar:</label>
+                        </div>
+                        <div class="field-body">
+                          <div class="field">
+                            <p class="control">
+                              <input id="metronome-bar-number" class="input is-rounded" type="text" value="1" readonly>
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                      <hr>
+                      <div class="field is-horizontal fullwidth">
+                        <div class="field-label is-normal">
+                          <label class="label">Tempo:</label>
+                        </div>
+                        <div class="field-body">
+                          <div class="field">
+                            <p class="control">
+                              <input id="metronome-tempo" class="input is-rounded" max="200" min="20" step="1" type="number" value="60">
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="field is-horizontal fullwidth">
+                        <div class="field-label is-normal">
+                          <label class="label">Signature:</label>
+                        </div>
+                        <div class="field-body">
+                          <div class="field">
+                            <p class="control">
+                              <select id="metronome-signature" class="fullwidth">
+                                {%- for signature in ['2/4', '3/4', '4/4', '6/8', '9/8', '12/8'] -%}
+                                <option value="{{ signature }}">{{ signature }}</option>
+                                {%- endfor -%}
+                              </select>
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="field is-horizontal fullwidth">
+                        <div class="field-label is-normal">
+                          <label class="label">Subdivision:</label>
+                        </div>
+                        <div class="field-body">
+                          <div class="field">
+                            <p class="control">
+                              <select id="metronome-subdivision" class="fullwidth">
+                                {%- for value, division in [(0, 'Quarter note (♩)'), (1, 'Eighth note (♪)'), (2, 'Sixteenth note (♬)'), (3, 'Thirty-second note 𝅘𝅥𝅰')] -%}
+                                <option value="{{ value }}">{{ division }}</option>
+                                {%- endfor -%}
+                              </select>
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div id="metronome-actions" class="buttons are-medium">
+                      <button id="metronome-start" class="button is-link is-fullwidth">Start</button>
+                      <button id="metronome-resume" class="button is-link is-fullwidth hide">Resume</button>
+                      <button id="metronome-pause" class="button is-link is-fullwidth hide">Pause</button>
+                      <button id="metronome-stop" class="button is-warning is-fullwidth hide">Stop</button>
+                    </div>
+                  </div>
+                </div>
+              </article>
+            </div>
+          </div>
+        </div>
+        <div class="vl"></div>
+        <hr id="practice-tools-mobile-hr">
+        <div class="tile is-parent">
+          <article class="tile is-child">
+            <div class="content">
+              <p class="subtitle has-text-centered">Timer</p>
+              <div class="content">
+                <div id="timer-container">
+                  <div id="timer-input">
+                    {%- for label, id, max, min, value in [('Hours:', 'num-hours', 24, 0, 0), ('Minutes:', 'num-minutes', 60, 0, 5), ('Seconds:', 'num-seconds', 60, 0, 0)] -%}
+                    <div class="field is-horizontal">
+                      <div class="field-label is-normal">
+                        <label class="label">{{ label }}</label>
+                      </div>
+                      <div class="field-body">
+                        <div class="field">
+                          <p class="control">
+                            <input id="timer-{{ id }}" class="input is-rounded" max="{{ max }}" min="{{ min }}" step="1" type="number" value="{{ value }}">
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    {%- endfor -%}
+                  </div>
+                  <p id="timer-countdown" class="subtitle is-1 has-text-centered hide">
+                    <span id="timer-hours">0</span>h
+                    <span id="timer-minutes">5</span>m
+                    <span id="timer-seconds">0</span>s
+                  </p>
+                </div>
+                <div id="practice-timers-actions" class="buttons are-medium">
+                  <button id="timer-start" class="button is-link is-fullwidth">Start</button>
+                  <button id="timer-stop" class="button is-warning is-fullwidth hide">Stop</button>
+                </div>
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+<script src="https://colxi.info/musical-timer/src/main.js" type="module"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  /* Timer */
+  const countdown = document.getElementById('timer-countdown');
+  const timerInputs = document.getElementById('timer-input');
+  const elements = {'hour': document.getElementById('timer-hours'), 'minutes': document.getElementById('timer-minutes'), 'seconds': document.getElementById('timer-seconds')};
+  let timer = new Timer(elements, 1000, () => document.getElementById('modal-practice-tools').classList.add('is-active'));
+
+  const numHours = document.getElementById('timer-num-hours');
+  const numMinutes = document.getElementById('timer-num-minutes');
+  const numSeconds = document.getElementById('timer-num-seconds');
+
+  const timerStart = document.getElementById('timer-start');
+  const timerStop = document.getElementById('timer-stop');
+
+  timerStart.addEventListener('mousedown', () => {
+    const time = Number(numHours.value)*3600 + Number(numMinutes.value)*60 + Number(numSeconds.value);
+
+    timerStart.classList.add('hide');
+    timerStop.classList.remove('hide');
+    countdown.classList.remove('hide');
+    timerInputs.classList.add('hide');
+
+    timer.start(time);
+  });
+
+  timerStop.addEventListener('mousedown', () => {
+    timerStart.classList.remove('hide');
+    timerStop.classList.add('hide');
+    countdown.classList.add('hide')
+    timerInputs.classList.remove('hide');
+
+    timer.stop();
+  });
+
+  /* Metronome */
+  const metronome = new Metronome();
+
+  const metronomeTempo = document.getElementById('metronome-tempo');
+  const metronomeSignature = document.getElementById('metronome-signature');
+  const metronomeSubdivision = document.getElementById('metronome-subdivision');
+
+  const metronomeStart = document.getElementById('metronome-start');
+  const metronomeResume = document.getElementById('metronome-resume');
+  const metronomePause = document.getElementById('metronome-pause');
+  const metronomeStop = document.getElementById('metronome-stop');
+
+  const metronomeSignature24 = document.getElementById('metronome-signature-2/4');
+  const metronomeSignature34 = document.getElementById('metronome-signature-3/4');
+  const metronomeSignature44 = document.getElementById('metronome-signature-4/4');
+  const metronomeSignature68 = document.getElementById('metronome-signature-6/8');
+  const metronomeSignature98 = document.getElementById('metronome-signature-9/8');
+  const metronomeSignature128 = document.getElementById('metronome-signature-12/8');
+  const signatures = [metronomeSignature24, metronomeSignature34, metronomeSignature44, metronomeSignature68, metronomeSignature98, metronomeSignature128];
+
+  metronomeSignature.selectedIndex = 2;
+  metronome.setTempo(metronomeTempo.value);
+  metronome.setSignature(metronomeSignature.value);
+  metronome.setSignatureVisual(document.getElementById(`metronome-signature-${metronomeSignature.value}`));
+  metronome.setSubdivision(Number(metronomeSubdivision.value));
+  metronome.setBarNumberElement(document.getElementById('metronome-bar-number'));
+
+  metronomeTempo.addEventListener('change', () => metronome.setTempo(metronomeTempo.value));
+
+  metronomeSignature.addEventListener('change', (event) => {
+    const signature = event.target.value;
+    metronome.setSignature(signature);
+    signatures.forEach(x => x.classList.add('hide'));
+
+    switch (signature) {
+    case '2/4':
+      metronomeSignature24.classList.remove('hide');
+      metronome.setSignatureVisual(metronomeSignature24);
+      break;
+    case '3/4':
+      metronomeSignature34.classList.remove('hide');
+      metronome.setSignatureVisual(metronomeSignature34);
+      break;
+    case '4/4':
+      metronomeSignature44.classList.remove('hide');
+      metronome.setSignatureVisual(metronomeSignature44);
+      break;
+    case '6/8':
+      metronomeSignature68.classList.remove('hide');
+      metronome.setSignatureVisual(metronomeSignature68);
+      break;
+    case '9/8':
+      metronomeSignature98.classList.remove('hide');
+      metronome.setSignatureVisual(metronomeSignature98);
+      break;
+    case '12/8':
+      metronomeSignature128.classList.remove('hide');
+      metronome.setSignatureVisual(metronomeSignature128);
+      break;
+    default:
+      break;
+    }
+  });
+
+  metronomeSubdivision.addEventListener('change', () => metronome.setSubdivision(Number(metronomeSubdivision.value)));
+
+  metronomeStart.addEventListener('mousedown', () => {
+    metronomeStart.classList.add('hide');
+    metronomePause.classList.remove('hide');
+    metronomeResume.classList.add('hide');
+    metronomeStop.classList.remove('hide');
+
+    metronome.play(metronomeTempo.value, metronomeSignature.value, );
+  });
+
+  metronomeStop.addEventListener('mousedown', () => {
+    metronomeStart.classList.remove('hide');
+    metronomePause.classList.add('hide');
+    metronomeResume.classList.add('hide');
+    metronomeStop.classList.add('hide');
+
+    metronome.stop();
+  });
+
+  metronomePause.addEventListener('mousedown', () => {
+    metronomeStart.classList.add('hide');
+    metronomePause.classList.add('hide');
+    metronomeResume.classList.remove('hide');
+    metronomeStop.classList.remove('hide');
+
+    metronome.pause();
+  });
+
+  metronomeResume.addEventListener('mousedown', () => {
+    metronomeStart.classList.add('hide');
+    metronomePause.classList.remove('hide');
+    metronomeResume.classList.add('hide');
+    metronomeStop.classList.remove('hide');
+
+    metronome.play(metronomeTempo.value, metronomeSignature.value, Number(metronomeSubdivision.value));
+  });
+})
+</script>

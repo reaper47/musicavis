@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block page_content %}
+<section class="section">
+  <div class="container padding-bottom3">
+    <div class="tile is-ancestor settings-access">
+      <div class="tile is-parent">
+        <div class="card">
+          <header class="card-header">
+            <p class="card-header-title">Change Password</p>
+          </header>
+          <form method="post">
+            {% csrf_token %}
+            <div class="card-content">
+              <div class="content">
+                {% include 'snippets/_form_field.html' with field=password_form.current_password %}
+                {% include 'snippets/_form_field.html' with field=password_form.new_password %}
+                {% include 'snippets/_form_field.html' with field=password_form.repeat_new_password %}
+              </div>
+            </div>
+            <button type="submit" class='button is-info is-fullwidth'>Save</button>
+          </form>
+        </div>
+      </div>
+      <div class="tile is-parent">
+        <div class="card">
+          <header class="card-header">
+            <p class="card-header-title">Change Email</p>
+          </header>
+          <form method="post">
+            {% csrf_token %}
+            <div class="card-content card-pushdown">
+              <div class="content">
+                {% include 'snippets/_form_field.html' with field=email_form.new_email %}
+                {% include 'snippets/_form_field.html' with field=email_form.repeat_email %}
+                {% include 'snippets/_form_field.html' with field=email_form.current_password %}
+              </div>
+            </div>
+            <button type="submit" class='button is-info is-fullwidth'>Save</button>
+          </form>
+        </div>
+      </div>
+      <div class="tile is-parent">
+        <div class="card">
+          <header class="card-header">
+            <p class="card-header-title">Change Username</p>
+          </header>
+          <form method="post">
+            {% csrf_token %}
+            <div class="card-content card-pushdown">
+              <div class="content">
+                {% include 'snippets/_form_field.html' with field=username_form.new_username %}
+                {% include 'snippets/_form_field.html' with field=username_form.current_password %}
+              </div>
+            </div>
+            <button type="submit" class='button is-info is-fullwidth'>Save</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="tile is-ancestor">
+    <div class="tile is-parent">
+      <div class="tile is-child box center">
+        <a class="button is-danger modal-button" data-target="modal-delete-account">Delete Account</a>
+      </div>
+    </div>
+  </div>
+</section>
+{% include 'partials/_dialog_delete_account.html' %}
+{% endblock %}

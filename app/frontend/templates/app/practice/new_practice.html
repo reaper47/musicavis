@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block page_content %}
+<section class="section">
+  <div class="columns is-centered">
+    <div class="column is-3 is-two-thirds-tablet is-half-desktop is-one-third-widescreen">
+      <div class="container is-fluid">
+        <div class="card">
+          <header class="card-header">
+            <p class="card-header-title">New Practice Session</p>
+          </header>
+          <form method="post">
+            {% csrf_token %}
+            <div class="card-content">
+              <div class="content">
+                <div class="dropdown-container no-style">
+                  {% include 'snippets/_form_field.html' with field=form.instruments %}
+                </div>
+              </div>
+            </div>
+            <button type="submit" class='button is-primary is-fullwidth'>Save</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const searchableDropdown = new SearchableDropdown('id_instrument')
+  searchableDropdown.createDropdown('Search for an instrument...')
+})
+</script>
+{% endblock %}

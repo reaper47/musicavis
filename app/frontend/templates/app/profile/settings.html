@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block page_content %}
+<section class="no-decoration full-height">
+  <div id="tiles-settings" class="tile is-ancestor full-height fit-mobile">
+    <div class="tile is-parent">
+      <a class="fullwidth center" href="{{ url_settings_access }}">
+        <h3 class="title">Account Access</h3>
+        <ul>
+          {% for option in options %}
+          <li>
+            <span><i class="fas fa-arrow-right"></i> {{ option }}</span>
+          </li>
+          {% endfor %}
+        </ul>
+      </a>
+    </div>
+    <div class="tile is-parent border-left">
+      <a class="fullwidth center" href="{{ url_settings_practice }}">
+        <h3 class="title">Practice</h3>
+        <ul>
+          <li>
+            <span>
+              <i class="fas fa-arrow-right"></i> Select instruments practiced
+            </span>
+          </li>
+        </ul>
+      </a>
+    </div>
+    <div class="tile is-parent border-left">
+      <a class="fullwidth center" href="{{ url_settings_profile }}">
+        <h3 class="title">Profile</h3>
+        <ul>
+          <li>
+            <span><i class="fas fa-arrow-right"></i> Avatar</span>
+          </li>
+          <li>
+            <span><i class="fas fa-arrow-right"></i> Email preferences</span>
+          </li>
+        </ul>
+      </a>
+    </div>
+  </div>
+</section>
+{% endblock %}

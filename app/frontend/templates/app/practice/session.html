@@ -1,0 +1,311 @@
+{% extends 'base.html' %}
+
+{% block page_content %}
+<form id="practice-form" class="section is-hidden-mobile" method="post" name="practice_form">
+  {% csrf_token %}
+  <div class="columns is-hidden-mobile">
+    <div class="column is-one-third">
+      <section class="small-margin-bottom">
+        <div class="card">
+          <header class="card-header">
+            <p class="card-header-title not-mobile">[{{ instrument_name }}] Today's Practice Goals</p>
+            <button class="card-header-icon button is-success add-row" type="button">
+              <span class="icon"><i class="fas fa-plus" aria-hidden="true"></i></span>
+            </button>
+          </header>
+          <div class="card-content not-mobile">
+            <div class="content no-style">
+              <ul id="ul-goals" class="practice-ul not-mobile">
+                {% for goal_field in form.get_goal_fields %}
+                <li>
+                  <p class="control"><i class="fas fa-chevron-right"></i></p>
+                  <p class="control">{{ goal_field }}</p>
+                  <p class="control remove-row"><a class="button is-danger"><i class="fas fa-minus"></i></a></p>
+                </li>
+                {% endfor %}
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section class="small-margin-bottom">
+        <div class="card">
+          <header class="card-header">
+            <p class="card-header-title not-mobile">What Went Well</p>
+            <a class="card-header-icon button is-success add-row" aria-label="add row">
+              <span class="icon"><i class="fas fa-plus" aria-hidden="true"></i></span>
+            </a>
+          </header>
+          <div class="card-content not-mobile">
+            <div class="content no-style">
+              <ul id="ul-positives" class="practice-ul not-mobile">
+                {% for positive_field in form.get_positive_fields %}
+                <li>
+                  <p class="control"><i class="fas fa-chevron-right"></i></p>
+                  <p class="control">{{ positive_field }}</p>
+                  <p class="control remove-row"><a class="button is-danger" type="button"><i class="fas fa-minus"></i></a></p>
+                </li>
+                {% endfor %}
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section class="small-margin-bottom">
+        <div class="card">
+          <header class="card-header">
+            <p class="card-header-title not-mobile">What to Improve</p>
+            <a class="card-header-icon button is-success add-row" aria-label="add row">
+              <span class="icon"><i class="fas fa-plus" aria-hidden="true"></i></span>
+            </a>
+          </header>
+          <div class="card-content not-mobile">
+            <div class="content no-style">
+              <ul id="ul-improvements" class="practice-ul not-mobile">
+                {% for improvement_field in form.get_improvement_fields %}
+                <li>
+                  <p class="control"><i class="fas fa-chevron-right"></i></p>
+                  <p class="control">{{ improvement_field }}</p>
+                  <p class="control remove-row"><a class="button is-danger" type="button"><i class="fas fa-minus"></i></a></p>
+                </li>
+                {% endfor %}
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section>
+        <div class="card">
+          <header class="card-header">
+            <p class="card-header-title not-mobile">Additional Notes</p>
+          </header>
+          <div class="card-content">
+            <div class="content no-style">
+              <div id="practice-notes">
+                {{ form.notes }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+    <div class="column">
+      <section id="section-notes">
+        <div class="card">
+          <header class="card-header">
+            <p class="card-header-title not-mobile">Exercises</p>
+            <a class="card-header-icon button is-success add-row" aria-label="add row">
+              <span class="icon"><i class="fas fa-plus" aria-hidden="true"></i></span>
+            </a>
+          </header>
+          <div class="card-content not-mobile">
+            <div class="content">
+              <div class="table-container">
+                <table id="practice-exercises" class="table">
+                  <thead>
+                    <tr>
+                      <th></th>
+                      <th>Exercise</th>
+                      <th class="short-cell">BPM (start)</th>
+                      <th class="short-cell">BPM (end)</th>
+                      <th class="short-cell">Minutes</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for exercise in form.get_exercise_fields %}
+                    <tr>
+                      <td>{{loop.index}}</td>
+                      <td>{{ exercise }}</td>
+                      <td> bpm_start </td>
+                      <td> bpm_end </td>
+                      <td> minutes </td>
+                      <td>
+                        <button class="button is-danger is-small remove-row" type="button">
+                          <i class="fas fa-minus"></i>
+                        </button>
+                      </td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+</form>
+<form id="practice-form-mobile" class="section is-hidden-tablet" method="post" name="practice_form_mobile">
+  <div id="practice-tabs-mobile" class="">
+    <p class="subtitle has-text-centered is-6">{{ instrument_name }} [{{ practice_date }}]</p>
+    <div  class="tabs is-centered is-boxed ">
+      <ul>
+        <li class="is-active"><a><span class="icon is-small"><i class="fas fa-bullseye" aria-hidden="true"></i></span></a></li>
+        <li><a><span class="icon is-small"><i class="fas fa-list" aria-hidden="true"></i></span></a></li>
+        <li><a><span class="icon is-small"><i class="far fa-smile" aria-hidden="true"></i></span></a></li>
+        <li><a><span class="icon is-small"><i class="far fa-frown" aria-hidden="true"></i></span></a></li>
+        <li><a><span class="icon is-small"><i class="far fa-file-alt" aria-hidden="true"></i></span></a></li>
+      </ul>
+    </div>
+    <section class="small-margin-bottom tab-content">
+      <div class="card">
+        <header class="card-header">
+          <p class="card-header-title mobile is-6">Today's Practice Goals}</p>
+          <button class="card-header-icon button is-success add-row" type="button">
+            <span class="icon"><i class="fas fa-plus" aria-hidden="true"></i></span>
+          </button>
+        </header>
+        <div class="card-content mobile">
+          <div class="content no-style">
+            <ul id="ul-goals-mobile" class="practice-ul mobile">
+              {% for goal in form.get_goal_fields %}
+              <li>
+                <p class="control"><i class="fas fa-chevron-right"></i></p>
+                <p class="control">{{ goal }}</p>
+                <p class="control remove-row"><a class="button is-danger"><i class="fas fa-minus"></i></a></p>
+              </li>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="small-margin-bottom tab-content">
+        <div class="card">
+          <header class="card-header">
+            <p class="card-header-title mobile is-6">Exercises</p>
+            <a class="card-header-icon button is-success add-row" aria-label="add row">
+              <span class="icon"><i class="fas fa-plus" aria-hidden="true"></i></span>
+            </a>
+          </header>
+          <div class="card-content mobile">
+            <div class="content no-style">
+               <ul id="practice-exercises-mobile" class="practice-ul mobile">
+                  {% for exercise in form.get_exercise_fields %}
+                    <li class="display-block">
+                      <div class="display-flex">
+                        <p><b>{{ forloop.counter }}.</b></p>
+                        {{ exercise }}
+                        <p class="control remove-row"><a class="button is-danger"><i class="fas fa-minus"></i></a></p>
+                      </div>
+                      <ul>
+                      <!--<li>
+                        <div class="display-flex-input-container">
+                          <div>
+                            <p>BPM (Start)</p>
+                             bpm_start
+                          </div>
+                          <div>
+                            <p>BPM (end)</p>
+                             bpm_end
+                          </div>
+                          <div>
+                            <p>Minutes</p>
+                             minutes
+                          </div>
+                        </div>
+                      </li>
+                      </ul>
+                    </li>-->
+                    {% if forloop.counter0 > 0 and forloop.counter0 < form.exercises|length %}
+                    <hr>
+                    {% endif %}
+                    {% endfor %}
+               </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+    <section class="small-margin-bottom tab-content">
+      <div class="card">
+        <header class="card-header">
+          <p class="card-header-title mobile is-6">What Went Well</p>
+          <a class="card-header-icon button is-success add-row" aria-label="add row">
+            <span class="icon"><i class="fas fa-plus" aria-hidden="true"></i></span>
+          </a>
+        </header>
+        <div class="card-content mobile">
+          <div class="content no-style">
+            <ul id="ul-positives-mobile" class="practice-ul mobile">
+              {% for positive in form.get_positive_fields %}
+              <li>
+                <p class="control"><i class="fas fa-chevron-right"></i></p>
+                <p class="control">{{ positive }}</p>
+                <p class="control remove-row"><a class="button is-danger" type="button"><i class="fas fa-minus"></i></a></p>
+              </li>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="small-margin-bottom tab-content">
+      <div class="card">
+        <header class="card-header">
+          <p class="card-header-title mobile is-6">What to Improve</p>
+          <a class="card-header-icon button is-success add-row" aria-label="add row">
+            <span class="icon"><i class="fas fa-plus" aria-hidden="true"></i></span>
+          </a>
+        </header>
+        <div class="card-content mobile">
+          <div class="content no-style">
+            <ul id="ul-improvements-mobile" class="practice-ul mobile">
+              {% for improvement in form.get_improvement_fields %}
+              <li>
+                <p class="control"><i class="fas fa-chevron-right"></i></p>
+                <p class="control">{{ improvement }}</p>
+                <p class="control remove-row"><a class="button is-danger" type="button"><i class="fas fa-minus"></i></a></p>
+              </li>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="small-margin-bottom tab-content">
+      <div class="card">
+        <header class="card-header">
+          <p class="card-header-title mobile is-6">Additional Notes</p>
+          <a class="card-header-icon button is-success add-row" aria-label="add row" style="visibility: hidden;"><span class="icon"><i class="fas fa-plus" aria-hidden="true"></i></span></a>
+        </header>
+        <div class="card-content">
+          <div class="content no-style">
+            <div id="practice-notes-mobile">
+              {{ form.notes }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</form>
+<section id="practice-actions">
+  <button id="delete-practice-button" class="button is-danger" type="button">Delete</button>
+  <input class="button is-info" id="submit-practice-form" name="submit" type="button" value="Save changes">
+</section>
+<!-- include 'partials/_dialog_practice_tools.html' -->
+<script>
+let lastActiveElement = null;
+var practiceUrl = "{{ practice_session_url }}";
+
+window.onbeforeunload = () => savePractice(false)
+
+window.onload = () => {
+  startTabsWithContent();
+
+  document.addEventListener('click', () => removeFocus(lastActiveElement));
+  document.addEventListener('keyup', (event) => tabListener(event.which));
+
+  document.getElementById('submit-practice-form').addEventListener('click', savePractice);
+  document.getElementById('delete-practice-button').addEventListener('click', deletePractice);
+
+  Object.values(document.getElementsByClassName('add-row')).forEach(node => addNodeListener(node));
+  Object.values(document.getElementsByClassName('remove-row')).forEach(node => removeNodeListener(node));
+
+
+  Array.from(document.getElementsByClassName('change-listener')).forEach(x => x.addEventListener('change', sessionKeysListener));
+  document.addEventListener('keyup', (event) => sessionKeysListener(event));
+}
+</script>
+{% endblock %}

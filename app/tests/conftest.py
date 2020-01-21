@@ -146,5 +146,43 @@ def is_reset_password_form(response):
     return all_equal(response, components)
 
 
+def is_contact_form(response, is_user_logged_in=True):
+    components = ['First name', 'Subject:', 'Message:', 'Send']
+    componentsNotLoggedIn = ['Email address']
+    has_components = all_equal(response, components)
+    has_other_components = all_equal(response, componentsNotLoggedIn)
+
+    if is_user_logged_in:
+        return has_components and has_other_components
+    return has_components and not has_other_components
+
+
+def is_profile_page(response):
+    components = ['Instruments Practiced', 'Settings', 'Export Practices']
+    return all_equal(response, components) and b'gravatar.com' in response.content
+
+
+def is_settings_page(response):
+    components = ['Access', 'Change email', 'Change password', 'Change username',
+                  'Practice', 'instruments practiced', 'Profile', 'Email preferences']
+    return all_equal(response, components)
+
+
+def is_access_settings(response):
+    components = ['Current password', 'New password', 'Repeat new password',
+                  'New email', 'Repeat email', 'Password', 'New username']
+    return all_equal(response, components)
+
+
+def is_practice_settings_page(response):
+    components = ['instruments you practice', 'not listed', 'Save']
+    return all_equal(response, components)
+
+
+def is_profile_settings_page(response):
+    components = ['Email preferences', 'Agree to receive', 'Practicing', 'Promotions', 'Features']
+    return all_equal(response, components)
+
+
 def all_equal(response, components):
     return all(c.encode() in response.content for c in components)

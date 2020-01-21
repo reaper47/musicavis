@@ -1,5 +1,5 @@
 from django.test import TestCase
-from app.backend.utils.enums import FileType, NewLine
+from app.backend.utils.enums import FileType, NewLine, FormType
 
 
 class EnumsTests(TestCase):
@@ -23,3 +23,9 @@ class EnumsTests(TestCase):
 
         self.assertTrue(all(NewLine.from_string(x) == NewLine.UNIX for x in unix))
         self.assertTrue(all(NewLine.from_string(x) == NewLine.WINDOWS for x in windows))
+
+    def test_formtype_from_keys(self):
+        keys = [['new_password'], ['new_email'], ['new_username']]
+        types_expected = [FormType.CHANGE_PASSWORD, FormType.CHANGE_EMAIL, FormType.CHANGE_USERNAME]
+
+        self.assertTrue(all([FormType.get_form_type(k) == t for k, t in zip(keys, types_expected)]))
