@@ -12,7 +12,6 @@ def export_practices(user, name, description, os, file_type):
     job = get_current_job()
 
     task = Task.objects.create(id=job.get_id(), name=name, description=description, user=user)
-    task.save()
 
     _set_task_file_name(job, task, file_type)
     file_name = user.export_practices(os, file_type)

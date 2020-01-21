@@ -1,23 +1,29 @@
 from unittest import mock
 
-from django.test import TestCase
+from django.test import TestCase, RequestFactory
 from django.urls import reverse
 from django.contrib.auth.models import User
 
-from app.models.practice import Instrument
+from app.backend.profile.views import export_practices_view, settings_profile_view
+from app.models.practice import Instrument, Practice, Exercise
+from app.models.profile import EmailPreferences
 from app.backend.utils.instruments import populate_db
-from .utils import change_email, change_password, change_username
-from app.tests.conftest import (create_user, delete_users, A_USERNAME, A_PASSWORD, OTHER_PASSWORD, OTHER_PASSWORD,
-                                OTHER_EMAIL, is_profile_page, is_settings_page, is_access_settings, AN_EMAIL,
-                                OTHER_USERNAME, is_practice_settings_page, SOME_INSTRUMENTS)
+from .utils import change_email, change_password, change_username, delete_post
+from app.tests.conftest import (create_user, delete_users, A_USERNAME, A_PASSWORD, OTHER_PASSWORD,
+                                OTHER_EMAIL, is_profile_page, is_settings_page, is_access_settings,
+                                is_profile_settings_page, AN_EMAIL, OTHER_USERNAME, is_practice_settings_page,
+                                SOME_INSTRUMENTS, MockUser)
 
 MOCK_UPDATE_EMAIL = 'app.backend.profile.views.update_email'
+MOCK_MESSAGES = 'app.backend.profile.views.messages'
+MOCK_LOGOUT = 'app.backend.profile.views.logout'
 
 
 class ProfileViewsTests(TestCase):
 
     @classmethod
     def setUpClass(cls):
+        cls.factory = RequestFactory()
         cls.a_user = create_user()
 
         cls.url_profile = reverse('app:profile.profile')
@@ -225,198 +231,201 @@ class ProfileViewsTests(TestCase):
     """
     SETTINGS PROFILE TESTS
     """
-    '''
-    def test_render_profile_settings_page(test_client, a_user_logged_in):
+
+    def test_render_profile_settings_page(self):
         """
         WHEN the profile settings page is requested
         THEN it the page is rendered
         """
-        response = self.client.get('/settings/profile', follow=True)
+        response = self.client.get(self.url_settings_profile, follow=True)
 
         self.assertEqual(response.status_code, 200)
-        assert is_profile_settings_page(response)
+        self.assertTrue(is_profile_settings_page(response))
 
-
-    @mock.patch(MOCK_CURRENT_USER)
-    def test_email_preferences_select_none(mock_current_user, test_client, a_user_logged_in):
+    def test_email_preferences_select_none(self):
         """
         WHEN the user unchecks all of the email preferences
         THEN they are updated
         """
-        response = test_client.post('/settings/profile',
-                                    data=dict(practicing=False, promotions=False, features=False),
-                                    follow=True)
+        data = dict(practicing=False, promotions=False, features=False)
+        request = self.factory.post(self.url_export_practices, data=data, HTTP_USER_AGENT='linux')
+        request.user = MockUser(username='hello')
 
-        self.assertEqual(response.status_code, 200)
-        assert mock_current_user.update_email_preferences.called
+        response = settings_profile_view(request)
 
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(request.user.profile.is_update_email_preferences_called)
 
     """
     DELETE ACCOUNT
     """
 
-
     @mock.patch(MOCK_LOGOUT)
-    def test_delete_account_ensure_user_logged_in(mock_logout, test_client):
+    def test_delete_account_ensure_user_logged_in(self, mock_logout):
         """
         WHEN the user requests his account to be deleted
-        THEN ensure the user is logged in to prevent a cURL POST
+        THEN ensure the user is logged in
         """
-        _post_delete(test_client)
+        self.client.logout()
 
-        assert not mock_logout.called
+        delete_post(self.client)
 
+        self.assertFalse(mock_logout.called)
 
     @mock.patch(MOCK_LOGOUT)
-    def test_delete_account_ensure_user_is_logged_out(mock_logout, test_client, a_user_logged_in):
+    def test_delete_account_ensure_user_is_logged_out(self, mock_logout):
         """
         WHEN a user deletes the account
         THEN the user is logged out
         """
-        response = _post_delete(test_client)
+        response = delete_post(self.client)
 
-        assert response.get_data(as_text=True)[-1] == '/'
-        assert mock_logout.called
+        self.assertEqual(response.url, reverse('app:main.index'))
+        self.assertTrue(mock_logout.called)
 
-
-    def test_delete_account_account_deleted(test_client, a_user_logged_in):
+    def test_delete_account_account_deleted(self):
         """
         WHEN the user requests his account to be deleted
         THEN the account is deleted
         """
-        username = a_user_logged_in.username
+        username = self.a_user.username
 
-        _post_delete(test_client)
+        response = delete_post(self.client)
 
-        assert User.query.filter_by(username=username).first() is None
+        self.assertIsNone(User.objects.filter(username=username).first())
+        self.a_user = create_user()
 
-
-    def test_delete_account_identical_passwords(test_client, a_user_logged_in):
+    def test_delete_account_identical_passwords(self):
         """
         WHEN a user requests his account to be deleted with the wrong credentials
         THEN the account remains intact
         """
-        _post_delete(test_client, is_wrong_password=True)
+        delete_post(self.client, is_wrong_password=True)
 
-        assert User.query.filter_by(username=a_user_logged_in.username).first() is not None
+        self.assertIsNotNone(User.objects.filter(username=self.a_user.username).first())
 
-
-    def test_delete_remove_email_preferences(test_client, a_user_logged_in):
+    def test_delete_remove_email_preferences(self):
         """
         WHEN a user deletes his account
         THEN the email preferences tied to the account are deleted
         """
-        num_preferences = len(EmailPreferences.query.all())
+        num_preferences = EmailPreferences.objects.count()
 
-        _post_delete(test_client)
-        num_preferences_actual = len(EmailPreferences.query.all())
+        delete_post(self.client)
+        num_preferences_actual = EmailPreferences.objects.count()
 
-        assert num_preferences_actual == num_preferences - 1
+        self.assertEqual(num_preferences_actual, num_preferences - 1)
 
-
-    def test_delete_remove_practices(test_client, a_user_logged_in, a_user_with_4_practices):
+    def test_delete_remove_practices(self):
         """
         GIVEN a user with 4 practices
         WHEN the user deletes his account
         THEN the practices tied to the account are deleted
         """
-        num_practices = len(Practice.query.all())
+        for instrument_name in ['one', 'two', 'three', 'four']:
+            self.a_user.profile.new_practice(instrument_name)
+        num_practices = Practice.objects.count()
 
-        _post_delete(test_client)
-        num_practices_actual = len(Practice.query.all())
+        delete_post(self.client)
+        num_practices_actual = Practice.objects.count()
 
-        assert num_practices_actual == num_practices - 4
+        self.assertEqual(num_practices_actual, num_practices - 4)
 
+    def test_delete_exercises_intact(self):
+        """
+        GIVEN a user with 4 practices, each with 1 exercise
+        WHEN the user deletes his account
+        THEN exercises are not deleted
+        """
+        for instrument_name in ['one', 'two', 'three', 'four']:
+            self.a_user.profile.new_practice(instrument_name)
+        exercises = [('a', 60, 80, 5), ('b', 70, 80, 6), ('c', 90, 80, 7), ('d', 50, 60, 8)]
+        exercises = [Exercise.objects.create(name=a, bpm_start=b, bpm_end=c, minutes=d) for a, b, c, d in exercises]
+        for practice, exercise in zip(self.a_user.profile.practices.all(), exercises):
+            practice.exercises.add(exercise)
+            practice.save()
+        num_practices_before = Practice.objects.count()
+        num_exercises_before = Exercise.objects.count()
 
-    def _post_delete(test_client, is_wrong_password=False):
-        password = A_PASSWORD + 'a' if is_wrong_password else A_PASSWORD
-        return test_client.post('/delete-account',
-                                data=json.dumps(dict(password=password)),
-                                content_type='application/json')
+        delete_post(self.client)
 
+        self.assertEqual(Practice.objects.count(), num_practices_before - 4)
+        self.assertEqual(Exercise.objects.count(), num_exercises_before)
 
     """
     EXPORT PRACTICES
     """
 
-
-    @mock.patch(MOCK_CURRENT_USER)
-    def test_export_practices_task_not_in_progress(mock_current_user, test_client, a_user_logged_in):
+    def test_export_practices_task_not_in_progress(self):
         """
         WHEN the user requests to export the practices
         THEN a new task is launched
         """
-        mock_current_user.get_task_in_progress.return_value = False
-        mock_current_user.launch_task.return_value = None
+        request = self.factory.post(self.url_export_practices, data=dict(file_type='pdf'), HTTP_USER_AGENT='linux')
+        request.user = MockUser(username='hello')
 
-        response = test_client.post('/export_practices', data=dict(file_type='pdf'),
-                                    environ_base={'HTTP_USER_AGENT': 'linux'})
+        response = export_practices_view(request)
 
-        assert response.data == b''
-        assert mock_current_user.launch_task.called
+        self.assertEqual(response.content, b'')
+        self.assertTrue(request.user.profile.is_launch_task_called)
 
-
-    @mock.patch(MOCK_CURRENT_USER)
-    def test_export_practices_task_in_progress(mock_current_user, test_client, a_user_logged_in):
+    @mock.patch(MOCK_MESSAGES)
+    def test_export_practices_task_in_progress(self, mock_messages):
         """
         WHEN the user requests to export the practices
         THEN a new task is launched
         """
-        mock_current_user.get_task_in_progress.return_value = True
+        request = self.factory.post(self.url_export_practices, data=dict(file_type='pdf'), HTTP_USER_AGENT='linux')
+        request.user = MockUser(username='hello')
+        request.user.profile.set_get_task = True
 
-        response = test_client.post('/export_practices', data=dict(file_type='pdf'))
+        response = export_practices_view(request)
 
-        assert response.data == b'task in progress'
-
+        self.assertEqual(response.content, b'task in progress')
 
     """
     ADD NEW INSTRUMENT
     """
 
-
-    def test_add_new_instrument_empty_string(test_client, a_user_logged_in):
+    def test_add_new_instrument_empty_string(self):
         """
         GIVEN an empty instrument name
         WHEN adding a new instrument to the database
         THEN the instrument is not added
         """
-        instruments_before = Instrument.query.all()
+        num_instruments_before = Instrument.objects.count()
 
-        response = test_client.post('/add-new-instrument', query_string=dict(name=''))
+        response = self.client.post(self.url_add_instrument, data=dict(name=''))
 
-        assert int(response.get_data(as_text=True)) == 400
-        assert instruments_before == Instrument.query.all()
+        self.assertEqual(int(response.content), 400)
+        self.assertEqual(num_instruments_before, Instrument.objects.count())
 
-
-    def test_add_new_instrument_non_empty_string(test_client, a_user_logged_in):
+    def test_add_new_instrument_non_empty_string(self):
         """
         GIVEN an instrument name
         WHEN adding a new instrument to the database
         THEN the instrument is added
         """
-        instrument = Instrument(name='test')
-        instrument_before = Instrument.query.filter_by(name=instrument.name).first()
+        instrument = Instrument(name='an instrument that does not exist')
+        num_instruments_before = Instrument.objects.count()
 
-        response = test_client.post('/add-new-instrument', query_string=dict(name=instrument.name))
-        instrument_after = Instrument.query.filter_by(name=instrument.name).first()
+        response = self.client.post(self.url_add_instrument, data=dict(name=instrument.name))
+        instrument_after = Instrument.objects.filter(name=instrument.name).first()
 
-        assert int(response.get_data(as_text=True)) == 200
-        assert instrument_before is None
-        assert instrument_after.name == instrument.name
+        self.assertEqual(int(response.content), 200)
+        self.assertEqual(num_instruments_before + 1, Instrument.objects.count())
+        self.assertEqual(instrument_after.name, instrument.name)
 
-
-    def test_add_new_instrument_already_exists(test_client, a_user_logged_in):
+    def test_add_new_instrument_already_exists(self):
         """
         GIVEN an instrument name that is already in the database
         WHEN adding a new instrument to the database
         THEN the instrument is not added
         """
-        instrument = Instrument(name='test')
-        commit(instrument)
-        instruments_before = Instrument.query.all()
+        instrument = Instrument.objects.create(name='test')
+        num_instruments_before = Instrument.objects.count()
 
-        response = test_client.post('/add-new-instrument', query_string=dict(name=instrument.name))
+        response = self.client.post(self.url_add_instrument, data=dict(name=instrument.name))
 
-        assert int(response.get_data(as_text=True)) == 400
-        assert instruments_before == Instrument.query.all()
-    '''
+        self.assertEqual(int(response.content), 400)
+        self.assertEqual(num_instruments_before, Instrument.objects.count())

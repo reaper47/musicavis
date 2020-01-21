@@ -1,7 +1,6 @@
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.contrib import messages
-from django.contrib.auth.models import AnonymousUser
 
 from .forms import ContactForm
 from app.backend.utils.tasks import send_email
@@ -13,7 +12,7 @@ def contact_us(request):
         if form.is_valid():
             data = request.POST.copy()
             subject = data['subject']
-            email = data['email_address'] if isinstance(request.user, AnonymousUser) else request.user.email
+            email = data['email_address'] if request.user.is_anonymous else request.user.email
             message = data['message'].splitlines()
 
             args = dict(message=message, name=data['first_name'], email=email)

@@ -40,8 +40,7 @@ class Profile(models.Model):
         if not hasattr(self, 'email_preferences'):
             self.user.email = self.user.email.lower()
 
-            email_preferences = EmailPreferences(features=True, practicing=True, promotions=True)
-            email_preferences.save()
+            email_preferences = EmailPreferences.objects.create(features=True, practicing=True, promotions=True)
             self.email_preferences = email_preferences
 
         return super().save(*args, **kwargs)
@@ -66,10 +65,8 @@ class Profile(models.Model):
         self.user.save()
 
     def update_email_preferences(self, accept_features: bool, accept_practicing: bool, accept_promotions: bool):
-        self.email_preferences.features = accept_features
-        self.email_preferences.practicing = accept_practicing
-        self.email_preferences.promotions = accept_promotions
-        self.email_preferences.save()
+        email_preferences = EmailPreferences.objects.filter(pk=self.email_preferences.pk)
+        email_preferences.update(features=accept_features, practicing=accept_practicing, promotions=accept_promotions)
 
     def update_instruments_practiced(self, instruments):
         for instrument in self.instruments_practiced.all():
@@ -86,8 +83,7 @@ class Profile(models.Model):
 
     def add_notification(self, name, data):
         self.notifications.all().filter(name=name).delete()
-        notification = Notification(name=name, payload_json=json.dumps(data), user_profile=self)
-        notification.save()
+        notification = Notification.objects.create(name=name, payload_json=json.dumps(data), user_profile=self)
         self.notifications.add(notification)
         return notification
 
@@ -96,6 +92,11 @@ class Profile(models.Model):
         html = '<br>- '.join([x.name.title() for x in instruments])
         html = f'- {html}' if instruments else 'None'
         return html
+
+    def delete(self):
+        self.email_preferences.delete()
+        self.user.delete()
+        super().delete()
 
     def __str__(self):
         return self.user.username
@@ -107,11 +108,9 @@ class Profile(models.Model):
     def new_practice(self, instrument_name: str) -> Practice:
         instrument = Instrument.objects.filter(name=instrument_name).first()
         if instrument is None:
-            instrument = Instrument(name=instrument_name)
-            instrument.save()
+            instrument = Instrument.objects.create(name=instrument_name)
 
-        practice = Practice(user_profile=self, instrument=instrument)
-        practice.save()
+        practice = Practice.objects.create(user_profile=self, instrument=instrument)
         self.practices.add(practice)
         return practice
 
@@ -154,7 +153,7 @@ class Profile(models.Model):
     """
 
     def launch_task(self, name: str, description: str, *args, **kwargs):
-        export_practices.delay(self, name, description)
+        export_practices.delay(self, name, description, *args, **kwargs)
 
     def get_tasks_in_progress(self):
         return Task.objects.filter(user_profile=self, complete=False).all()
@@ -206,8 +205,7 @@ def update_profile_signal(sender, instance, created, **kwargs):
         Profile.objects.create(user=instance)
         instance.email = instance.email.lower()
 
-        email_preferences = EmailPreferences(features=True, practicing=True, promotions=True)
-        email_preferences.save()
+        email_preferences = EmailPreferences.objects.create(features=True, practicing=True, promotions=True)
         instance.email_preferences = email_preferences
 
     instance.profile.save()

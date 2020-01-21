@@ -1,7 +1,6 @@
 import os
 
 from django.shortcuts import render
-from django.contrib.auth.models import AnonymousUser
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse, StreamingHttpResponse
 
@@ -11,7 +10,7 @@ from app.backend.utils.export import FileDeleteWrapper
 
 
 def index_view(request):
-    if isinstance(request.user, AnonymousUser):
+    if request.user.is_anonymous:
         args = dict(
             export_extensions=['pdf', 'docx', 'xlsx', 'csv', 'txt', 'json', 'xml', 'odt', 'ods'],
             num_love_trees=range(6),

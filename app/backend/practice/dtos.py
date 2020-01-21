@@ -41,8 +41,7 @@ class PracticeDTO:
         for name in [x['name'].lower() for x in names if x['name']]:
             x = entity.objects.filter(name=name).first()
             if x is None:
-                x = entity(name=name)
-                x.save()
+                x = entity.objects.create(name=name)
             entities.append(x)
         return entities
 
@@ -55,8 +54,7 @@ class PracticeDTO:
                                          exercise['bpm_end'], exercise['minutes'])
             entity = Exercise.objects.filter(name=name.lower(), bpm_start=start, bpm_end=end, minutes=minutes).first()
             if entity is None:
-                entity = Exercise(name=name.lower(), bpm_start=start, bpm_end=end, minutes=minutes)
-                entity.save()
+                entity = Exercise.objects.create(name=name.lower(), bpm_start=start, bpm_end=end, minutes=minutes)
             entities.append(entity)
         return entities
 

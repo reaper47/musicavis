@@ -1,5 +1,3 @@
-from typing import List
-
 from django import forms
 
 from app.models.practice import Practice
@@ -35,9 +33,10 @@ class NameForm(forms.Form):
 
 
 class PracticeForm(forms.ModelForm):
+
     class Meta:
-            model = Practice
-            fields = ['notes', 'goals', 'exercises', 'positives', 'improvements']
+        model = Practice
+        fields = ['notes', 'goals', 'exercises', 'positives', 'improvements']
 
     notes = forms.CharField(label='Additional Notes', widget=forms.TextInput(), required=False)
 
@@ -88,7 +87,7 @@ class PracticeForm(forms.ModelForm):
         practice.notes = self.cleaned_data['notes']
 
         practice.interest_set.all().delete()
-        #for goal in self.cleaned_data['goals']:
+        # for goal in self.cleaned_data['goals']:
         #   Goal.objects.create(
         #       profile=profile,
         #       interest=interest,
@@ -113,5 +112,3 @@ class PracticeForm(forms.ModelForm):
         for field_name in self.fields:
             if field_name.startswith('improvement_'):
                 yield self[field_name]
-
-

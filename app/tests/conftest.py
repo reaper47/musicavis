@@ -41,8 +41,7 @@ PRACTICE
 def create_practice(user=None) -> Practice:
     user = user if user else create_user(A_USERNAME, AN_EMAIL, A_PASSWORD)
     instrument = create_instrument(AN_INSTRUMENT)
-    practice = Practice(user_profile=user.profile, instrument=instrument)
-    practice.save()
+    practice = Practice.objects.create(user_profile=user.profile, instrument=instrument)
     return practice
 
 
@@ -50,8 +49,7 @@ def create_complete_practice(user, instrument, date, exercises=None, goals=None,
                              improvements=None, positives=None, notes=''):
     instrument.save()
 
-    practice = Practice(user_profile=user.profile, date=date, instrument=instrument, notes=notes)
-    practice.save()
+    practice = Practice.objects.create(user_profile=user.profile, date=date, instrument=instrument, notes=notes)
 
     if exercises:
         for exercise in exercises:
@@ -79,15 +77,13 @@ def create_complete_practice(user, instrument, date, exercises=None, goals=None,
 def create_instrument(name: str) -> Instrument:
     instrument = Instrument.objects.filter(name=name).first()
     if not instrument:
-        instrument = Instrument(name=name)
-        instrument.save()
+        instrument = Instrument.objects.create(name=name)
     return instrument
 
 
 def add_instruments_to_database():
     for name in SOME_INSTRUMENTS:
-        instrument = Instrument(name=name)
-        instrument.save()
+        Instrument.objects.create(name=name)
 
 
 """
@@ -105,9 +101,7 @@ class JobMock:
 
 
 def create_task(id, name, description, profile, complete=False):
-    task = Task(id=id, name=name, description=description, user_profile=profile, complete=complete)
-    task.save()
-    return task
+    return Task.objects.create(id=id, name=name, description=description, user_profile=profile, complete=complete)
 
 
 """
@@ -180,9 +174,48 @@ def is_practice_settings_page(response):
 
 
 def is_profile_settings_page(response):
-    components = ['Email preferences', 'Agree to receive', 'Practicing', 'Promotions', 'Features']
+    components = ['Email Preferences', 'agree to receive', 'to practicing', 'Promotions', 'features']
     return all_equal(response, components)
 
 
 def all_equal(response, components):
     return all(c.encode() in response.content for c in components)
+
+
+"""
+MOCKS
+"""
+
+
+class MockUser:
+
+    def __init__(self, username):
+        self.username = username
+        self.is_authenticated = True
+        self.profile = MockProfile()
+
+
+class MockProfile:
+
+    def __init__(self):
+        self.set_get_task = False
+        self.is_launch_task_called = False
+        self.is_update_email_preferences_called = False
+        self.email_preferences = MockEmailPreferences()
+
+    def get_task_in_progress(self, name):
+        return self.set_get_task
+
+    def launch_task(self, *args, **kwargs):
+        self.is_launch_task_called = True
+
+    def update_email_preferences(self, *args, **kwargs):
+        self.is_update_email_preferences_called = True
+
+
+class MockEmailPreferences:
+
+    def __init__(self):
+        self.features = True
+        self.practicing = True
+        self.promotions = True

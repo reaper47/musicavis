@@ -11,5 +11,8 @@ class EmailPreferences(models.Model):
                 self.practicing == other.practicing and
                 self.promotions == other.promotions)
 
+    def __hash__(self):
+        return hash(self.features + self. practicing + self.promotions)
+
     def __str__(self):
         return f'[{self.features},{self.practicing},{self.promotions}]'

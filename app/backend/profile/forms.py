@@ -12,8 +12,8 @@ username_validator = RegexValidator(regex='^[A-Za-z][A-Za-z0-9_.]*$',
 
 class SelectFileTypeForm(forms.Form):
     filetype = forms.ChoiceField(label='Select your preferred file format',
-                                widget=forms.Select,
-                                choices=((x.value, FileType.description(x)) for x in FileType))
+                                 widget=forms.Select,
+                                 choices=((x.value, FileType.description(x)) for x in FileType))
 
 
 class ChangeUsernameForm(forms.Form):
@@ -73,6 +73,9 @@ class ChangeEmailForm(forms.Form):
         if not self.user.check_password(password):
             raise forms.ValidationError('The password is incorrect.')
 
+        if User.objects.filter(email=self.cleaned_data.get('new_email', 'null')).first():
+            raise forms.ValidationError('Email is already taken.')
+
 
 class SelectDefaultInstrumentForm(forms.Form):
     instruments = forms.MultipleChoiceField(label='Select the instruments you practice',
@@ -84,6 +87,7 @@ class SelectDefaultInstrumentForm(forms.Form):
         super().__init__(*args, **kwargs)
         choices = sorted([(x.name.lower(), x.name.title()) for x in Instrument.objects.all()])
         choices.insert(0, (str(None), 'None'))
+
         self.fields['instruments'].choices = choices
 
     def clean(self):

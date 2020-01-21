@@ -95,6 +95,7 @@ class ProfileModelTests(TestCase):
                                                      accept_practicing=(not before_practicing),
                                                      accept_promotions=(not before_promotions))
 
+        self.a_user.profile.email_preferences.refresh_from_db()
         self.assertEqual(self.a_user.profile.email_preferences.features, not before_features)
         self.assertEqual(self.a_user.profile.email_preferences.practicing, not before_practicing)
         self.assertEqual(self.a_user.profile.email_preferences.promotions, not before_promotions)
@@ -129,8 +130,7 @@ class ProfileModelTests(TestCase):
         """
         name1, name2, name3 = 'red', 'green', 'blue'
         for name in [name1, name2, name3]:
-            instrument = Instrument(name=name)
-            instrument.save()
+            instrument = Instrument.objects.create(name=name)
             self.a_user.profile.instruments_practiced.add(instrument)
         format_expected = '- Red<br>- Green<br>- Blue'
 
@@ -159,12 +159,12 @@ class ProfileModelTests(TestCase):
         WHEN a practice session is created
         THEN add the new session to the user's list of practices
         """
-        npractices_before = len(self.a_user.profile.practices.all())
+        npractices_before = self.a_user.profile.practices.count()
 
         self.a_user.profile.new_practice(AN_INSTRUMENT)
         self.a_user.profile.new_practice(AN_INSTRUMENT)
 
-        self.assertEqual(len(self.a_user.profile.practices.all()), npractices_before + 2)
+        self.assertEqual(self.a_user.profile.practices.count(), npractices_before + 2)
 
     def test_add_new_practice_session_instrument_field(self):
         """
@@ -181,12 +181,12 @@ class ProfileModelTests(TestCase):
         WHEN the practice session is deleted
         THEN ensure it is deleted in the database
         """
-        self.assertEqual(len(self.a_user_with_a_practice.profile.practices.all()), 1)
+        self.assertEqual(self.a_user_with_a_practice.profile.practices.count(), 1)
 
         a_practice = self.a_user_with_a_practice.profile.practices.all()[0]
         self.a_user_with_a_practice.profile.delete_practice(a_practice)
 
-        self.assertEqual(len(self.a_user_with_a_practice.profile.practices.all()), 0)
+        self.assertEqual(self.a_user_with_a_practice.profile.practices.count(), 0)
 
     def test_delete_practice_session_bad_user(self):
         """
@@ -198,8 +198,8 @@ class ProfileModelTests(TestCase):
 
         self.a_user.profile.delete_practice(self.a_user_with_a_practice.profile.practices.all()[0])
 
-        self.assertEqual(len(self.a_user.profile.practices.all()), 1)
-        self.assertEqual(len(self.a_user_with_a_practice.profile.practices.all()), 1)
+        self.assertEqual(self.a_user.profile.practices.count(), 1)
+        self.assertEqual(self.a_user_with_a_practice.profile.practices.count(), 1)
 
     def test_instruments_practiced(self):
         """
@@ -394,7 +394,7 @@ class ProfileModelTests(TestCase):
         """
         self.a_user.profile.add_notification('test', {'task_id': 1})
 
-        self.assertEqual(len(Notification.objects.all()), 1)
+        self.assertEqual(Notification.objects.count(), 1)
         self.assertEqual(Notification.objects.all()[0].name, 'test')
 
     def test_add_notification_multiple(self):
@@ -405,7 +405,7 @@ class ProfileModelTests(TestCase):
         self.a_user.profile.add_notification('test', {'task_id': 1})
         self.a_user.profile.add_notification('test', {'task_id': 2})
 
-        self.assertEqual(len(Notification.objects.all()), 1)
+        self.assertEqual(Notification.objects.count(), 1)
         self.assertEqual(Notification.objects.all()[0].name, 'test')
 
     """

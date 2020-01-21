@@ -10,7 +10,7 @@ class PracticeStats:
     def __init__(self, practices: List[Practice]):
         self.practices = practices
         self.practice_times = [sum([x.minutes for x in practice.exercises.all()]) for practice in practices]
-        self.exercises_per_practice = [len(practice.exercises.all()) for practice in practices]
+        self.exercises_per_practice = [practice.exercises.count() for practice in practices]
         self.exercises = [[x.minutes for x in practice.exercises.all()] for practice in practices]
         self.instruments = [practice.instrument.name.lower() for practice in self.practices]
 

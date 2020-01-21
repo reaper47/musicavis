@@ -1,7 +1,7 @@
 import re
 
 from django.contrib.auth import REDIRECT_FIELD_NAME, login, logout, authenticate
-from django.contrib.auth.models import AnonymousUser, User
+from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.sites.shortcuts import get_current_site
 from django.shortcuts import render, redirect
@@ -21,7 +21,7 @@ from app.backend.utils.enums import TokenType
 @csrf_protect
 @never_cache
 def login_view(request, redirect_field_name=REDIRECT_FIELD_NAME, login_form=LoginForm):
-    if not isinstance(request.user, AnonymousUser):
+    if not request.user.is_anonymous:
         return redirect(reverse('app:main.index'))
 
     if request.method == 'POST':

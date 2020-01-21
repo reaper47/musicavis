@@ -14,8 +14,7 @@ def populate_db():
     instruments = Instrument.objects.all()
     if not instruments:
         all_instruments = gather_instruments()
-        for name in all_instruments:
-            instrument = Instrument(name=name.replace('\n', '').replace('\r', '').strip().lower())
-            instrument.save()
+        Instrument.objects.bulk_create([Instrument(name=name.replace('\n', '').replace('\r', '').strip().lower())
+                                        for name in all_instruments])
     else:
         print('Instruments already pushed in the database.')

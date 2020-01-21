@@ -118,7 +118,7 @@ class MainViewTests(TestCase):
 
         self.client.get(reverse('app:main.export', args=(exported_file,)))
 
-        self.assertEqual(len(self.a_user.profile.notifications.all()), 0)
+        self.assertEqual(self.a_user.profile.notifications.count(), 0)
 
 
 def export_file(fname: str):

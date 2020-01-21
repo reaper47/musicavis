@@ -115,8 +115,7 @@ class PracticeModelTests(TestCase):
         practice = self.a_user_with_a_practice.profile.practices.first()
         exercises = [('C', 80, 75, length1), ('D', 95, 70, length2)]
         for name, start, end, min in exercises:
-            exercise = Exercise(name=name, bpm_start=start, bpm_end=end, minutes=min)
-            exercise.save()
+            exercise = Exercise.objects.create(name=name, bpm_start=start, bpm_end=end, minutes=min)
             practice.exercises.add(exercise)
 
         length = self.a_user_with_a_practice.profile.practices.first().length

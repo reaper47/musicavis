@@ -29,7 +29,7 @@
           </header>
           <form method="post">
             {% csrf_token %}
-            <div class="card-content card-pushdown">
+            <div class="card-content">
               <div class="content">
                 {% include 'snippets/_form_field.html' with field=email_form.new_email %}
                 {% include 'snippets/_form_field.html' with field=email_form.repeat_email %}
