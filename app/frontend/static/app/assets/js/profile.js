@@ -1,3 +1,5 @@
+import { makeSearchableDropDown, SearchableDropdown } from './dropdown';
+
 function pushNewInstrument(newInstrumentInput, addButton, addInstrument, dropdown) {
     const instrumentName = newInstrumentInput.value;
     if (instrumentName === '') {
@@ -10,17 +12,37 @@ function pushNewInstrument(newInstrumentInput, addButton, addInstrument, dropdow
     newInstrumentInput.value = '';
     addInstrument.classList.remove('hide');
 
-    const http = new XMLHttpRequest();
-    http.open('POST', `/add-new-instrument?name=${instrumentName}`, true);
-    http.setRequestHeader('Content-type', 'text/plain');
-    http.onreadystatechange = () => {
-        if (http.readyState == 4 && http.status == 200) {
-            if (http.responseText == 200) {
-                dropdown.addOption(instrumentName);
-            }
-        }
-    }
-    http.send(null);
+    fetch(new Request('/add-new-instrument/', {
+        method: 'POST',
+        mode: 'same-origin',
+        headers: {'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value},
+        body: JSON.stringify({'name': `${instrumentName}`})
+    })).then(() => dropdown.addOption(instrumentName));
 }
 
-export default pushNewInstrument;
+
+function settingsPracticeLoad() {
+    const searchableDropDown = makeSearchableDropDown('id_instruments', 'Search for an instrument...', true);
+
+    const confirmAddInstrument = document.getElementById('confirm-add-instrument');
+    const addInstrument = document.getElementById('add-instrument');
+    const newInstrumentInput = document.getElementById('new-instrument');
+
+    newInstrumentInput.addEventListener('keydown', (event) => {
+        if (event.code === 'Enter') {
+            event.preventDefault();
+            pushNewInstrument(newInstrumentInput, confirmAddInstrument, addInstrument, searchableDropDown);
+        }
+    });
+
+    addInstrument.addEventListener('click', () => {
+        confirmAddInstrument.classList.remove('hide');
+        addInstrument.classList.add('hide');
+        newInstrumentInput.classList.remove('hide');
+        newInstrumentInput.focus();
+    });
+
+    confirmAddInstrument.addEventListener('click', () => pushNewInstrument(newInstrumentInput, confirmAddInstrument, addInstrument, searchableDropDown));
+}
+
+export { makeSearchableDropDown, SearchableDropdown, pushNewInstrument, settingsPracticeLoad };

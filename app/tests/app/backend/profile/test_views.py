@@ -4,7 +4,7 @@ from django.test import TestCase, RequestFactory
 from django.urls import reverse
 from django.contrib.auth.models import User
 
-from app.backend.profile.views import export_practices_view, settings_profile_view
+from app.backend.profile.views import export_practices_view, settings_profile_view, add_new_instrument_view
 from app.models.practice import Instrument, Practice, Exercise
 from app.models.profile import EmailPreferences
 from app.backend.utils.instruments import populate_db
@@ -12,7 +12,7 @@ from .utils import change_email, change_password, change_username, delete_post
 from app.tests.conftest import (create_user, delete_users, A_USERNAME, A_PASSWORD, OTHER_PASSWORD,
                                 OTHER_EMAIL, is_profile_page, is_settings_page, is_access_settings,
                                 is_profile_settings_page, AN_EMAIL, OTHER_USERNAME, is_practice_settings_page,
-                                SOME_INSTRUMENTS, MockUser)
+                                SOME_INSTRUMENTS, MockUser, mockRequestAddInstrument)
 
 MOCK_UPDATE_EMAIL = 'app.backend.profile.views.update_email'
 MOCK_MESSAGES = 'app.backend.profile.views.messages'
@@ -242,7 +242,8 @@ class ProfileViewsTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTrue(is_profile_settings_page(response))
 
-    def test_email_preferences_select_none(self):
+    @mock.patch(MOCK_MESSAGES)
+    def test_email_preferences_select_none(self, mock_messages):
         """
         WHEN the user unchecks all of the email preferences
         THEN they are updated
@@ -290,7 +291,7 @@ class ProfileViewsTests(TestCase):
         """
         username = self.a_user.username
 
-        response = delete_post(self.client)
+        delete_post(self.client)
 
         self.assertIsNone(User.objects.filter(username=username).first())
         self.a_user = create_user()
@@ -394,8 +395,9 @@ class ProfileViewsTests(TestCase):
         THEN the instrument is not added
         """
         num_instruments_before = Instrument.objects.count()
+        request = mockRequestAddInstrument('', self.factory, self.url_add_instrument)
 
-        response = self.client.post(self.url_add_instrument, data=dict(name=''))
+        response = add_new_instrument_view(request)
 
         self.assertEqual(int(response.content), 400)
         self.assertEqual(num_instruments_before, Instrument.objects.count())
@@ -408,8 +410,9 @@ class ProfileViewsTests(TestCase):
         """
         instrument = Instrument(name='an instrument that does not exist')
         num_instruments_before = Instrument.objects.count()
+        request = mockRequestAddInstrument(instrument.name, self.factory, self.url_add_instrument)
 
-        response = self.client.post(self.url_add_instrument, data=dict(name=instrument.name))
+        response = add_new_instrument_view(request)
         instrument_after = Instrument.objects.filter(name=instrument.name).first()
 
         self.assertEqual(int(response.content), 200)
@@ -424,8 +427,9 @@ class ProfileViewsTests(TestCase):
         """
         instrument = Instrument.objects.create(name='test')
         num_instruments_before = Instrument.objects.count()
+        request = mockRequestAddInstrument(instrument.name, self.factory, self.url_add_instrument)
 
-        response = self.client.post(self.url_add_instrument, data=dict(name=instrument.name))
+        response = add_new_instrument_view(request)
 
         self.assertEqual(int(response.content), 400)
         self.assertEqual(num_instruments_before, Instrument.objects.count())

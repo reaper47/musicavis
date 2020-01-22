@@ -90,11 +90,13 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('is_confirmed', models.BooleanField(default=False)),
-                ('email_preferences', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='app.EmailPreferences')),
+                ('email_preferences', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE,
+                                                        to='app.EmailPreferences')),
                 ('instruments_practiced', models.ManyToManyField(to='app.Instrument')),
                 ('notifications', models.ManyToManyField(to='app.Notification')),
                 ('practices', models.ManyToManyField(to='app.Practice')),
-                ('user', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                ('user', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE,
+                                              to=settings.AUTH_USER_MODEL)),
             ],
         ),
         migrations.CreateModel(

@@ -1,5 +1,3 @@
-import json
-
 from django.urls import reverse
 
 from app.tests.conftest import A_PASSWORD

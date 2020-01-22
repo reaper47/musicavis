@@ -1,6 +1,7 @@
+import json
+
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
 from django.views.decorators.http import require_POST
 from django.shortcuts import render, redirect
 from django.urls import reverse
@@ -8,7 +9,7 @@ from django.contrib import messages
 from django.http import HttpResponse
 
 from app.models.practice import Instrument
-from app.backend.utils.enums import FormType, NewLine, FileType
+from app.backend.utils.enums import NewLine, FileType
 from .utils import update_email
 from .forms import (SelectFileTypeForm, ChangePasswordForm, ChangeUsernameForm,
                     ChangeEmailForm, EmailPreferencesForm, SelectDefaultInstrumentForm)
@@ -77,7 +78,10 @@ def settings_access_view(request):
             messages.info(request, 'Your username has been updated.')
             return redirect(reverse('app:profile.settings'))
 
-        for error in list(change_password_form.errors.items()) + list(change_email_form.errors.items()) + list(change_username_form.errors.items()):
+        errors = (list(change_password_form.errors.items()) +
+                  list(change_email_form.errors.items()) +
+                  list(change_username_form.errors.items()))
+        for error in errors:
             message = error[1].data[0].message
             if message != 'This field is required.':
                 messages.info(request, message)
@@ -117,7 +121,7 @@ def settings_practice_view(request):
 @require_POST
 @login_required
 def add_new_instrument_view(request):
-    name = request.POST['name']
+    name = json.loads(request.body.decode('utf-8'))['name']
     instrument = Instrument.objects.filter(name=name).first()
     if not name or instrument:
         return HttpResponse('400')

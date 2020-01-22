@@ -3,12 +3,15 @@ const webpack = require('webpack');
 const BundleTracker = require('webpack-bundle-tracker');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
+const ENTRY_PATH = './app/frontend/static/app/assets/js/';
+
 
 module.exports = {
   mode: 'production',
   context: __dirname,
   entry: {
-    main: ['@babel/polyfill', './app/frontend/static/app/assets/js/index']
+    main: [/*'@babel/polyfill',*/ `${ENTRY_PATH}/index`],
+    profile: [`${ENTRY_PATH}/profile`]
   },
   output: {
       path: path.resolve('./app/frontend/static/app/assets/bundles/'),

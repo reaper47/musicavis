@@ -72,13 +72,13 @@ class PracticeForm(forms.ModelForm):
         i = 0
         field_name = f'{label}_{i}'
         while self.cleaned_data.get(field_name):
-           component = self.cleaned_data[field_name]
-           if component in components:
-               self.add_error(field_name, 'Duplicate')
-           else:
-               components.add(interest)
-           i += 1
-           field_name = f'{label}_{i}'
+            component = self.cleaned_data[field_name]
+            if component in components:
+                self.add_error(field_name, 'Duplicate')
+            else:
+                components.add(component)
+                i += 1
+                field_name = f'{label}_{i}'
 
         self.cleaned_data[f'{label}s'] = components
 

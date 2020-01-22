@@ -1,3 +1,5 @@
+import json
+
 from django.contrib.auth.models import User
 
 from app.models.practice import Practice, Instrument
@@ -219,3 +221,11 @@ class MockEmailPreferences:
         self.features = True
         self.practicing = True
         self.promotions = True
+
+
+def mockRequestAddInstrument(instrument_name, factory, url):
+    data = {'name': instrument_name}
+    request = factory.post(url, data=data, HTTP_USER_AGENT='linux')
+    request.user = MockUser(username='hello')
+    request._body = json.dumps(data).encode('utf-8')
+    return request

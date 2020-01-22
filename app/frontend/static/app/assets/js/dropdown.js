@@ -108,22 +108,25 @@ class SearchableDropdown {
       })
   }
 
-  _addOpenCloseListener() {
-      this.newSelect.addEventListener('click', (event) => {
-          if (event.target.classList.contains('dd-searchbox')) {
-              return;
-          } else if (this.newSelect.classList.contains('open')) {
-              this._removeTabIndex();
-              if (!this.allowMultiple)
-                    this.newSelect.classList.remove('open');
-              return;
-          }
+    _addOpenCloseListener() {
+        this.newSelect.addEventListener('click', (event) => {
+            const eventList = event.target.classList;
+            const parentElementList = event.target.parentElement.classList;
 
-          this.newSelect.classList.add('open');
-          Array.from(this.searchBoxOptions.children).forEach(el => el.tabIndex = 0);
-          this.searchBoxInput.focus();
-      });
-  }
+            if (parentElementList.contains('open') || parentElementList.contains('multiple-select-item-container')) {
+                this._removeTabIndex();
+                if (!this.allowMultiple)
+                    this.newSelect.classList.remove('open');
+                return;
+            } else if (eventList.contains('dd-searchbox') || eventList.contains('checkbox-option') || event.target.tagName === 'UL') {
+                return;
+            }
+
+            this.newSelect.classList.toggle('open');
+            Array.from(this.searchBoxOptions.children).forEach(el => el.tabIndex = 0);
+            this.searchBoxInput.focus();
+        });
+    }
 
   _addClickOutsideListener() {
     document.addEventListener('click', (event) => {
@@ -165,7 +168,7 @@ class SearchableDropdown {
             checkbox.checked ? option.classList.add('selected') : option.classList.remove('selected');
             this.originalSelect.children[option.dataset['value']].selected = checkbox.checked;
 
-            const selected = getSelectValues(this.originalSelect).join(', ');
+            const selected = main.getSelectValues(this.originalSelect).join(', ');
             this.newSelect.firstChild.textContent = selected ? selected : 'None';
         } else {
             Array.from(this.searchBoxOptions.children).forEach(el => el.classList.remove('selected'));
