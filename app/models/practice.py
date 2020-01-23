@@ -7,7 +7,7 @@ from django.utils import timezone
 class Practice(models.Model):
     user_profile = models.ForeignKey('Profile', on_delete=models.CASCADE)
     date = models.DateTimeField(default=timezone.now)
-    instrument = models.ForeignKey('Instrument', on_delete=models.CASCADE)
+    instrument = models.ForeignKey('Instrument', on_delete=models.DO_NOTHING)
     goals = models.ManyToManyField('Goal')
     exercises = models.ManyToManyField('Exercise')
     improvements = models.ManyToManyField('Improvement')
@@ -109,7 +109,7 @@ class Goal(models.Model):
         return self.name == other.name
 
     def __str__(self):
-        return self.name
+        return f'#{self.pk} - {self.name}'
 
 
 class Improvement(models.Model):

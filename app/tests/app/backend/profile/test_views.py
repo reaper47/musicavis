@@ -1,3 +1,4 @@
+import json
 from unittest import mock
 
 from django.test import TestCase, RequestFactory
@@ -12,7 +13,7 @@ from .utils import change_email, change_password, change_username, delete_post
 from app.tests.conftest import (create_user, delete_users, A_USERNAME, A_PASSWORD, OTHER_PASSWORD,
                                 OTHER_EMAIL, is_profile_page, is_settings_page, is_access_settings,
                                 is_profile_settings_page, AN_EMAIL, OTHER_USERNAME, is_practice_settings_page,
-                                SOME_INSTRUMENTS, MockUser, mockRequestAddInstrument)
+                                SOME_INSTRUMENTS, MockUser, mockRequestWithBody)
 
 MOCK_UPDATE_EMAIL = 'app.backend.profile.views.update_email'
 MOCK_MESSAGES = 'app.backend.profile.views.messages'
@@ -362,8 +363,10 @@ class ProfileViewsTests(TestCase):
         WHEN the user requests to export the practices
         THEN a new task is launched
         """
-        request = self.factory.post(self.url_export_practices, data=dict(file_type='pdf'), HTTP_USER_AGENT='linux')
+        data = dict(file_type='pdf')
+        request = self.factory.post(self.url_export_practices, data=data, HTTP_USER_AGENT='linux')
         request.user = MockUser(username='hello')
+        request._body = json.dumps(data).encode('utf-8')
 
         response = export_practices_view(request)
 
@@ -395,7 +398,7 @@ class ProfileViewsTests(TestCase):
         THEN the instrument is not added
         """
         num_instruments_before = Instrument.objects.count()
-        request = mockRequestAddInstrument('', self.factory, self.url_add_instrument)
+        request = mockRequestWithBody('', self.factory, self.url_add_instrument)
 
         response = add_new_instrument_view(request)
 
@@ -410,7 +413,7 @@ class ProfileViewsTests(TestCase):
         """
         instrument = Instrument(name='an instrument that does not exist')
         num_instruments_before = Instrument.objects.count()
-        request = mockRequestAddInstrument(instrument.name, self.factory, self.url_add_instrument)
+        request = mockRequestWithBody(instrument.name, self.factory, self.url_add_instrument)
 
         response = add_new_instrument_view(request)
         instrument_after = Instrument.objects.filter(name=instrument.name).first()
@@ -427,7 +430,7 @@ class ProfileViewsTests(TestCase):
         """
         instrument = Instrument.objects.create(name='test')
         num_instruments_before = Instrument.objects.count()
-        request = mockRequestAddInstrument(instrument.name, self.factory, self.url_add_instrument)
+        request = mockRequestWithBody(instrument.name, self.factory, self.url_add_instrument)
 
         response = add_new_instrument_view(request)
 

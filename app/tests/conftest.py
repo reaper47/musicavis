@@ -223,7 +223,7 @@ class MockEmailPreferences:
         self.promotions = True
 
 
-def mockRequestAddInstrument(instrument_name, factory, url):
+def mockRequestWithBody(instrument_name, factory, url):
     data = {'name': instrument_name}
     request = factory.post(url, data=data, HTTP_USER_AGENT='linux')
     request.user = MockUser(username='hello')

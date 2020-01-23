@@ -95,10 +95,11 @@ class PracticeModelTests(TestCase):
         THEN each model is formatted as intended
         """
         practice = self.a_user_with_a_practice.profile.practices.first()
+        goal = Goal.objects.create(name='test')
         models = [(practice, f'#{practice.pk} - {practice.date}'),
                   (Exercise(name='test'), f'test - [None,None] (None)'),
                   (practice.instrument, f'{practice.instrument.name}'),
-                  (Goal(name='test'), 'test'),
+                  (goal, '#9 - test'),
                   (Improvement(name='test'), 'test'),
                   (Positive(name='test'), 'test')]
 

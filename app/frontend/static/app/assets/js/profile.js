@@ -1,4 +1,5 @@
 import { makeSearchableDropDown, SearchableDropdown } from './dropdown';
+import Main from './main';
 
 function pushNewInstrument(newInstrumentInput, addButton, addInstrument, dropdown) {
     const instrumentName = newInstrumentInput.value;
@@ -15,8 +16,8 @@ function pushNewInstrument(newInstrumentInput, addButton, addInstrument, dropdow
     fetch(new Request('/add-new-instrument/', {
         method: 'POST',
         mode: 'same-origin',
-        headers: {'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value},
-        body: JSON.stringify({'name': `${instrumentName}`})
+        headers: {'X-CSRFToken': main.getCsrfToken()},
+        body: JSON.stringify({'name': instrumentName})
     })).then(() => dropdown.addOption(instrumentName));
 }
 

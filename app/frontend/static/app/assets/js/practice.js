@@ -1,3 +1,7 @@
+import { makeSearchableDropDown, SearchableDropdown } from './dropdown';
+import { Timer, Metronome } from './tools.js'
+
+
 class Practice {
     constructor() {
 
@@ -442,4 +446,4 @@ class Practice {
 
 }
 
-export default Practice;
+export { Practice, makeSearchableDropDown, SearchableDropdown, Timer, Metronome };

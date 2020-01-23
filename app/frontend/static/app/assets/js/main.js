@@ -181,6 +181,10 @@ class Main {
         const options = Array.from(select && select.options);
         return options.flatMap(opt => opt.selected ? [opt.value || opt.text] : []);
     }
+
+    getCsrfToken() {
+        return document.querySelector('[name=csrfmiddlewaretoken]').value;
+    }
 }
 
 export default Main;

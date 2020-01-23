@@ -64,6 +64,10 @@ main {
   margin-bottom: 1rem;
 }
 
+.margin-bottom025 {
+  margin-bottom: 0.25rem !important;
+}
+
 .cursor-default {
   cursor: default !important;
 }

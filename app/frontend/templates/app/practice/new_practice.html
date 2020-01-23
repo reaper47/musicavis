@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block page_content %}
 <section class="section">
@@ -14,21 +15,17 @@
             <div class="card-content">
               <div class="content">
                 <div class="dropdown-container no-style">
-                  {% include 'snippets/_form_field.html' with field=form.instruments %}
+                  {% include 'snippets/_form_field.html' with field=form.instrument %}
                 </div>
               </div>
             </div>
-            <button type="submit" class='button is-primary is-fullwidth'>Save</button>
+            <button type="submit" class='button is-primary is-fullwidth'>Create</button>
           </form>
         </div>
       </div>
     </div>
   </div>
 </section>
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-  const searchableDropdown = new SearchableDropdown('id_instrument')
-  searchableDropdown.createDropdown('Search for an instrument...')
-})
-</script>
+<script src="{% static 'bundles/practice.js' %}"></script>
+<script>document.addEventListener('DOMContentLoaded', () => makeSearchableDropDown('id_instrument', 'Search for an instrument...'))</script>
 {% endblock %}

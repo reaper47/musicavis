@@ -34,7 +34,7 @@ def export_practices_view(request):
         return HttpResponse('task in progress')
 
     os = NewLine.from_string(request.META['HTTP_USER_AGENT'])
-    file_type = FileType.from_string(request.POST['file_type'])
+    file_type = FileType.from_string(json.loads(request.body.decode('utf-8'))['file_type'])
     request.user.profile.launch_task('export_practices', 'Exporting practices...', os=os, file_type=file_type)
     return HttpResponse('')
 

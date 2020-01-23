@@ -1,3 +1,5 @@
+{% load static %}
+
 <div id="modal-export-practices" class="modal">
   <div class="modal-background"></div>
   <div class="modal-card">
@@ -19,30 +21,7 @@
     </form>
   </div>
 </div>
-<script>
-  window.onload = () => {
-    document.getElementById('form-export-practices').addEventListener('submit-export', () => {
-      toast({
-        'message': 'We are exporting your practices. Please wait.',
-        'duration': 3000,
-        'type': 'is-info',
-        'animate': {'in': 'fadeIn', 'out': 'fadeOut'}
-      })
-    })
-  }
-
-  document.addEventListener('DOMContentLoaded', () => {
-    const searchableDropdown = new SearchableDropdown('id_filetype');
-    searchableDropdown.createDropdown('Search for a format...');
-
-    document.getElementById('submit-export').addEventListener('click', (event) => {
-      event.preventDefault();
-
-      const xhr = new XMLHttpRequest()
-      xhr.open('POST', "{{ url_export_practices }}");
-      const formData = new FormData(document.getElementById('form-export-practices'));
-      formData.set('file_type', document.getElementById('id_filetype').value);
-      xhr.send(formData);
-    });
-  })
+<script src="{% static 'bundles/dialog_export_practice.js' %}"></script>
+<script defer>
+document.addEventListener('DOMContentLoaded', () => setUpExportPractice("{{ url_export_practices }}"));
 </script>
