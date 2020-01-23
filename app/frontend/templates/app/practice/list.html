@@ -1,25 +1,25 @@
 {% extends 'base.html' %}
 
-{%- block page_content -%}
-{%- if practices -%}
+{% block page_content %}
+{% if page_obj.paginator.count %}
 <section class="section full-height" id="practice-list-grid">
-  {%- include 'partials/_practice.html' -%}
+  {% include 'partials/_practice.html' %}
 </section>
 <section id="practice-list-actions">
   <div class="practice-list-action">
-    <a class="button is-fullwidth" href="{% if prev_url %}{{ prev_url }}{% endif %}" {% if prev_url is none %}disabled{% endif %}>
+    <a class="button is-fullwidth" href="{% if page_obj.has_previous %}{{ page_obj.previous_page_number }}{% endif %}" {% if not page_obj.has_previous %}disabled{% endif %}>
       <i class="fas fa-long-arrow-alt-left"></i>&nbsp;More Recent
     </a>
   </div>
   <div class="practice-list-action">
-    <a class="button is-fullwidth" href="{% if next_url %}{{ next_url }}{% endif %}" {% if next_url is none %}disabled{% endif %}>
+    <a class="button is-fullwidth" href="{% if page_obj.has_next %}{{ page_obj.next_page_number }}{% endif %}" {% if not page_obj.has_next %}disabled{% endif %}>
       Older&nbsp;<i class="fas fa-long-arrow-alt-right"></i>
     </a>
   </div>
 </section>
-{%- else -%}
-{%- include 'partials/_start_practicing.html' -%}
-{%- endif -%}
+{% else %}
+{% include 'partials/_start_practicing.html' %}
+{% endif %}
 <script>
 window.onload = () => {
   document.addEventListener('keydown', (event) => {
@@ -28,10 +28,10 @@ window.onload = () => {
     let xhr = new XMLHttpRequest();
 
     if (event.keyCode === rightArrow) {
-      xhr.open('GET', '{{ next_url }}')
+      xhr.open('GET', '{% if page_obj.has_previous %}{{ page_obj.previous_page_number }}{% endif %}')
       xhr.send()
     } else if (event.keyCode === leftArrow) {
-      xhr.open('GET', '{{ prev_url }}')
+      xhr.open('GET', '{% if page_obj.has_next %}{{ page_obj.next_page_number }}{% endif %}')
       xhr.send()
     }
 
@@ -53,4 +53,4 @@ document.addEventListener('DOMContentLoaded', () => {
   practiceDates.forEach(span => span.textContent = moment(new Date(span.textContent)).format('LL'))
 })
 </script>
-{%- endblock -%}
+{% endblock %}

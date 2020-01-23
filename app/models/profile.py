@@ -133,7 +133,7 @@ class Profile(models.Model):
         data = {x.instrument.name: [] for x in practices}
         for practice in practices:
             date = f'{practice.date:%Y%m%d}'
-            data[practice.instrument.name].append({'length': practice.length, 'date': date})
+            data[practice.instrument.name].append({'length': float(practice.length), 'date': date})
 
         start_date = min([x.date for x in practices])
         delta = timezone.now() - start_date

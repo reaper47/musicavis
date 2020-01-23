@@ -3,9 +3,13 @@ from django.urls import reverse
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
+from django.http import JsonResponse, HttpResponseRedirect
+from django.core.paginator import Paginator
 
-from app.models.practice import Practice, Instrument
+from app.models.practice import Instrument
 from app.backend.practice.forms import NewPracticeForm, PracticeForm
+
+PRACTICES_PER_PAGE = 12
 
 
 @login_required
@@ -34,19 +38,21 @@ def new_view(request):
 
 @login_required
 def session_view(request, practice_id):
-    practice = get_object_or_404(Practice, pk=practice_id)
+    practice = get_object_or_404(request.user.profile.practices, pk=practice_id)
     form = PracticeForm(instance=practice)
 
-    if request.method == 'DELETE':
-        messages.info(request, f'[{practice.instrument.name.title()}] Practice #{number} successfully deleted.')
-        request.user.profile.delete_practice(number)
-        return reverse('app:practice.list_past_practices')
-    elif request.method == 'POST':
-        model = PracticeDTO.json_to_model(form.data)
-        practice.update_model(model)
-        model = Practice.query.filter_by(id=number).first()
-        jsonable = PracticeDTO.model_to_jsonable(model, 'Changes have been saved.')
-        return jsonify(jsonable)
+    if request.method == 'POST':
+        data = request.POST.dict().copy()
+        form = PracticeForm(data=data, instance=practice)
+        if form.is_valid():
+            form.save(practice)
+            messages.info(request, 'Changes have been saved.')
+            return JsonResponse({'status_code': 200})
+        return JsonResponse({'status_code': 400})
+    elif request.method == 'DELETE':
+        messages.info(request, f'[{practice.instrument.name.title()}] Practice #{practice.pk} successfully deleted.')
+        practice.delete()
+        return HttpResponseRedirect(reverse('app:practice.list_past_practices'))
 
     args = dict(title=f'Practice #{practice.id} ({practice.instrument.name})',
                 instrument_name=practice.instrument.name.title(),
@@ -61,9 +67,9 @@ def session_view(request, practice_id):
 
 @login_required
 def list_past_practices_view(request):
-    page = request.GET.get('page', 1, type=int)
-    practices = request.user.profile.paginate_practices(page, PRACTICES_PER_PAGE)
-    next_url = reverse('app:practice.list_past_practices', args=[practices.next_num]) if practices.has_next else None
-    prev_url = reverse('app:practice.list_past_practices', args=[practices.prev_num]) if practices.has_prev else None
-    args = dict(title='Past Practice Sessions', practices=practices.items, next_url=next_url, prev_url=prev_url)
+    practices = request.user.profile.practices.order_by('-date')
+    paginator = Paginator(practices.all(), PRACTICES_PER_PAGE)
+    page_obj = paginator.get_page(request.GET.get('page', 1))
+
+    args = dict(title='Past Practice Sessions', page_obj=page_obj)
     return render(request, 'practice/list.html', args)

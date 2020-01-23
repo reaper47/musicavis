@@ -3,7 +3,7 @@ from decimal import Decimal
 from django.test import TestCase
 
 from app.backend.practice.forms import PracticeForm
-from app.tests.conftest import create_user, delete_users
+from app.tests.conftest import create_user, delete_users, delete_everything
 from app.models.practice import Goal, Positive, Improvement, Exercise
 from app.backend.utils.namedtuples import ExerciseData
 
@@ -71,14 +71,12 @@ class PracticeFormsTests(TestCase):
 
     @classmethod
     def setUpClass(cls):
+        delete_everything()
         cls.a_user = create_user()
 
     @classmethod
     def tearDownClass(cls):
-        Goal.objects.all().delete()
-        Positive.objects.all().delete()
-        Improvement.objects.all().delete()
-        Exercise.objects.all().delete()
+        delete_everything()
         delete_users()
 
     def setUp(self):
@@ -158,6 +156,7 @@ class PracticeFormsTests(TestCase):
         WHEN the form is saved
         THEN the database is updated correctly
         """
+        Exercise.objects.all().delete()
         form = PracticeForm(data=other_data, instance=self.practice)
         form.is_valid()
         form.save(self.practice)

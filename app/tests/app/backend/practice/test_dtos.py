@@ -21,6 +21,7 @@ class PracticeDtoTests(TestCase):
 
     @classmethod
     def setUpClass(cls):
+        Instrument.objects.all().delete()
         cls.a_profile = create_user()
 
     @classmethod

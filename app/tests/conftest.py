@@ -2,7 +2,7 @@ import json
 
 from django.contrib.auth.models import User
 
-from app.models.practice import Practice, Instrument
+from app.models.practice import Practice, Instrument, Goal, Improvement, Positive, Exercise
 from app.models.task import Task
 
 A_USERNAME = 'test'
@@ -86,6 +86,14 @@ def create_instrument(name: str) -> Instrument:
 def add_instruments_to_database():
     for name in SOME_INSTRUMENTS:
         Instrument.objects.create(name=name)
+
+
+def delete_everything():
+    Instrument.objects.all().delete()
+    Goal.objects.all().delete()
+    Improvement.objects.all().delete()
+    Positive.objects.all().delete()
+    Exercise.objects.all().delete()
 
 
 """
@@ -177,6 +185,16 @@ def is_practice_settings_page(response):
 
 def is_profile_settings_page(response):
     components = ['Email Preferences', 'agree to receive', 'to practicing', 'Promotions', 'features']
+    return all_equal(response, components)
+
+
+def is_new_practice_form(response):
+    components = ['Create', 'Instrument'] + SOME_INSTRUMENTS
+    return all_equal(response, components)
+
+
+def is_practice_session(response):
+    components = ['Practice Goals', 'Exercises', 'What Went Well', 'to Improve', 'Notes', 'Delete', 'Save changes']
     return all_equal(response, components)
 
 

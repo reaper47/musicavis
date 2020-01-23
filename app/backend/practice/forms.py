@@ -123,14 +123,16 @@ class PracticeForm(forms.ModelForm):
     def __field_cleaning_with_dict(self, i, data, label):
         components = set()
         field_name = f'{label}_{i}'
-        while self.data.get(field_name):
-            component = self.data[field_name]
+        while data.get(field_name):
+            component = data[field_name]
             if component in components:
                 self.add_error(field_name, 'Duplicate')
             else:
                 components.add(component)
+
             i += 1
             field_name = f'{label}_{i}'
+
         self.cleaned_data[f'{label}s'] = self.cleaned_data[f'{label}s'].union(components)
         return i
 
@@ -142,20 +144,18 @@ class PracticeForm(forms.ModelForm):
 
     def __field_cleaning_exercises_with_dict(self, i, data):
         components = set()
-        field_name = f'exercise_{i}'
-        while data.get(f'{field_name}_name'):
-            component = ExerciseData(name=data[f'{field_name}_name'],
-                                     bpm_start=int(data[f'{field_name}_bpm_start']),
-                                     bpm_end=int(data[f'{field_name}_bpm_end']),
-                                     minutes=Decimal(str(data[f'{field_name}_minutes'])))
+        while data.get(f'exercise_{i}_name'):
+            component = ExerciseData(name=data[f'exercise_{i}_name'],
+                                     bpm_start=int(data[f'exercise_{i}_bpm_start']),
+                                     bpm_end=int(data[f'exercise_{i}_bpm_end']),
+                                     minutes=Decimal(str(data[f'exercise_{i}_minutes'])))
 
             if component in components:
-                self.add_error(field_name, 'Duplicate')
+                self.add_error('exercise', 'Duplicate')
             else:
                 components.add(component)
-
             i += 1
-            field_name = f'exercise_{i}_name'
+
         self.cleaned_data['exercises'] = self.cleaned_data['exercises'].union(components)
         return i
 

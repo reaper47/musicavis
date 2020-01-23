@@ -10,6 +10,7 @@ from app.backend.profile.views import (profile_view, export_practices_view, sett
                                        settings_profile_view, settings_practice_view, add_new_instrument_view,
                                        delete_account_view)
 from app.backend.practice.views import new_view, session_view, list_past_practices_view
+from app.backend.dashboard.views import dashboard_index_view
 
 
 app_name = 'app'
@@ -35,7 +36,7 @@ urlpatterns = [
     path('password_reset/<token>/', password_reset_view, name='auth.password_reset'),
     path('unsubscribe/<token>/', unsubscribe_view, name='auth.unsubscribe'),
 
-    path('dashboard/', contact_us, name='dashboard.index'),
+    path('dashboard/', dashboard_index_view, name='dashboard.index'),
 
     path('profile/', profile_view, name='profile.profile'),
     path('settings/', settings_view, name='profile.settings'),

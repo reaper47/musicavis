@@ -3,13 +3,14 @@ from django.test import TestCase
 import app.tests.app.backend.practice.test_dtos as dtos
 from app.backend.practice.dtos import PracticeDTO
 from app.models.practice import Goal, Improvement, Positive, Exercise, Practice
-from app.tests.conftest import create_user, create_user_with_a_practice, AN_INSTRUMENT, delete_users
+from app.tests.conftest import create_user, create_user_with_a_practice, AN_INSTRUMENT, delete_users, delete_everything
 
 
 class PracticeModelTests(TestCase):
 
     @classmethod
     def setUpClass(cls):
+        delete_everything()
         cls.a_user_with_a_practice = create_user_with_a_practice()
 
     @classmethod
@@ -99,7 +100,7 @@ class PracticeModelTests(TestCase):
         models = [(practice, f'#{practice.pk} - {practice.date}'),
                   (Exercise(name='test'), f'test - [None,None] (None)'),
                   (practice.instrument, f'{practice.instrument.name}'),
-                  (goal, '#9 - test'),
+                  (goal, '#16 - test'),
                   (Improvement(name='test'), 'test'),
                   (Positive(name='test'), 'test')]
 
