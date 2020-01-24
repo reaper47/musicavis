@@ -148,41 +148,13 @@
         'duration': 3000,
         'type': 'is-info',
         'animate': {'in': 'fadeIn', 'out': 'fadeOut'}
-      })
+      });
       {% endfor %}
       {% endif %}
 
-      const burgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
-      burgers.forEach(el => {
-        el.addEventListener('click', () => {
-          const target = document.getElementById(el.dataset.target);
-          el.classList.toggle('is-active');
-          target.classList.toggle('is-active');
-        });
-      });
-      /*
       {% if request.user.is_authenticated %}
-      const notificationsArea = document.getElementById('notifications');
-      document.addEventListener('mousedown', (event) => {
-        let el = event.target;
-        while (el && !el.id.includes('notification-bell')) {
-          if (el.id.includes('notifications')) {
-            notificationsArea.classList.remove('hide');
-            return;
-          }
-          el = el.parentElement;
-        }
-        el ? notificationsArea.classList.toggle('hide') : notificationsArea.classList.add('hide');
-      });
-
-      const notificationsList = notificationsArea.lastElementChild.lastElementChild.firstElementChild;
-      const notificationBadge = document.getElementById('notification-badge');
-      const noNotificationMessage = document.getElementById('no-notification');
-      updateNotifications(since, notificationBadge, notificationsList, noNotificationMessage);
-      var since = 0;
-      setInterval(() => updateNotifications(since, notificationBadge, notificationsList, noNotificationMessage), 10000);
+      main.initNotifications();
       {% endif %}
-      */
     });
   </script>
 </html>

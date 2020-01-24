@@ -7,6 +7,7 @@ class Main {
         this.originalWindowTitle = document.title;
         this.cookieNotice();
         initModals(document);
+        this.initBurgers();
     }
 
     cookieNotice() {
@@ -24,7 +25,7 @@ class Main {
 
     getCookie(name) {
         if (this.document.cookie.length > 0) {
-            let cookies = this.document.cookie.split(';').map(x => x.trim())
+            const cookies = this.document.cookie.split(';').map(x => x.trim())
             return cookies.find(x => x.split('=')[0] === name);
         }
         return false;
@@ -49,30 +50,6 @@ class Main {
         return element;
     }
 
-    passwordStrength(fieldId) {
-        const strength = {0: 'Bad', 1: 'Okay', 2: 'Good', 3: 'Very Good', 4: 'Strong'};
-        const field = this.document.getElementById(fieldId);
-        const meter = this.create('progress', {'id': 'password-strength-meter', 'value': 0, 'max': 4}, field.parentNode);
-        const text = this.create('p', {'id': 'password-strength-text'}, field.parentNode);
-
-        field.addEventListener('keyup', (el) => {
-            const password = el.srcElement.value;
-            const score = zxcvbn(password).score;
-            meter.value = score;
-            text.textContent = (password !== '') ? `Strength: ${strength[score]}` : '';
-        });
-    }
-
-    passwordsMatch(password, password2, span) {
-        if (password.value === password2.value && password2.value) {
-            span.setAttribute('checked', '');
-            span.removeAttribute('unchecked');
-        } else {
-            span.removeAttribute('checked');
-            span.setAttribute('unchecked', '');
-        }
-    }
-
     submitFormOnEnter(form) {
         this.document.addEventListener('keydown', (event) => {
             if (event.keyCode === 13) {
@@ -86,63 +63,6 @@ class Main {
         el.parentNode.removeChild(el);
     }
 
-    updateNotifications(since, notificationBadge, notificationsList, noNotificationMessage) {
-        const xhr = new XMLHttpRequest();
-        xhr.onreadystatechange = () => {
-            if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
-                const notifications = JSON.parse(xhr.responseText);
-                const numberOfNotifications = notifications.length;
-
-                if (Number(notificationBadge.textContent) === numberOfNotifications) {
-                    return;
-                } else if (numberOfNotifications > 0) {
-                    this.document.title = `(${numberOfNotifications}) ${originalWindowTitle}`;
-                    _deleteNotifications();
-
-                    notificationBadge.textContent = numberOfNotifications;
-                    notificationBadge.classList.remove('hide');
-                    noNotificationMessage.classList.add('hide');
-
-                    const container = this.document.createElement('ul')
-                    container.classList.add('notification-element')
-                    notifications.forEach(x => {
-                        const data = JSON.parse(x.data);
-                        if (!data.file_name)
-                            return;
-
-                        if (x.name.includes('export_practice_task')) {
-                            const li = this.document.createElement('li');
-                            li.classList.add('dropdown-item');
-
-                            const a = this.document.createElement('a');
-                            a.textContent = `Your ${data.file_name.split('.')[1].toUpperCase()} file is ready. Click here to download it`;
-                            a.href = `/exports/${data.file_name}`;
-
-                            li.appendChild(a);
-                            li.addEventListener('click', (event) => setTimeout(() => updateNotifications(since, notificationBadge, notificationsList, noNotificationMessage), 60000));
-                            container.appendChild(li);
-                            notificationsList.appendChild(container);
-                        }
-                    });
-                } else {
-                    this.document.title = originalWindowTitle;
-                    _deleteNotifications();
-                    notificationBadge.textContent = 0;
-                    notificationBadge.classList.add('hide');
-                    noNotificationMessage.classList.remove('hide');
-                }
-            }
-        }
-
-        xhr.open('GET', `/notifications?since=${since}`);
-        xhr.send(null);
-    }
-
-    _deleteNotifications() {
-        elementsToRemove = Array.from(this.document.getElementsByClassName('notification-element'));
-        elementsToRemove.forEach(x => x.parentElement.removeChild(x));
-    }
-
     startTabsWithContent() {
         const tabs = this.document.querySelectorAll('.tabs li');
         const tabsContent = this.document.querySelectorAll('.tab-content');
@@ -154,26 +74,28 @@ class Main {
 
         tabs.forEach(tab => {
             tab.addEventListener('click', () => {
-              deactivateAllTabs();
-              hideTabsContent();
-              tab.classList.add('is-active');
-              activateTabsContent(tab);
+                deactivateAllTabs();
+                hideTabsContent();
+                tab.classList.add('is-active');
+                activateTabsContent(tab);
             });
-        })
+        });
 
         tabs[0].click();
     }
 
     isNumberKey(evt) {
         const charCode = (evt.which) ? evt.which : event.keyCode
-        if (charCode > 31 && (charCode < 48 || charCode > 57))
+        if (charCode > 31 && (charCode < 48 || charCode > 57)) {
             return false;
+        }
         return true;
     }
 
     getOtherElFromScreenType(el) {
-        if (el.id.includes('mobile'))
+        if (el.id.includes('mobile')) {
             return this.document.getElementById(el.id.split('-mobile')[0]);
+        }
         return this.document.getElementById(`${el.id}-mobile`);
     }
 
@@ -184,6 +106,95 @@ class Main {
 
     getCsrfToken() {
         return document.querySelector('[name=csrfmiddlewaretoken]').value;
+    }
+
+    initBurgers() {
+        const burgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
+        burgers.forEach(el => {
+            el.addEventListener('click', () => {
+                el.classList.toggle('is-active');
+                document.getElementById(el.dataset.target).classList.toggle('is-active');
+            });
+        });
+    }
+
+    initNotifications() {
+        const notificationsArea = document.getElementById('notifications');
+        document.addEventListener('mousedown', (event) => {
+            let el = event.target;
+            while (el && !el.id.includes('notification-bell')) {
+                if (el.id.includes('notifications')) {
+                    notificationsArea.classList.remove('hide');
+                    return;
+                }
+                el = el.parentElement;
+            }
+            el ? notificationsArea.classList.toggle('hide') : notificationsArea.classList.add('hide');
+        });
+
+        var since = 0;
+        this.notificationsList = notificationsArea.lastElementChild.lastElementChild.firstElementChild;
+        const notificationBadge = document.getElementById('notification-badge');
+        const noNotificationMessage = document.getElementById('no-notification');
+        this.updateNotifications(since, notificationBadge, noNotificationMessage);
+        setInterval(() => this.updateNotifications(since, notificationBadge, noNotificationMessage), 60000);
+    }
+
+    updateNotifications(since, notificationBadge, noNotificationMessage) {
+        fetch(new Request(`/notifications?since=${since}`, {
+            method: 'get',
+            mode: 'same-origin',
+        }))
+        .then(response => response.text())
+        .then(response => {
+            const notifications = JSON.parse(response);
+            const numberOfNotifications = notifications.names.length;
+
+            if (Number(notificationBadge.textContent) === numberOfNotifications) {
+                return;
+            } else if (numberOfNotifications > 0) {
+                this.document.title = `(${numberOfNotifications}) ${this.originalWindowTitle}`;
+                this._deleteNotifications();
+
+                notificationBadge.textContent = numberOfNotifications;
+                notificationBadge.classList.remove('hide');
+                noNotificationMessage.classList.add('hide');
+
+                const container = this.document.createElement('ul')
+                container.classList.add('notification-element')
+                notifications.names.forEach(x => {
+                    const data = JSON.parse(x.data);
+                    if (!data.file_name) {
+                        return;
+                    }
+
+                    if (x.name.includes('export_practice_task')) {
+                        const li = this.document.createElement('li');
+                        li.classList.add('dropdown-item');
+
+                        const a = this.document.createElement('a');
+                        a.textContent = `Your ${data.file_name.split('.')[1].toUpperCase()} file is ready. Click here to download it`;
+                        a.href = `/exports/${data.file_name}`;
+
+                        li.appendChild(a);
+                        li.addEventListener('click', () => setTimeout(() => updateNotifications(since, notificationBadge, noNotificationMessage), 60000));
+                        container.appendChild(li);
+                        this.notificationsList.appendChild(container);
+                    }
+                });
+            } else {
+                this.document.title = originalWindowTitle;
+                this._deleteNotifications();
+                notificationBadge.textContent = 0;
+                notificationBadge.classList.add('hide');
+                noNotificationMessage.classList.remove('hide');
+            }
+        }).catch(error => console.log(`GET NOTIFICATION ERROR ${error}`));
+    }
+
+    _deleteNotifications() {
+        Array.from(this.document.getElementsByClassName('notification-element'))
+             .forEach(x => x.parentElement.removeChild(x));
     }
 }
 
