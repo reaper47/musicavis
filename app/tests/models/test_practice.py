@@ -100,7 +100,7 @@ class PracticeModelTests(TestCase):
         models = [(practice, f'#{practice.pk} - {practice.date}'),
                   (Exercise(name='test'), f'test - [None,None] (None)'),
                   (practice.instrument, f'{practice.instrument.name}'),
-                  (goal, '#16 - test'),
+                  (goal, '#18 - test'),
                   (Improvement(name='test'), 'test'),
                   (Positive(name='test'), 'test')]
 

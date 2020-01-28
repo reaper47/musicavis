@@ -137,6 +137,14 @@
     </div>
   </div>
 </form>
+<div class="tabs hide">
+  <ul>
+    <li class="is-active"><a>Pictures</a></li>
+    <li><a>Music</a></li>
+    <li><a>Videos</a></li>
+    <li><a>Documents</a></li>
+  </ul>
+</div>
 <section id="practice-actions">
   <button id="delete-practice-button" class="button is-danger" type="button">Delete</button>
   <input class="button is-info" id="submit-practice-form" name="submit" type="button" value="Save changes">
@@ -144,26 +152,8 @@
 <!-- include 'partials/_dialog_practice_tools.html' -->
 <script src="{% static 'bundles/practice.js' %}"></script>
 <script>
-let lastActiveElement = null;
-var practiceUrl = "{{ practice_session_url }}";
-
-window.onbeforeunload = () => savePractice(false)
-
-window.onload = () => {
-  startTabsWithContent();
-
-  document.addEventListener('click', () => removeFocus(lastActiveElement));
-  document.addEventListener('keyup', (event) => tabListener(event.which));
-
-  document.getElementById('submit-practice-form').addEventListener('click', savePractice);
-  document.getElementById('delete-practice-button').addEventListener('click', deletePractice);
-
-  Object.values(document.getElementsByClassName('add-row')).forEach(node => addNodeListener(node));
-  Object.values(document.getElementsByClassName('remove-row')).forEach(node => removeNodeListener(node));
-
-
-  Array.from(document.getElementsByClassName('change-listener')).forEach(x => x.addEventListener('change', sessionKeysListener));
-  document.addEventListener('keyup', (event) => sessionKeysListener(event));
-}
+const practice = new Practice("{{ practice_session_url }}");
+window.onbeforeunload = () => practice.exitConfirmation();
+window.onload = () => practice.init();
 </script>
 {% endblock %}

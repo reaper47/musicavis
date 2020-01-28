@@ -10,10 +10,11 @@ module.exports = {
   mode: 'production',
   context: __dirname,
   entry: {
-    main: [/*'@babel/polyfill',*/ `${ENTRY_PATH}/index`],
+    main: [`${ENTRY_PATH}/index`],
     profile: [`${ENTRY_PATH}/profile`],
     practice: [`${ENTRY_PATH}/practice`],
     dialog_export_practice: [`${ENTRY_PATH}/dialog_export_practices`],
+    dashboard: [`${ENTRY_PATH}/dashboard`],
   },
   output: {
       path: path.resolve('./app/frontend/static/app/assets/bundles/'),

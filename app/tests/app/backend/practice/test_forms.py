@@ -172,6 +172,28 @@ class PracticeFormsTests(TestCase):
         self.assertEqual(list(self.practice.positives.all()), positives)
         self.assertEqual(list(self.practice.exercises.all()), exercises)
 
+    def test_save_complete_practice_duplicates(self):
+        """
+        GIVEN a practice form completely filled out with duplicate goals, positives, improvements, and exercises
+        WHEN the form is saved
+        THEN saved form has no duplicates
+        """
+        Exercise.objects.all().delete()
+        form = PracticeForm(data=other_data, instance=self.practice)
+        form.is_valid()
+        form.save(self.practice)
+
+        goals = list(Goal.objects.all())
+        improvements = list(Improvement.objects.all())
+        positives = list(Positive.objects.all())
+        exercises = list(Exercise.objects.all())
+        for x in [goals, improvements, positives, exercises]:
+            self.assertEqual(len(x), 2, x[0].__class__)
+        self.assertEqual(list(self.practice.goals.all()), goals)
+        self.assertEqual(list(self.practice.improvements.all()), improvements)
+        self.assertEqual(list(self.practice.positives.all()), positives)
+        self.assertEqual(list(self.practice.exercises.all()), exercises)
+
 
 def make_empty_practice(practice):
     goal = Goal(name=A_GOAL_NAME)

@@ -1,12 +1,10 @@
 import json
-import math
 from hashlib import md5
 from datetime import timedelta
 
 from django.db import models
 from django.contrib.auth.models import User
 from django.contrib.auth.hashers import check_password
-from django.utils import timezone
 from django.dispatch import receiver
 from django.db.models.signals import post_save
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
@@ -132,16 +130,17 @@ class Profile(models.Model):
 
         data = {x.instrument.name: [] for x in practices}
         for practice in practices:
-            date = f'{practice.date:%Y%m%d}'
+            date = f'{practice.date}'
             data[practice.instrument.name].append({'length': float(practice.length), 'date': date})
 
         start_date = min([x.date for x in practices])
-        delta = timezone.now() - start_date
-        delta_days = math.ceil(delta.days + delta.seconds / 86400)
-        dates = [f'{start_date + timedelta(days=i):%Y%m%d}' for i in range(delta_days + 1)]
+        end_date = max([x.date for x in practices])
+        dates = [start_date + timedelta(days=i) for i in range((end_date - start_date).days + 2)]
+        dates_days = [str(x.date) for x in dates]
+        dates = list(map(str, dates))
 
         for instrument, values in data.items():
-            for date in dates:
+            for date in dates_days:
                 if not next((x for x in values if x['date'] == date), False):
                     data[instrument].append({'length': 0, 'date': date})
             data[instrument].sort(key=lambda k: k['date'])

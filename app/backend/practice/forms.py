@@ -125,9 +125,7 @@ class PracticeForm(forms.ModelForm):
         field_name = f'{label}_{i}'
         while data.get(field_name):
             component = data[field_name]
-            if component in components:
-                self.add_error(field_name, 'Duplicate')
-            else:
+            if component not in components:
                 components.add(component)
 
             i += 1
@@ -149,10 +147,7 @@ class PracticeForm(forms.ModelForm):
                                      bpm_start=int(data[f'exercise_{i}_bpm_start']),
                                      bpm_end=int(data[f'exercise_{i}_bpm_end']),
                                      minutes=Decimal(str(data[f'exercise_{i}_minutes'])))
-
-            if component in components:
-                self.add_error('exercise', 'Duplicate')
-            else:
+            if component not in components:
                 components.add(component)
             i += 1
 

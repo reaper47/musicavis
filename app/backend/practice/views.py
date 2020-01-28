@@ -46,9 +46,8 @@ def session_view(request, practice_id):
         form = PracticeForm(data=data, instance=practice)
         if form.is_valid():
             form.save(practice)
-            messages.info(request, 'Changes have been saved.')
-            return JsonResponse({'status_code': 200})
-        return JsonResponse({'status_code': 400})
+            return JsonResponse({'status_code': 200, 'toast': 'Changes have been saved.'})
+        return JsonResponse({'status_code': 400, 'toast': 'Error saving changes.'})
     elif request.method == 'DELETE':
         messages.info(request, f'[{practice.instrument.name.title()}] Practice #{practice.pk} successfully deleted.')
         practice.delete()
