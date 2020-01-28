@@ -156,5 +156,8 @@
       main.initNotifications();
       {% endif %}
     });
+
+    var chatSocket = new WebSocket(`ws://${window.location.host}/ws/app/`);
+    chatSocket.onmessage = (e) => main.updateNotificationsList(e.data);
   </script>
 </html>

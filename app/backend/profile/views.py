@@ -9,7 +9,7 @@ from django.contrib import messages
 from django.http import HttpResponse
 
 from app.models.practice import Instrument
-from app.backend.utils.enums import NewLine, FileType
+from app.backend.utils.enums import NewLine
 from .utils import update_email
 from .forms import (SelectFileTypeForm, ChangePasswordForm, ChangeUsernameForm,
                     ChangeEmailForm, EmailPreferencesForm, SelectDefaultInstrumentForm)
@@ -33,9 +33,9 @@ def export_practices_view(request):
         messages.info(request, 'An export task is currently in progress')
         return HttpResponse('task in progress')
 
-    os = NewLine.from_string(request.META['HTTP_USER_AGENT'])
-    file_type = FileType.from_string(json.loads(request.body.decode('utf-8'))['file_type'])
-    request.user.profile.launch_task('export_practices', 'Exporting practices...', os=os, file_type=file_type)
+    request.user.profile.launch_task('export_practices', 'Exporting practices...',
+                                     os=NewLine.from_string(request.META['HTTP_USER_AGENT']).value,
+                                     file_type=json.loads(request.body.decode('utf-8'))['file_type'])
     return HttpResponse('')
 
 

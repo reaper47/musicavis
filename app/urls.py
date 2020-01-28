@@ -17,7 +17,7 @@ app_name = 'app'
 urlpatterns = [
     path('', index_view, name='main.index'),
 
-    path('export/<fname>/', download_file_route, name='main.export'),
+    path('exports/<fname>/', download_file_route, name='main.export'),
     path('features/', features_view, name='main.features'),
     path('notifications/', notifications_route, name='main.notifications'),
     path('pricing/', pricing_view, name='main.pricing'),

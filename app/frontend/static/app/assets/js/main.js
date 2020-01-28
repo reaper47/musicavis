@@ -119,77 +119,71 @@ class Main {
     }
 
     initNotifications() {
-        const notificationsArea = document.getElementById('notifications');
+        this.notificationsArea = document.getElementById('notifications');
         document.addEventListener('mousedown', (event) => {
             let el = event.target;
             while (el && !el.id.includes('notification-bell')) {
                 if (el.id.includes('notifications')) {
-                    notificationsArea.classList.remove('hide');
+                    this.notificationsArea.classList.remove('hide');
                     return;
                 }
                 el = el.parentElement;
             }
-            el ? notificationsArea.classList.toggle('hide') : notificationsArea.classList.add('hide');
+            el ? this.notificationsArea.classList.toggle('hide') : this.notificationsArea.classList.add('hide');
         });
 
-        var since = 0;
-        this.notificationsList = notificationsArea.lastElementChild.lastElementChild.firstElementChild;
-        const notificationBadge = document.getElementById('notification-badge');
-        const noNotificationMessage = document.getElementById('no-notification');
-        this.updateNotifications(since, notificationBadge, noNotificationMessage);
-        setInterval(() => this.updateNotifications(since, notificationBadge, noNotificationMessage), 60000);
+        this.notificationsList = this.notificationsArea.lastElementChild.lastElementChild.firstElementChild;
+        this.notificationBadge = document.getElementById('notification-badge');
+        this.noNotificationMessage = document.getElementById('no-notification');
     }
 
-    updateNotifications(since, notificationBadge, noNotificationMessage) {
-        fetch(new Request(`/notifications?since=${since}`, {
-            method: 'get',
-            mode: 'same-origin',
-        }))
-        .then(response => response.text())
-        .then(response => {
-            const notifications = JSON.parse(response);
-            const numberOfNotifications = notifications.names.length;
+    updateNotificationsList(response, closeNotificationList = true) {
+        const notifications = JSON.parse(response);
+        const numberOfNotifications = notifications.names.length;
 
-            if (Number(notificationBadge.textContent) === numberOfNotifications) {
-                return;
-            } else if (numberOfNotifications > 0) {
-                this.document.title = `(${numberOfNotifications}) ${this.originalWindowTitle}`;
-                this._deleteNotifications();
+        if (Number(this.notificationBadge.textContent) === numberOfNotifications) {
+            return;
+        } else if (numberOfNotifications > 0) {
+            this.document.title = `(${numberOfNotifications}) ${this.originalWindowTitle}`;
+            this._deleteNotifications();
 
-                notificationBadge.textContent = numberOfNotifications;
-                notificationBadge.classList.remove('hide');
-                noNotificationMessage.classList.add('hide');
+            this.notificationBadge.textContent = numberOfNotifications;
+            this.notificationBadge.classList.remove('hide');
+            this.noNotificationMessage.classList.add('hide');
 
-                const container = this.document.createElement('ul')
-                container.classList.add('notification-element')
-                notifications.names.forEach(x => {
-                    const data = JSON.parse(x.data);
-                    if (!data.file_name) {
-                        return;
-                    }
+            const container = this.document.createElement('ul')
+            container.classList.add('notification-element')
+            notifications.names.forEach((name, idx) => {
+                const data = JSON.parse(notifications.data[idx]);
+                if (!data.file_name) {
+                    return;
+                }
 
-                    if (x.name.includes('export_practice_task')) {
-                        const li = this.document.createElement('li');
-                        li.classList.add('dropdown-item');
+                if (name.includes('export_practice_task')) {
+                    const li = this.document.createElement('li');
+                    li.classList.add('dropdown-item');
 
-                        const a = this.document.createElement('a');
-                        a.textContent = `Your ${data.file_name.split('.')[1].toUpperCase()} file is ready. Click here to download it`;
-                        a.href = `/exports/${data.file_name}`;
+                    const a = this.document.createElement('a');
+                    a.textContent = `Your ${data.file_name.split('.')[1].toUpperCase()} file is ready. Click here to download it`;
+                    a.href = `/exports/${data.file_name}`;
+                    a.setAttribute('download', '');
 
-                        li.appendChild(a);
-                        li.addEventListener('click', () => setTimeout(() => updateNotifications(since, notificationBadge, noNotificationMessage), 60000));
-                        container.appendChild(li);
-                        this.notificationsList.appendChild(container);
-                    }
-                });
-            } else {
-                this.document.title = originalWindowTitle;
-                this._deleteNotifications();
-                notificationBadge.textContent = 0;
-                notificationBadge.classList.add('hide');
-                noNotificationMessage.classList.remove('hide');
-            }
-        }).catch(error => console.log(`GET NOTIFICATION ERROR ${error}`));
+                    li.appendChild(a);
+                    container.appendChild(li);
+                    this.notificationsList.appendChild(container);
+                }
+            });
+        } else {
+            this.document.title = this.originalWindowTitle;
+            this._deleteNotifications();
+            this.notificationBadge.textContent = 0;
+            this.notificationBadge.classList.add('hide');
+            this.noNotificationMessage.classList.remove('hide');
+        }
+
+        if (closeNotificationList) {
+            this.notificationsArea.classList.add('hide')
+        }
     }
 
     _deleteNotifications() {

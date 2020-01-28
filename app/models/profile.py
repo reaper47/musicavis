@@ -152,14 +152,14 @@ class Profile(models.Model):
     TASKS
     """
 
-    def launch_task(self, name: str, description: str, *args, **kwargs):
-        export_practices.delay(self, name, description, *args, **kwargs)
+    def launch_task(self, name, description, *args, **kwargs):
+        export_practices.delay(self.pk, name, description, os=kwargs['os'], file_type=kwargs['file_type'])
 
     def get_tasks_in_progress(self):
-        return Task.objects.filter(user_profile=self, complete=False).all()
+        return Task.objects.filter(profile_id=self.pk, complete=False).all()
 
     def get_task_in_progress(self, name):
-        return Task.objects.filter(name=name, user_profile=self, complete=False).first()
+        return Task.objects.filter(name=name, profile_id=self.pk, complete=False).first()
 
     """
     TOKENS

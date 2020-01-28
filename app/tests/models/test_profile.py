@@ -420,7 +420,7 @@ class ProfileModelTests(TestCase):
         """
         mock_rq.delay.return_value = JobMock()
 
-        self.a_user.profile.launch_task('name', 'description')
+        self.a_user.profile.launch_task('name', 'description', os='linux', file_type='pdf')
 
         self.assertTrue(mock_rq.delay.called)
 

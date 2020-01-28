@@ -39,7 +39,6 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'app.apps.AppConfig',
-    'django_rq',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -48,6 +47,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_extensions',
     'webpack_loader',
+    'channels',
 ]
 
 MIDDLEWARE = [
@@ -240,3 +240,16 @@ if DEBUG:
     BASE_URL = 'http://127.0.0.1:8000'
 else:
     BASE_URL = 'https://www.musicavis.ca'
+
+# Channels
+#
+
+ASGI_APPLICATION = 'musicavis.routing.application'
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('127.0.0.1', 6379)],
+        },
+    },
+}

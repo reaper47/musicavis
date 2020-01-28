@@ -4,6 +4,7 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse, StreamingHttpResponse
 
+from app.backend.utils.tasks import notifications_update
 from musicavis.settings import EXPORTS_DIR, MIMETYPES
 from app.models.profile import get_profile_from_user
 from app.backend.utils.export import FileDeleteWrapper
@@ -66,4 +67,6 @@ def download_file_route(request, fname):
     response['Content-Length'] = os.path.getsize(filepath)
     response['Content-Disposition'] = f"attachment; filename={fname}"
     response['Content-Type'] = MIMETYPES.guess_type(fname)[0]
+
+    notifications_update.delay(profile.pk)
     return response

@@ -111,7 +111,7 @@ class JobMock:
 
 
 def create_task(id, name, description, profile, complete=False):
-    return Task.objects.create(id=id, name=name, description=description, user_profile=profile, complete=complete)
+    return Task.objects.create(id=id, name=name, description=description, profile_id=profile.pk, complete=complete)
 
 
 """
