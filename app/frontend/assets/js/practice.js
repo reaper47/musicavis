@@ -2,6 +2,7 @@ import { makeSearchableDropDown, SearchableDropdown } from './dropdown';
 import { Timer, Metronome } from './tools.js'
 
 
+
 class Practice {
     constructor(practiceUrl) {
         this.lastActiveElement = null;
@@ -24,6 +25,9 @@ class Practice {
 
         this.mobileExericesUl = document.getElementById('practice-exercises-mobile');
         this.mobileExericesUl.removeChild(this.mobileExericesUl.lastElementChild);
+
+        this.initTimer();
+        this.initMetronome();
     }
 
     savePractice() {
@@ -308,6 +312,143 @@ class Practice {
         this.isDirty = false;
         return null;
     }
+
+    initTimer() {
+        const metronome = new Metronome();
+
+        const metronomeTempo = document.getElementById('metronome-tempo');
+        const metronomeSignature = document.getElementById('metronome-signature');
+        const metronomeSubdivision = document.getElementById('metronome-subdivision');
+
+        const metronomeStart = document.getElementById('metronome-start');
+        const metronomeResume = document.getElementById('metronome-resume');
+        const metronomePause = document.getElementById('metronome-pause');
+        const metronomeStop = document.getElementById('metronome-stop');
+
+        const metronomeSignature24 = document.getElementById('metronome-signature-2/4');
+        const metronomeSignature34 = document.getElementById('metronome-signature-3/4');
+        const metronomeSignature44 = document.getElementById('metronome-signature-4/4');
+        const metronomeSignature68 = document.getElementById('metronome-signature-6/8');
+        const metronomeSignature98 = document.getElementById('metronome-signature-9/8');
+        const metronomeSignature128 = document.getElementById('metronome-signature-12/8');
+        const signatures = [metronomeSignature24, metronomeSignature34, metronomeSignature44, metronomeSignature68, metronomeSignature98, metronomeSignature128];
+
+        metronomeSignature.selectedIndex = 2;
+        metronome.setTempo(metronomeTempo.value);
+        metronome.setSignature(metronomeSignature.value);
+        metronome.setSignatureVisual(document.getElementById(`metronome-signature-${metronomeSignature.value}`));
+        metronome.setSubdivision(Number(metronomeSubdivision.value));
+        metronome.setBarNumberElement(document.getElementById('metronome-bar-number'));
+
+        metronomeTempo.addEventListener('change', () => metronome.setTempo(metronomeTempo.value));
+
+        metronomeSignature.addEventListener('change', (event) => {
+          const signature = event.target.value;
+          metronome.setSignature(signature);
+          signatures.forEach(x => x.classList.add('hide'));
+
+          switch (signature) {
+          case '2/4':
+            metronomeSignature24.classList.remove('hide');
+            metronome.setSignatureVisual(metronomeSignature24);
+            break;
+          case '3/4':
+            metronomeSignature34.classList.remove('hide');
+            metronome.setSignatureVisual(metronomeSignature34);
+            break;
+          case '4/4':
+            metronomeSignature44.classList.remove('hide');
+            metronome.setSignatureVisual(metronomeSignature44);
+            break;
+          case '6/8':
+            metronomeSignature68.classList.remove('hide');
+            metronome.setSignatureVisual(metronomeSignature68);
+            break;
+          case '9/8':
+            metronomeSignature98.classList.remove('hide');
+            metronome.setSignatureVisual(metronomeSignature98);
+            break;
+          case '12/8':
+            metronomeSignature128.classList.remove('hide');
+            metronome.setSignatureVisual(metronomeSignature128);
+            break;
+          default:
+            break;
+          }
+        });
+
+        metronomeSubdivision.addEventListener('change', () => metronome.setSubdivision(Number(metronomeSubdivision.value)));
+
+        metronomeStart.addEventListener('mousedown', () => {
+          metronomeStart.classList.add('hide');
+          metronomePause.classList.remove('hide');
+          metronomeResume.classList.add('hide');
+          metronomeStop.classList.remove('hide');
+
+          metronome.play(metronomeTempo.value, metronomeSignature.value, );
+        });
+
+        metronomeStop.addEventListener('mousedown', () => {
+          metronomeStart.classList.remove('hide');
+          metronomePause.classList.add('hide');
+          metronomeResume.classList.add('hide');
+          metronomeStop.classList.add('hide');
+
+          metronome.stop();
+        });
+
+        metronomePause.addEventListener('mousedown', () => {
+          metronomeStart.classList.add('hide');
+          metronomePause.classList.add('hide');
+          metronomeResume.classList.remove('hide');
+          metronomeStop.classList.remove('hide');
+
+          metronome.pause();
+        });
+
+        metronomeResume.addEventListener('mousedown', () => {
+          metronomeStart.classList.add('hide');
+          metronomePause.classList.remove('hide');
+          metronomeResume.classList.add('hide');
+          metronomeStop.classList.remove('hide');
+
+          metronome.play(metronomeTempo.value, metronomeSignature.value, Number(metronomeSubdivision.value));
+        });
+    }
+
+    initMetronome() {
+        const countdown = document.getElementById('timer-countdown');
+        const timerInputs = document.getElementById('timer-input');
+        const elements = {'hour': document.getElementById('timer-hours'), 'minutes': document.getElementById('timer-minutes'), 'seconds': document.getElementById('timer-seconds')};
+        let timer = new Timer(elements, 1000, () => document.getElementById('modal-practice-tools').classList.add('is-active'));
+
+        const numHours = document.getElementById('timer-num-hours');
+        const numMinutes = document.getElementById('timer-num-minutes');
+        const numSeconds = document.getElementById('timer-num-seconds');
+
+        const timerStart = document.getElementById('timer-start');
+        const timerStop = document.getElementById('timer-stop');
+
+        timerStart.addEventListener('mousedown', () => {
+          const time = Number(numHours.value)*3600 + Number(numMinutes.value)*60 + Number(numSeconds.value);
+
+          timerStart.classList.add('hide');
+          timerStop.classList.remove('hide');
+          countdown.classList.remove('hide');
+          timerInputs.classList.add('hide');
+
+          timer.start(time);
+        });
+
+        timerStop.addEventListener('mousedown', () => {
+          timerStart.classList.remove('hide');
+          timerStop.classList.add('hide');
+          countdown.classList.add('hide')
+          timerInputs.classList.remove('hide');
+
+          timer.stop();
+        });
+    }
 }
 
-export { Practice, makeSearchableDropDown, SearchableDropdown, Timer, Metronome };
+export { Practice, makeSearchableDropDown, SearchableDropdown };

@@ -1,3 +1,6 @@
+import { Howl } from 'howler';
+
+
 class Timer {
     constructor(elements, interval, timesUpFunc, errorFunc = null) {
         this.workFunc = this._updateTimer;
@@ -5,7 +8,7 @@ class Timer {
         this.errorFunc = errorFunc;
         this.timesUpFunc = timesUpFunc;
         this.timeComponents = {hour: elements.hour, minutes: elements.minutes, seconds: elements.seconds};
-        this.sound = new Howl({src: '/sounds/sos.mp3', loop: true});
+        this.sound = new Howl({src: '/static/sounds/sos.mp3', loop: true});
     }
 
     start(time) {
@@ -68,9 +71,9 @@ class Timer {
 class Metronome {
     constructor() {
         this._ctx = new AudioContext();
-        this._soundBeatOne = new Howl({src: '/sounds/one.wav'});
-        this._soundBeatOther = new Howl({src: '/sounds/other.wav'});
-        this._soundBeatBetween = new Howl({src: '/sounds/between.wav'});
+        this._soundBeatOne = new Howl({src: '/static/sounds/one.wav'});
+        this._soundBeatOther = new Howl({src: '/static/sounds/other.wav'});
+        this._soundBeatBetween = new Howl({src: '/static/sounds/between.wav'});
 
         this._lastBar = 0;
         this._lastBeat = 0;
@@ -93,7 +96,7 @@ class Metronome {
         });
     }
 
-    _beep(sound, duration=160) {
+    _beep(sound) {
         sound.play();
 
         try {

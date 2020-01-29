@@ -251,9 +251,11 @@ class ExportPractices:
                 self.__add_list_itemize_latex(doc, 'Positives', practice.positives.all())
 
             with doc.create(pylatex.Subsection('Notes:')):
-                doc.append(practice.notes)
+                if practice.notes:
+                    for note in practice.notes.split('\r\n'):
+                        doc.append(note) if note else doc.append(pylatex.NewLine())
 
-        doc.generate_pdf(fname[:-4], clean=True)
+        doc.generate_pdf(fname.split('.pdf')[0], clean=True)
 
     def __add_list_itemize_latex(self, doc, title, elements):
         with doc.create(pylatex.Subsection(title)):

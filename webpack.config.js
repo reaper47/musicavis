@@ -3,7 +3,7 @@ const webpack = require('webpack');
 const BundleTracker = require('webpack-bundle-tracker');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
-const ENTRY_PATH = './app/frontend/static/app/assets/js/';
+const ENTRY_PATH = './app/frontend/assets/js/';
 
 
 module.exports = {
@@ -13,6 +13,7 @@ module.exports = {
     main: [`${ENTRY_PATH}/index`],
     profile: [`${ENTRY_PATH}/profile`],
     practice: [`${ENTRY_PATH}/practice`],
+    practice_list: [`${ENTRY_PATH}/practice_list`],
     dialog_export_practice: [`${ENTRY_PATH}/dialog_export_practices`],
     dashboard: [`${ENTRY_PATH}/dashboard`],
   },

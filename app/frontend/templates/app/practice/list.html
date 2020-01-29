@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block page_content %}
 {% if page_obj.paginator.count %}
@@ -20,37 +21,9 @@
 {% else %}
 {% include 'partials/_start_practicing.html' %}
 {% endif %}
+<script src="{% static 'bundles/practice_list.js' %}"></script>
 <script>
-window.onload = () => {
-  document.addEventListener('keydown', (event) => {
-    const rightArrow = 39
-    const leftArrow = 37
-    let xhr = new XMLHttpRequest();
-
-    if (event.keyCode === rightArrow) {
-      xhr.open('GET', '{% if page_obj.has_previous %}{{ page_obj.previous_page_number }}{% endif %}')
-      xhr.send()
-    } else if (event.keyCode === leftArrow) {
-      xhr.open('GET', '{% if page_obj.has_next %}{{ page_obj.next_page_number }}{% endif %}')
-      xhr.send()
-    }
-
-    xhr.onreadystatechange = () => {
-      if (xhr.readyState == XMLHttpRequest.DONE && xhr.status === 200) {
-        window.location.replace(xhr.responseURL)
-        document.getElementById("practice-list-grid").focus();
-      } else {
-        console.log("Error: ", xhr)
-      }
-    }
-
-    xhr.onerror = () => location.reload()
-  })
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-  const practiceDates = Array.from(document.getElementsByClassName('list-item-practice-date'))
-  practiceDates.forEach(span => span.textContent = moment(new Date(span.textContent)).format('LL'))
-})
+const practiceList = new PracticeList();
+document.addEventListener('DOMContentLoaded', () => practiceList.init())
 </script>
 {% endblock %}

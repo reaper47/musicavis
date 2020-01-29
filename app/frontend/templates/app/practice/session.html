@@ -279,19 +279,11 @@
     </section>
   </div>
 </form>
-<div class="tabs hide">
-  <ul>
-    <li class="is-active"><a>Pictures</a></li>
-    <li><a>Music</a></li>
-    <li><a>Videos</a></li>
-    <li><a>Documents</a></li>
-  </ul>
-</div>
 <section id="practice-actions">
   <button id="delete-practice-button" class="button is-danger" type="button">Delete</button>
   <input class="button is-info" id="submit-practice-form" name="submit" type="button" value="Save changes">
 </section>
-<!-- include 'partials/_dialog_practice_tools.html' -->
+{% include 'partials/_dialog_practice_tools.html' %}
 <script src="{% static 'bundles/practice.js' %}"></script>
 <script>
 const practice = new Practice("{{ practice_session_url }}");

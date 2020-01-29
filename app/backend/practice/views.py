@@ -61,7 +61,13 @@ def session_view(request, practice_id):
                 practice=practice,
                 practice_session_url=reverse('app:practice.session', args=[practice.pk]),
                 form=form,
-                form_mobile=form_mobile)
+                isSession=True,
+                form_mobile=form_mobile,
+                signatures=['2/4', '3/4', '4/4', '6/8', '9/8', '12/8'],
+                divisions=[(0, 'Quarter note (♩)'), (1, 'Eighth note (♪)'),
+                           (2, 'Sixteenth note (♬)'), (3, 'Thirty-second note 𝅘𝅥𝅰')],
+                timer_components=[('Hours:', 'num-hours', 24, 0, 0), ('Minutes:', 'num-minutes', 60, 0, 5),
+                                  ('Seconds:', 'num-seconds', 60, 0, 0)])
     return render(request, 'practice/session.html', args)
 
 
