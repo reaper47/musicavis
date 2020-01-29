@@ -12,18 +12,21 @@ class Practice {
     init() {
         main.startTabsWithContent();
 
-        document.addEventListener('click', () => this.__removeFocus(this.lastActiveElement));
+        document.addEventListener('click', () => this.__removeFocus());
         document.getElementById('submit-practice-form').addEventListener('click', () => this.savePractice());
         document.getElementById('delete-practice-button').addEventListener('click', () => this.deletePractice());
 
         Object.values(document.getElementsByClassName('add-row')).forEach(node => this.__addNodeListener(node));
         Object.values(document.getElementsByClassName('remove-row')).forEach(node => this.__removeNodeListener(node));
 
-        Array.from(document.getElementsByClassName('change-listener')).forEach(x => x.addEventListener('change', this.sessionKeysListener));
-        document.addEventListener('keyup', (event) => this.sessionKeysListener(event));
+        Array.from(document.getElementsByClassName('input-change')).forEach(x => x.addEventListener('change', (event) => this.listener(event)));
+        document.addEventListener('keyup', (event) => this.listener(event));
+
+        this.mobileExericesUl = document.getElementById('practice-exercises-mobile');
+        this.mobileExericesUl.removeChild(this.mobileExericesUl.lastElementChild);
     }
 
-    savePractice(async_ = true) {
+    savePractice() {
         if (!this.isDirty) {
             return;
         }
@@ -35,13 +38,11 @@ class Practice {
         }))
         .then(response => response.json())
         .then(json => {
-            if (async_) {
-                toast({
-                    'message': json.toast,
-                    'type': 'is-info',
-                    'animate': {'in': 'fadeIn', 'out': 'fadeOut'}
-                });
-            }
+            toast({
+                'message': json.toast,
+                'type': 'is-info',
+                'animate': {'in': 'fadeIn', 'out': 'fadeOut'}
+            });
 
             this.isDirty = false;
         });
@@ -58,7 +59,7 @@ class Practice {
         }
     }
 
-    sessionKeysListener(event) {
+    listener(event) {
         const isAlt = event.altKey;
         const key = event.code;
         this.isDirty = true;
@@ -70,21 +71,47 @@ class Practice {
         } else if (key === 'Enter') {
             for (let el = event.srcElement; el = el.parentElement;) {
                 if (['UL', 'TABLE'].includes(el.tagName)) {
-                    return this.__addEntry(el);
+                    const otherEl = this.__getOtherContainer(el.id);
+                    this.__addEntry(otherEl);
+                    this.__addEntry(el);
+                    break;
                 }
             }
         } else if (key === 'Tab') {
-            this.__removeFocus(this.lastActiveElement);
+            this.__removeFocus();
+        } else if (['TEXTAREA', 'INPUT'].includes(event.target.tagName) || event.type === 'change') {
+            const otherEl = this.__getOtherElement(event.srcElement.id);
+            otherEl.value = event.target.value;
         }
     }
 
     __addEntry(el) {
-        if (el.tagName === 'UL') {
+        if (el.tagName === 'UL' && el.id === 'practice-exercises-mobile') {
+            this.__removeFocus();
+
+            const newLi = el.lastElementChild.cloneNode(true);
+            newLi.children[0].children[0].textContent = `${Number(newLi.children[0].children[0].textContent.split('.')[0]) + 1}.`;
+            this.__updateTextInput(newLi.children[0].children[1]);
+            this.__updateCellInput(newLi.children[1].children[0].children[0].children[0].children[1]);
+            this.__updateCellInput(newLi.children[1].children[0].children[0].children[1].children[1]);
+            this.__updateCellInput(newLi.children[1].children[0].children[0].children[2].children[1]);
+
+            el.appendChild(document.createElement('hr'));
+            el.appendChild(newLi);
+            this.__focusElement(newLi.children[0].children[1]);
+            this.__removeNodeListener(newLi.children[0].children[2])
+        } else if (el.tagName === 'UL') {
+            this.__removeFocus();
+
             const newLi = el.lastElementChild.cloneNode(true);
             const childLi = newLi.children[1].children[0];
             this.__updateTextInput(childLi);
+
             el.appendChild(newLi);
+            this.__focusElement(childLi);
+            this.__removeNodeListener(newLi.lastElementChild)
         } else if (el.tagName === 'TABLE') {
+            this.__removeFocus();
             const newTr = el.tBodies[0].lastElementChild.cloneNode(true);
 
             newTr.children[0].textContent = `${Number(newTr.children[0].textContent.split('.')[0]) + 1}.`;
@@ -94,7 +121,36 @@ class Practice {
             this.__updateCellInput(newTr.children[4].children[0]);
 
             el.tBodies[0].appendChild(newTr);
+            this.__focusElement(newTr.children[1].children[0]);
+            this.__removeNodeListener(newTr.children[5].children[0])
         }
+    }
+
+    __focusElement(el) {
+        el.focus();
+        el.className += ' is-focused'
+        this.lastActiveElement = el;
+    }
+
+    __removeFocus() {
+        if (this.lastActiveElement) {
+            this.lastActiveElement.classList.remove('is-focused');
+            this.lastActiveElement = null;
+        }
+    }
+
+    __getOtherElement(id) {
+        if (id.includes('mobile')) {
+            return document.getElementById(id.replace('id_mobile-', 'id_'));
+        }
+        return document.getElementById(id.replace('id_', 'id_mobile-'));
+    }
+
+    __getOtherContainer(id) {
+        if (id.includes('mobile')) {
+            return document.getElementById(id.replace('-mobile', ''));
+        }
+        return document.getElementById(`${id}-mobile`);
     }
 
     __addNodeListener(node) {
@@ -110,56 +166,126 @@ class Practice {
             }
 
             this.__addEntry(el);
+            this.__addEntry(this.__getOtherContainer(el.id));
             this.isDirty = true;
         });
     }
 
     __removeNodeListener(node) {
         node.addEventListener('click', (event) => {
-            let root = event.srcElement.parentElement.parentElement;
+            let root = event.srcElement.parentElement.parentElement
             if (!['LI', 'TR'].includes(root.tagName)) {
                 root = root.parentElement;
+
+                if (root.tagName === 'DIV') {
+                    root = root.parentElement;
+                }
             }
 
-            const children = root.parentElement.children;
-            if (children.length === 1) {
-                if (root.tagName === 'LI') {
+            let itemIndex = [...root.parentNode.children].indexOf(root);
+            let otherRoot = this.__getOtherContainer(root.parentElement.id);
+            if (otherRoot === null) {
+                otherRoot = this.__getOtherContainer(root.parentElement.parentElement.id);
+            }
+
+            if (root.tagName === 'TABLE' || otherRoot.tagName === 'TABLE') {
+                if (otherRoot.id === 'practice-exercises') {
+                    let numHrElements = 0;
+
+                    if (itemIndex !== 0) {
+                        for (let el of root.parentElement.children) {
+                            if (el.tagName === 'HR') {
+                                numHrElements++;
+                            }
+                        }
+                    }
+
+                    itemIndex -= numHrElements;
+                    otherRoot = otherRoot.tBodies[0]
+                }
+            }
+
+            this.__removeNode(root);
+            this.__removeNode(otherRoot.children[itemIndex]);
+        });
+    }
+
+    __removeNode(root) {
+        const children = root.parentElement.children;
+        if (children.length === 1) {
+            if (root.tagName === 'LI') {
+                if (root.children[0].tagName === 'DIV') {
+                    root.children[0].children[1].value = '';
+                    root.children[1].children[0].children[0].children[0].children[1].value = 60;
+                    root.children[1].children[0].children[0].children[1].children[1].value = 60;
+                    root.children[1].children[0].children[0].children[2].children[1].value = 5.00;
+                } else {
                     root.children[1].children[0].value = '';
                 }
-                return;
+            } else {
+                root.children[1].children[0].value = '';
+                root.children[2].children[0].value = 60;
+                root.children[3].children[0].value = 60;
+                root.children[4].children[0].value = 5.00;
+            }
+            return;
+        }
+
+        const itemIndex = [...root.parentNode.children].indexOf(root);
+        if (root.parentElement.classList.contains('mobile') && root.children[0].tagName === 'DIV') {
+            const rootChildren = root.parentElement.children;
+
+            for (let i = itemIndex; i < children.length; i += 2) {
+                const el = children[i];
+                el.children[0].children[0].textContent = `${Number(el.children[0].children[0].textContent.split('.')[0]) - 1}.`;
+
+                this.__updateTextInput(el.children[0].children[1], true, false);
+                this.__updateCellInput(el.children[1].children[0].children[0].children[0].children[1], true, false, false);
+                this.__updateCellInput(el.children[1].children[0].children[0].children[1].children[1], true, false, false);
+                this.__updateCellInput(el.children[1].children[0].children[0].children[2].children[1], true, false, false);
             }
 
-            const itemIndex = [...root.parentNode.children].indexOf(root);
+            const hr = itemIndex === 0 ? rootChildren[itemIndex + 1] : rootChildren[itemIndex - 1];
+            root.parentElement.removeChild(hr);
+            root.parentElement.removeChild(root);
+        } else {
             for (let i = itemIndex; i < children.length; i++) {
                 const el = children[i];
                 if (el.tagName === 'LI') {
-                    console.log(el, el.children[1].children[0].id)
                     this.__updateTextInput(el.children[1].children[0], true, false);
                 } else {
-
+                    el.children[0].textContent = `${Number(el.children[0].textContent.split('.')[0]) - 1}.`;
+                    this.__updateTextInput(el.children[1].children[0], true, false, false);
+                    this.__updateCellInput(el.children[2].children[0], true, false, false);
+                    this.__updateCellInput(el.children[3].children[0], true, false, false);
+                    this.__updateCellInput(el.children[4].children[0], true, false, false);
                 }
             }
-
             root.parentElement.removeChild(root);
-            this.isDirty = true;
-        });
+        }
+
+        this.isDirty = true;
     }
 
     __updateTextInput(el, isIdDecreased = false, isValueWiped = true) {
         const newId = this.__createNewId(el.id, isIdDecreased);
         el.id = newId;
-        el.name = newId;
+        el.name = newId.split('_').slice(1).join('_');
         if (isValueWiped) {
             el.value = '';
         }
     }
 
-    __updateCellInput(el) {
-        const newId = this.__createNewId(el.id);
+    __updateCellInput(el, isIdDecreased = false, isValueWiped = true, isDefaultValue = true) {
+        const newId = this.__createNewId(el.id, isIdDecreased);
         el.id = newId;
-        el.name = newId;
-        el.value = el.defaultValue;
-        if (!el.hasAttribute('min')) {
+        el.name = newId.split('_').slice(1).join('_');;
+
+        if (isDefaultValue) {
+            el.value = el.defaultValue;
+        }
+
+        if (!el.hasAttribute('min') && isValueWiped) {
             el.value = '';
         }
     }
@@ -172,18 +298,6 @@ class Practice {
             splitId[2] = Number(splitId[2]) + 1;
         }
         return splitId.join('_');
-    }
-
-    __focusElement(el) {
-        el.focus();
-        el.className += ' is-focused'
-    }
-
-    __removeFocus(element) {
-        if (element) {
-            element.classList.remove('is-focused');
-            element = null;
-        }
     }
 
     exitConfirmation() {

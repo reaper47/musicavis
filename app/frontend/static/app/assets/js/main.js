@@ -81,7 +81,7 @@ class Main {
             });
         });
 
-        //tabs[0].click();
+        tabs[0].click();
     }
 
     isNumberKey(evt) {

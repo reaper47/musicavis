@@ -117,9 +117,9 @@
                     <tr>
                       <td class="exercise-number">{{ forloop.counter }}.</td>
                       <td>{{ name }}</td>
-                      <td>{{ bpm_start}}</td>
-                      <td>{{ bpm_end}}</td>
-                      <td>{{ minutes}}</td>
+                      <td>{{ bpm_start }}</td>
+                      <td>{{ bpm_end }}</td>
+                      <td>{{ minutes }}</td>
                       <td>
                         <button class="button is-danger is-small remove-row" type="button">
                           <i class="fas fa-minus"></i>
@@ -135,6 +135,148 @@
         </div>
       </section>
     </div>
+  </div>
+</form>
+<form id="practice-form-mobile" class="section is-hidden-tablet" method="post" name="practice_form_mobile">
+  <div id="practice-tabs-mobile" class="">
+    <p class="subtitle has-text-centered is-6">{{ instrument_name }} [{{ practice_date }}]</p>
+    <div  class="tabs is-centered is-boxed ">
+      <ul>
+        <li class="is-active"><a><span class="icon is-small"><i class="fas fa-bullseye" aria-hidden="true"></i></span></a></li>
+        <li><a><span class="icon is-small"><i class="fas fa-list" aria-hidden="true"></i></span></a></li>
+        <li><a><span class="icon is-small"><i class="far fa-smile" aria-hidden="true"></i></span></a></li>
+        <li><a><span class="icon is-small"><i class="far fa-frown" aria-hidden="true"></i></span></a></li>
+        <li><a><span class="icon is-small"><i class="far fa-file-alt" aria-hidden="true"></i></span></a></li>
+      </ul>
+    </div>
+    <section class="small-margin-bottom tab-content">
+      <div class="card">
+        <header class="card-header">
+          <p class="card-header-title mobile is-6">Today's Practice Goals</p>
+          <button class="card-header-icon button is-success add-row" type="button">
+            <span class="icon"><i class="fas fa-plus" aria-hidden="true"></i></span>
+          </button>
+        </header>
+        <div class="card-content mobile">
+          <div class="content no-style">
+            <ul id="ul-goals-mobile" class="practice-ul mobile">
+              {% for goal_field in form_mobile.get_goal_fields %}
+              <li>
+                <p class="control"><i class="fas fa-chevron-right"></i></p>
+                <p class="control">{{ goal_field }}</p>
+                <p class="control remove-row"><a class="button is-danger"><i class="fas fa-minus"></i></a></p>
+              </li>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="small-margin-bottom tab-content">
+      <div class="card">
+        <header class="card-header">
+          <p class="card-header-title mobile is-6">{{ form_mobile.exercises.label }}</p>
+          <a class="card-header-icon button is-success add-row" aria-label="add row">
+            <span class="icon"><i class="fas fa-plus" aria-hidden="true"></i></span>
+          </a>
+        </header>
+        <div class="card-content mobile">
+          <div class="content no-style">
+            <ul id="practice-exercises-mobile" class="practice-ul mobile">
+              {% for name, bpm_start, bpm_end, minutes in form_mobile.get_exercise_fields %}
+              <li class="display-block">
+                <div class="display-flex">
+                  <p class="exercise-number">{{ forloop.counter }}.</p>
+                  {{ name }}
+                  <p class="control remove-row"><a class="button is-danger"><i class="fas fa-minus"></i></a></p>
+                </div>
+                <ul>
+                  <li>
+                    <div class="display-flex-input-container">
+                      <div>
+                        <p>BPM (Start)</p>
+                        {{ bpm_start }}
+                        </div>
+                      <div>
+                        <p>BPM (end)</p>
+                        {{ bpm_end }}
+                      </div>
+                      <div>
+                        <p>Minutes</p>
+                        {{ minutes }}
+                      </div>
+                    </div>
+                  </li>
+                </ul>
+              </li>
+              <hr>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="small-margin-bottom tab-content">
+      <div class="card">
+        <header class="card-header">
+          <p class="card-header-title mobile is-6">What Went Well</p>
+          <a class="card-header-icon button is-success add-row" aria-label="add row">
+            <span class="icon"><i class="fas fa-plus" aria-hidden="true"></i></span>
+          </a>
+        </header>
+        <div class="card-content mobile">
+          <div class="content no-style">
+            <ul id="ul-positives-mobile" class="practice-ul mobile">
+              {% for positive_field in form_mobile.get_positive_fields %}
+              <li>
+                <p class="control"><i class="fas fa-chevron-right"></i></p>
+                <p class="control">{{ positive_field }}</p>
+                <p class="control remove-row"><a class="button is-danger" type="button"><i class="fas fa-minus"></i></a></p>
+              </li>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="small-margin-bottom tab-content">
+      <div class="card">
+        <header class="card-header">
+          <p class="card-header-title mobile is-6">What to Improve</p>
+          <a class="card-header-icon button is-success add-row" aria-label="add row">
+            <span class="icon"><i class="fas fa-plus" aria-hidden="true"></i></span>
+          </a>
+        </header>
+        <div class="card-content mobile">
+          <div class="content no-style">
+            <ul id="ul-improvements-mobile" class="practice-ul mobile">
+              {% for improvement_field in form_mobile.get_improvement_fields %}
+              <li>
+                <p class="control"><i class="fas fa-chevron-right"></i></p>
+                <p class="control">{{ improvement_field }}</p>
+                <p class="control remove-row"><a class="button is-danger" type="button"><i class="fas fa-minus"></i></a></p>
+              </li>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="small-margin-bottom tab-content">
+      <div class="card">
+        <header class="card-header">
+          <p class="card-header-title mobile is-6">Additional Notes</p>
+          <a class="card-header-icon button is-success add-row" aria-label="add row" style="visibility: hidden;"><span class="icon"><i class="fas fa-plus" aria-hidden="true"></i></span></a>
+        </header>
+        <div class="card-content">
+          <div class="content no-style">
+            <div id="practice-notes-mobile">
+              {{ form_mobile.notes }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
   </div>
 </form>
 <div class="tabs hide">

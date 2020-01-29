@@ -40,6 +40,7 @@ def new_view(request):
 def session_view(request, practice_id):
     practice = get_object_or_404(request.user.profile.practices, pk=practice_id)
     form = PracticeForm(instance=practice)
+    form_mobile = PracticeForm(instance=practice, prefix='mobile')
 
     if request.method == 'POST':
         data = request.POST.dict().copy()
@@ -59,8 +60,8 @@ def session_view(request, practice_id):
                 goals=form.fields['goals'],
                 practice=practice,
                 practice_session_url=reverse('app:practice.session', args=[practice.pk]),
-                isSession=True,
-                form=form)
+                form=form,
+                form_mobile=form_mobile)
     return render(request, 'practice/session.html', args)
 
 

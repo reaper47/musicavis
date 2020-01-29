@@ -142,12 +142,14 @@
     font-size: 0.85rem;
     min-height: 90vh;
   }
+
   .card-content.mobile {
     padding-right: 0.6rem !important;
     padding-left: 0rem !important;
     padding-top: 0.4rem !important;
     padding-bottom: 0.4rem !important;
   }
+
   #ul-goals-mobile,
   #ul-positives-mobile,
   #ul-improvements-mobile,
@@ -155,22 +157,28 @@
   #practice-exercises-mobile {
     margin-left: 0.5rem;
   }
+
   .card-header-title.mobile {
     padding: 0 !important;
     padding-left: 1rem !important;
   }
+
   #modal-practice-tools header > p {
     font-size: 1.3rem;
   }
+
   #metronome-visuals {
     height: 5rem !important;
   }
+
   .metronome-signature-container {
     height: 4rem;
   }
+
   .metronome-signature-container > div {
     font-size: 1rem  !important;
   }
+
   #metronome-input {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -178,33 +186,41 @@
     grid-gap: 1rem;
     height: 11rem !important;
   }
+
   #metronome-input hr {
     visibility: hidden;
   }
+
   #metronome-input > hr:nth-child(2) {
     visibility: hidden;
   }
+
   #metronome-input div.fullwidth:nth-child(3) {
     grid-column: 2 / 3;
     grid-row: 1 / 2;
   }
+
   #metronome-input div.field:nth-child(5) {
      grid-column: 2 / 2;
      grid-row: 2 / 3;
   }
+
   #metronome-input div.field:nth-child(4) {
      grid-column: 1 / 2;
      grid-row: 2 / 3;
   }
+
   #practice-tools-mobile-hr {
     visibility: visible;
     margin-top: 0.5rem;
     margin-bottom: 0.5rem;
   }
+
   #timer-input > div:nth-child(1) {
      grid-column: 1 / 2;
      grid-row: 1 / 2;
   }
+
   #timer-input {
      display: grid;
      grid-template-columns: 1fr 1fr 1fr;
@@ -212,13 +228,16 @@
      grid-gap: 1rem;
      font-size: 1rem;
   }
+
   #timer-container {
      height: 6.8rem !important;
   }
+
   section.modal-card-body {
     overflow: auto;
     min-height: 63vh;
   }
+
   div.modal-card {
     width: 95vw;
   }
