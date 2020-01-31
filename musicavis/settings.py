@@ -34,6 +34,8 @@ DEBUG = False
 
 ALLOWED_HOSTS = [
     '0.0.0.0',
+    'localhost',
+    '127.0.0.1',
     '192.168.0.117',
     'www.musicavis.ca',
     'musicavis.ca'
@@ -89,6 +91,8 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'musicavis.wsgi.application'
+
+ASGI_APPLICATION = 'musicavis.asgi.application'
 
 
 # Database
@@ -228,7 +232,6 @@ else:
 # Channels
 #
 
-ASGI_APPLICATION = 'musicavis.routing.application'
 CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',

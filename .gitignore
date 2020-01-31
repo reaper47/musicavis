@@ -2,7 +2,7 @@
 .vscode/
 db.conf
 node_modules/
-
+static/
 
 # Django #
 *.log
