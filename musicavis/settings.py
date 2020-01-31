@@ -32,8 +32,16 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'you-will-never-guess')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    '0.0.0.0',
+    '192.168.0.117',
+    'www.musicavis.ca',
+    'musicavis.ca'
+]
 
+#CSRF_COOKIE_SECURE = True
+
+#SECURE_HSTS_SECONDS = False
 
 # Application definition
 
@@ -98,35 +106,6 @@ DATABASES = {
     }
 }
 
-RQ_QUEUES = {
-    'default': {
-        'HOST': 'localhost',
-        'PORT': 6379,
-        'DB': 0,
-        # 'PASSWORD': 'some-password',
-        'DEFAULT_TIMEOUT': 360,
-    },
-    'with-sentinel': {
-        'SENTINELS': [('localhost', 26736), ('localhost', 26737)],
-        'MASTER_NAME': 'redismaster',
-        'DB': 0,
-        'PASSWORD': 'secret',
-        'SOCKET_TIMEOUT': None,
-        'CONNECTION_KWARGS': {
-            'socket_connect_timeout': 0.3
-        },
-    },
-    'high': {
-        'URL': os.getenv('REDISTOGO_URL', 'redis://localhost:6379/0'),  # If you're on Heroku
-        'DEFAULT_TIMEOUT': 500,
-    },
-    'low': {
-        'HOST': 'localhost',
-        'PORT': 6379,
-        'DB': 0,
-    }
-}
-
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
 
@@ -162,12 +141,13 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
+STATIC_ROOT = f'{ROOT}/static/'
+
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [
     f'{ROOT}/app/frontend/static/app/',
     f'{ROOT}/app/frontend/static/app/assets',
-    '/var/www/static/',
 ]
 
 # Session
