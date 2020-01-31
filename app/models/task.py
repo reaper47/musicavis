@@ -8,6 +8,9 @@ class Task(models.Model):
     profile_id = models.PositiveIntegerField(null=False)
     complete = models.BooleanField(default=False)
 
+    def __hash__(self):
+        return hash(self.id)
+
     def __eq__(self, other):
         return (self.id == other.id and
                 self.name == other.name and
