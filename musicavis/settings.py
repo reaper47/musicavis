@@ -30,7 +30,7 @@ load_dotenv(f'{ROOT}/.env')
 SECRET_KEY = os.environ.get('SECRET_KEY', 'you-will-never-guess')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = [
     '0.0.0.0',
@@ -155,7 +155,11 @@ STATICFILES_DIRS = [
 
 SESSION_COOKIE_AGE = 60*60*24*30  # One month
 
-SESSION_COOKIE_SECURE = False if DEBUG else True
+SESSION_COOKIE_SECURE = False  # if DEBUG else True
+
+SESSION_SAVE_EVERY_REQUEST = True
+
+SESSION_COOKIE_NAME = 'musicavis-session'
 
 # Webpack
 #
