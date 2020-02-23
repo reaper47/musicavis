@@ -1,0 +1,50 @@
+.calendar-container {
+    overflow: auto !important;
+}
+
+.calendar {
+    width: 98%;
+    margin: 0 auto;
+    margin-top: 1rem;
+}
+
+.calendar tr, .calendar td {
+    border: 1px solid black;
+}
+
+.calendar th {
+    padding: 0.5rem;
+    text-align: center !important;
+    font-size: 1.1rem;
+}
+
+.calendar td {
+    width: 200px;
+    height: 14vh;
+    padding: 0.5rem 0px 0px 0.5rem;
+}
+
+.month {
+    font-size: 1.4rem !important;
+    text-align: center !important;
+}
+
+.date {
+    font-size: 16px;
+}
+
+.calendar ul {
+    height: 100%;
+    padding: 0px 20px;
+}
+
+.calendar li a {
+    display: flex;
+    justify-content: space-between;
+}
+
+#calendar-buttons {
+    display: flex;
+    margin: 1rem;
+    justify-content: space-between;
+}

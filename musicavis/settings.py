@@ -17,8 +17,9 @@ from dotenv import load_dotenv
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
 ROOT = Path(__file__).resolve().parent.parent
-EXPORTS_DIR = f'{ROOT}/app/frontend/static/app/exports'
+
 BASE_TEMPLATES_DIR = f'{ROOT}/app/frontend/templates/app'
 
 load_dotenv(f'{ROOT}/.env')
@@ -30,7 +31,7 @@ load_dotenv(f'{ROOT}/.env')
 SECRET_KEY = os.environ.get('SECRET_KEY', 'you-will-never-guess')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = [
     '0.0.0.0',
@@ -92,7 +93,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'musicavis.wsgi.application'
 
-ASGI_APPLICATION = 'musicavis.asgi.application'
+ASGI_APPLICATION = 'musicavis.routing.application'
 
 
 # Database
@@ -133,7 +134,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'America/Toronto'
+TIME_ZONE = 'UTC'
 
 USE_I18N = True
 
@@ -153,6 +154,8 @@ STATICFILES_DIRS = [
     f'{ROOT}/app/frontend/static/app/',
     f'{ROOT}/app/frontend/static/app/assets',
 ]
+
+EXPORTS_DIR = f'{STATIC_ROOT}/exports'
 
 # Session
 #

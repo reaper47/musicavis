@@ -1,3 +1,6 @@
+import calendar
+import json
+
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.contrib import messages
@@ -5,9 +8,12 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
 from django.http import JsonResponse, HttpResponseRedirect
 from django.core.paginator import Paginator
+from django.utils import timezone
+from django.utils.html import mark_safe
 
 from app.models.practice import Instrument
 from app.backend.practice.forms import NewPracticeForm, PracticeForm
+from app.backend.utils.calendar import PracticeListCalendar
 
 PRACTICES_PER_PAGE = 12
 
@@ -73,9 +79,29 @@ def session_view(request, practice_id):
 
 @login_required
 def list_past_practices_view(request):
-    practices = request.user.profile.practices.order_by('-date')
-    paginator = Paginator(practices.all(), PRACTICES_PER_PAGE)
-    page_obj = paginator.get_page(request.GET.get('page', 1))
+    date = timezone.now()
+    months = list(calendar.month_abbr)
 
-    args = dict(title='Past Practice Sessions', page_obj=page_obj)
+    try:
+        referer = request.headers['Referer'].split('?')[1].split('&')
+        params = dict(year=int(referer[1].split('=')[1]),
+                      month=int(months.index(referer[0].split('=')[1][:3])),
+                      flow=referer[2].split('=')[1])
+
+        if params['flow'] == 'next':
+            month = 1 if params['month'] == 12 else params['month'] + 1
+            year = params['year'] if params['month'] < 12 else params['year'] + 1
+        else:
+            month = 12 if params['month'] == 1 else params['month'] - 1
+            year = params['year'] if params['month'] > 1 else params['year'] - 1
+
+        date = date.replace(month=month, year=year)
+    except IndexError:
+        pass
+
+    cal = PracticeListCalendar(date, request.user.profile.practices.all()).formatmonth()
+
+    args = dict(title='Past Practice Sessions',
+                url_practice_list=reverse('app:practice.list_past_practices'),
+                calendar=mark_safe(cal))
     return render(request, 'practice/list.html', args)
