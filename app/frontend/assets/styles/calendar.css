@@ -43,6 +43,10 @@
     justify-content: space-between;
 }
 
+.calendar li a:hover {
+    background-color: #c8d6e5;
+}
+
 #calendar-buttons {
     display: flex;
     margin: 1rem;
