@@ -25,6 +25,7 @@ class PracticeList {
             } else if (event.code === 'ArrowLeft') {
                 this.__get_previous_month();
             }
+            location.reload();
         });
     }
 
