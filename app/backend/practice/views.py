@@ -1,5 +1,4 @@
 import calendar
-import json
 
 from django.shortcuts import render, redirect
 from django.urls import reverse
@@ -7,7 +6,6 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
 from django.http import JsonResponse, HttpResponseRedirect
-from django.core.paginator import Paginator
 from django.utils import timezone
 from django.utils.html import mark_safe
 
@@ -96,7 +94,7 @@ def list_past_practices_view(request):
             year = params['year'] if params['month'] > 1 else params['year'] - 1
 
         date = date.replace(month=month, year=year)
-    except IndexError:
+    except (IndexError, KeyError):
         pass
 
     cal = PracticeListCalendar(date, request.user.profile.practices.all()).formatmonth()

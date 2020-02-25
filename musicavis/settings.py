@@ -42,9 +42,9 @@ ALLOWED_HOSTS = [
     'musicavis.ca'
 ]
 
-#CSRF_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
 
-#SECURE_HSTS_SECONDS = False
+SECURE_HSTS_SECONDS = False
 
 # Application definition
 

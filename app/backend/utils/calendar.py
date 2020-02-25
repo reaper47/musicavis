@@ -1,9 +1,6 @@
 from calendar import HTMLCalendar, SUNDAY
 
-from django.utils import timezone
 from django.urls import reverse
-
-from app.models.practice import Practice
 
 
 class PracticeListCalendar(HTMLCalendar):

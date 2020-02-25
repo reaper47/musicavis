@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models.practice import Practice, Instrument, Goal, Positive, Improvement, Exercise
+from .models.practice import Practice, Instrument, Goal, Improvement
 from .models.profile import Profile
 from .models.notification import Notification
 from .models.email_preferences import EmailPreferences
