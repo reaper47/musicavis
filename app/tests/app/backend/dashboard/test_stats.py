@@ -8,8 +8,8 @@ from app.backend.dashboard.stats import PracticeStats
 from app.models.practice import Practice, Instrument, Exercise
 from app.tests.conftest import create_user, delete_users
 
-AN_INSTRUMENT_NAME = 'bob'
-OTHER_INSTRUMENT_NAME = 'bobby'
+AN_INSTRUMENT_NAME = "bob"
+OTHER_INSTRUMENT_NAME = "bobby"
 
 
 def stats():
@@ -18,70 +18,126 @@ def stats():
     instrument2 = Instrument.objects.create(name=OTHER_INSTRUMENT_NAME)
 
     practice1 = Practice.objects.create(
-        user_profile=user.profile,
-        date=timezone.now(),
-        instrument=instrument1
+        user_profile=user.profile, date=timezone.now(), instrument=instrument1
     )
-    practice1.exercises.set([
-        Exercise.objects.create(name='C-Arpeggio', bpm_start=60, bpm_end=80, minutes=Decimal('5')),
-        Exercise.objects.create(name='D-Arpeggio', bpm_start=60, bpm_end=75, minutes=Decimal('5')),
-        Exercise.objects.create(name='Chord Progressions', bpm_start=80, bpm_end=80, minutes=Decimal('10')),
-        Exercise.objects.create(name='Psychroptic', bpm_start=80, bpm_end=80, minutes=Decimal('20'))
-    ])
+    practice1.exercises.set(
+        [
+            Exercise.objects.create(
+                name="C-Arpeggio", bpm_start=60, bpm_end=80, minutes=Decimal("5")
+            ),
+            Exercise.objects.create(
+                name="D-Arpeggio", bpm_start=60, bpm_end=75, minutes=Decimal("5")
+            ),
+            Exercise.objects.create(
+                name="Chord Progressions",
+                bpm_start=80,
+                bpm_end=80,
+                minutes=Decimal("10"),
+            ),
+            Exercise.objects.create(
+                name="Psychroptic", bpm_start=80, bpm_end=80, minutes=Decimal("20")
+            ),
+        ]
+    )
 
     practice2 = Practice.objects.create(
         user_profile=user.profile,
         date=timezone.now() - timedelta(days=1),
-        instrument=instrument2
+        instrument=instrument2,
     )
-    practice2.exercises.set([
-        Exercise.objects.create(name='D-Arpeggio', bpm_start=60, bpm_end=80, minutes=Decimal('5')),
-        Exercise.objects.create(name='E-Arpeggio', bpm_start=50, bpm_end=55, minutes=Decimal('7')),
-        Exercise.objects.create(name='Downpicking', bpm_start=80, bpm_end=80, minutes=Decimal('10')),
-        Exercise.objects.create(name='Kalmah', bpm_start=80, bpm_end=80, minutes=Decimal('22'))
-    ])
+    practice2.exercises.set(
+        [
+            Exercise.objects.create(
+                name="D-Arpeggio", bpm_start=60, bpm_end=80, minutes=Decimal("5")
+            ),
+            Exercise.objects.create(
+                name="E-Arpeggio", bpm_start=50, bpm_end=55, minutes=Decimal("7")
+            ),
+            Exercise.objects.create(
+                name="Downpicking", bpm_start=80, bpm_end=80, minutes=Decimal("10")
+            ),
+            Exercise.objects.create(
+                name="Kalmah", bpm_start=80, bpm_end=80, minutes=Decimal("22")
+            ),
+        ]
+    )
 
     practice3 = Practice.objects.create(
         user_profile=user.profile,
         date=timezone.now() - timedelta(days=2),
-        instrument=instrument1
+        instrument=instrument1,
     )
-    practice3.exercises.set([
-        Exercise.objects.create(name='C-Arpeggio', bpm_start=60, bpm_end=85, minutes=Decimal('8')),
-        Exercise.objects.create(name='F-Arpeggio', bpm_start=80, bpm_end=75, minutes=Decimal('5')),
-        Exercise.objects.create(name='Chord Progressions', bpm_start=80, bpm_end=80, minutes=Decimal('10')),
-        Exercise.objects.create(name='Psychroptic', bpm_start=80, bpm_end=80, minutes=Decimal('20'))
-    ])
+    practice3.exercises.set(
+        [
+            Exercise.objects.create(
+                name="C-Arpeggio", bpm_start=60, bpm_end=85, minutes=Decimal("8")
+            ),
+            Exercise.objects.create(
+                name="F-Arpeggio", bpm_start=80, bpm_end=75, minutes=Decimal("5")
+            ),
+            Exercise.objects.create(
+                name="Chord Progressions",
+                bpm_start=80,
+                bpm_end=80,
+                minutes=Decimal("10"),
+            ),
+            Exercise.objects.create(
+                name="Psychroptic", bpm_start=80, bpm_end=80, minutes=Decimal("20")
+            ),
+        ]
+    )
 
     practice4 = Practice.objects.create(
         user_profile=user.profile,
         date=timezone.now() - timedelta(days=3),
-        instrument=instrument2
+        instrument=instrument2,
     )
-    practice4.exercises.set([
-        Exercise.objects.create(name='G-Arpeggio', bpm_start=90, bpm_end=95, minutes=Decimal('5')),
-        Exercise.objects.create(name='D-Arpeggio', bpm_start=60, bpm_end=75, minutes=Decimal('5')),
-        Exercise.objects.create(name='Alternate Picking', bpm_start=80, bpm_end=80, minutes=Decimal('10')),
-        Exercise.objects.create(name='Psychroptic', bpm_start=80, bpm_end=80, minutes=Decimal('25'))
-    ])
+    practice4.exercises.set(
+        [
+            Exercise.objects.create(
+                name="G-Arpeggio", bpm_start=90, bpm_end=95, minutes=Decimal("5")
+            ),
+            Exercise.objects.create(
+                name="D-Arpeggio", bpm_start=60, bpm_end=75, minutes=Decimal("5")
+            ),
+            Exercise.objects.create(
+                name="Alternate Picking",
+                bpm_start=80,
+                bpm_end=80,
+                minutes=Decimal("10"),
+            ),
+            Exercise.objects.create(
+                name="Psychroptic", bpm_start=80, bpm_end=80, minutes=Decimal("25")
+            ),
+        ]
+    )
 
     practice5 = Practice.objects.create(
         user_profile=user.profile,
         date=timezone.now() - timedelta(days=4),
-        instrument=instrument1
+        instrument=instrument1,
     )
-    practice5.exercises.set([
-        Exercise.objects.create(name='C-Arpeggio', bpm_start=60, bpm_end=80, minutes=Decimal('15')),
-        Exercise.objects.create(name='B-Arpeggio', bpm_start=65, bpm_end=70, minutes=Decimal('15')),
-        Exercise.objects.create(name='Sweep Picking', bpm_start=80, bpm_end=80, minutes=Decimal('15')),
-        Exercise.objects.create(name='Kalmah', bpm_start=80, bpm_end=80, minutes=Decimal('20'))
-    ])
+    practice5.exercises.set(
+        [
+            Exercise.objects.create(
+                name="C-Arpeggio", bpm_start=60, bpm_end=80, minutes=Decimal("15")
+            ),
+            Exercise.objects.create(
+                name="B-Arpeggio", bpm_start=65, bpm_end=70, minutes=Decimal("15")
+            ),
+            Exercise.objects.create(
+                name="Sweep Picking", bpm_start=80, bpm_end=80, minutes=Decimal("15")
+            ),
+            Exercise.objects.create(
+                name="Kalmah", bpm_start=80, bpm_end=80, minutes=Decimal("20")
+            ),
+        ]
+    )
 
     return PracticeStats([practice1, practice2, practice3, practice4, practice5])
 
 
 class StatsTests(TestCase):
-
     @classmethod
     def setUpClass(cls):
         cls.stats = stats()
@@ -89,8 +145,8 @@ class StatsTests(TestCase):
     @classmethod
     def tearDownClass(cls):
         delete_users()
-        Instrument.objects.get(name='bob').delete()
-        Instrument.objects.get(name='bobby').delete()
+        Instrument.objects.get(name="bob").delete()
+        Instrument.objects.get(name="bobby").delete()
 
     def test_total_practice_time(self):
         time_expected = 237
@@ -149,7 +205,7 @@ class StatsTests(TestCase):
         self.assertEqual(median_num_exercises_expected, median_num_exercises)
 
     def test_avg_exercise_length(self):
-        avg_exercise_length_expected = Decimal('11.85')
+        avg_exercise_length_expected = Decimal("11.85")
 
         avg_exercise_length = self.stats.avg_exercise_length
 
@@ -180,9 +236,15 @@ class StatsTests(TestCase):
         stats = PracticeStats([])
 
         results = [
-            stats.avg_practice_time, stats.median_practice_time, stats.max_practice_time,
-            stats.min_practice_time, stats.num_exercises, stats.avg_num_exercises,
-            stats.median_num_exercises, stats.avg_exercise_length, stats.median_exercise_length
+            stats.avg_practice_time,
+            stats.median_practice_time,
+            stats.max_practice_time,
+            stats.min_practice_time,
+            stats.num_exercises,
+            stats.avg_num_exercises,
+            stats.median_num_exercises,
+            stats.avg_exercise_length,
+            stats.median_exercise_length,
         ]
 
         for result in results:

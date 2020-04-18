@@ -4,7 +4,6 @@ from app.tests.conftest import create_user, delete_users
 
 
 class TasksModelTests(TestCase):
-
     @classmethod
     def setUpClass(cls):
         cls.a_profile = create_user()

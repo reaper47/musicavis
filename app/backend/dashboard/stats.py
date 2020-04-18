@@ -6,13 +6,20 @@ from app.models.practice import Practice
 
 
 class PracticeStats:
-
     def __init__(self, practices: List[Practice]):
         self.practices = practices
-        self.practice_times = [sum([x.minutes for x in practice.exercises.all()]) for practice in practices]
-        self.exercises_per_practice = [practice.exercises.count() for practice in practices]
-        self.exercises = [[x.minutes for x in practice.exercises.all()] for practice in practices]
-        self.instruments = [practice.instrument.name.lower() for practice in self.practices]
+        self.practice_times = [
+            sum([x.minutes for x in practice.exercises.all()]) for practice in practices
+        ]
+        self.exercises_per_practice = [
+            practice.exercises.count() for practice in practices
+        ]
+        self.exercises = [
+            [x.minutes for x in practice.exercises.all()] for practice in practices
+        ]
+        self.instruments = [
+            practice.instrument.name.lower() for practice in self.practices
+        ]
 
     @property
     def total_practice_time(self):
@@ -52,7 +59,9 @@ class PracticeStats:
 
     @property
     def median_exercise_length(self):
-        return self.__calculate(statistics.median, list(itertools.chain(*self.exercises)))
+        return self.__calculate(
+            statistics.median, list(itertools.chain(*self.exercises))
+        )
 
     def __calculate(self, fnc, param):
         try:

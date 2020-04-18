@@ -3,17 +3,22 @@ from unittest import mock
 from django.test import TestCase
 from django.urls import reverse
 
-from app.tests.conftest import is_contact_form, create_user, delete_users, A_USERNAME, A_PASSWORD
+from app.tests.conftest import (
+    is_contact_form,
+    create_user,
+    delete_users,
+    A_USERNAME,
+    A_PASSWORD,
+)
 
-MOCK_SEND_EMAIL = 'app.backend.contact.views.send_email'
+MOCK_SEND_EMAIL = "app.backend.contact.views.send_email"
 
 
 class ContactViewsTests(TestCase):
-
     @classmethod
     def setUpClass(cls):
         cls.a_user = create_user()
-        cls.url = reverse('app:contact.contact_us')
+        cls.url = reverse("app:contact.contact_us")
 
     @classmethod
     def tearDownClass(cls):
@@ -48,12 +53,17 @@ class ContactViewsTests(TestCase):
         WHEN the contact form is sent
         THEN send an email to support
         """
-        data = dict(first_name='a_name', subject='a_subject', message='a_message', email_address='anemail@test.test')
+        data = dict(
+            first_name="a_name",
+            subject="a_subject",
+            message="a_message",
+            email_address="anemail@test.test",
+        )
         response = self.client.post(self.url, data=data, follow=True)
 
         self.assertEqual(response.status_code, 200)
         self.assertTrue(mock_send_email.delay.called)
-        self.assertIn(b'Thank you for contacting us', response.content)
+        self.assertIn(b"Thank you for contacting us", response.content)
 
     @mock.patch(MOCK_SEND_EMAIL)
     def test_contact_form_send_email_user(self, mock_send_email):
@@ -63,12 +73,12 @@ class ContactViewsTests(TestCase):
         THEN send an email to support
         """
         self.client.login(username=A_USERNAME, password=A_PASSWORD)
-        data = dict(first_name='a_name', subject='a_subject', message='a_message')
+        data = dict(first_name="a_name", subject="a_subject", message="a_message")
         response = self.client.post(self.url, data=data, follow=True)
 
         self.assertEqual(response.status_code, 200)
         self.assertTrue(mock_send_email.delay.called)
-        self.assertIn(b'Thank you for contacting us', response.content)
+        self.assertIn(b"Thank you for contacting us", response.content)
 
     @mock.patch(MOCK_SEND_EMAIL)
     def test_contact_form_send_email_redirect(self, mock_send_email):
@@ -76,8 +86,13 @@ class ContactViewsTests(TestCase):
         WHEN the contact form is sent
         THEN the user is redirected to the index page
         """
-        data = dict(first_name='a_name', subject='a_subject', message='a_message', email_address='anemail@test.test')
+        data = dict(
+            first_name="a_name",
+            subject="a_subject",
+            message="a_message",
+            email_address="anemail@test.test",
+        )
         response = self.client.post(self.url, data=data)
 
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, reverse('app:main.index'))
+        self.assertEqual(response.url, reverse("app:main.index"))

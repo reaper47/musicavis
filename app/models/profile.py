@@ -28,17 +28,19 @@ def get_profile_from_user(user: User):
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    practices = models.ManyToManyField('Practice')
-    email_preferences = models.ForeignKey('EmailPreferences', on_delete=models.CASCADE)
-    notifications = models.ManyToManyField('Notification')
+    practices = models.ManyToManyField("Practice")
+    email_preferences = models.ForeignKey("EmailPreferences", on_delete=models.CASCADE)
+    notifications = models.ManyToManyField("Notification")
     is_confirmed = models.BooleanField(default=False)
-    instruments_practiced = models.ManyToManyField('Instrument')
+    instruments_practiced = models.ManyToManyField("Instrument")
 
     def save(self, *args, **kwargs):
-        if not hasattr(self, 'email_preferences'):
+        if not hasattr(self, "email_preferences"):
             self.user.email = self.user.email.lower()
 
-            email_preferences = EmailPreferences.objects.create(features=True, practicing=True, promotions=True)
+            email_preferences = EmailPreferences.objects.create(
+                features=True, practicing=True, promotions=True
+            )
             self.email_preferences = email_preferences
 
         return super().save(*args, **kwargs)
@@ -62,9 +64,17 @@ class Profile(models.Model):
         self.user.username = new_username
         self.user.save()
 
-    def update_email_preferences(self, accept_features: bool, accept_practicing: bool, accept_promotions: bool):
-        email_preferences = EmailPreferences.objects.filter(pk=self.email_preferences.pk)
-        email_preferences.update(features=accept_features, practicing=accept_practicing, promotions=accept_promotions)
+    def update_email_preferences(
+        self, accept_features: bool, accept_practicing: bool, accept_promotions: bool
+    ):
+        email_preferences = EmailPreferences.objects.filter(
+            pk=self.email_preferences.pk
+        )
+        email_preferences.update(
+            features=accept_features,
+            practicing=accept_practicing,
+            promotions=accept_promotions,
+        )
 
     def update_instruments_practiced(self, instruments):
         for instrument in self.instruments_practiced.all():
@@ -76,19 +86,21 @@ class Profile(models.Model):
         self.save()
 
     def avatar(self, size):
-        digest = md5(self.user.email.encode('utf-8')).hexdigest()
-        return f'https://www.gravatar.com/avatar/{digest}?d=identicon&s={size}'
+        digest = md5(self.user.email.encode("utf-8")).hexdigest()
+        return f"https://www.gravatar.com/avatar/{digest}?d=identicon&s={size}"
 
     def add_notification(self, name, data):
         self.notifications.all().filter(name=name).delete()
-        notification = Notification.objects.create(name=name, payload_json=json.dumps(data), user_profile=self)
+        notification = Notification.objects.create(
+            name=name, payload_json=json.dumps(data), user_profile=self
+        )
         self.notifications.add(notification)
         return notification
 
     def list_instruments_practiced_html(self) -> str:
         instruments = self.instruments_practiced.all()
-        html = '<br>- '.join([x.name.title() for x in instruments])
-        html = f'- {html}' if instruments else 'None'
+        html = "<br>- ".join([x.name.title() for x in instruments])
+        html = f"- {html}" if instruments else "None"
         return html
 
     def delete(self):
@@ -130,20 +142,25 @@ class Profile(models.Model):
 
         data = {x.instrument.name: [] for x in practices}
         for practice in practices:
-            date = f'{practice.date}'
-            data[practice.instrument.name].append({'length': float(practice.length), 'date': date})
+            date = f"{practice.date}"
+            data[practice.instrument.name].append(
+                {"length": float(practice.length), "date": date}
+            )
 
         start_date = min([x.date for x in practices])
         end_date = max([x.date for x in practices])
-        dates = [start_date + timedelta(days=i) for i in range((end_date - start_date).days + 2)]
+        dates = [
+            start_date + timedelta(days=i)
+            for i in range((end_date - start_date).days + 2)
+        ]
         dates_days = [str(x.date) for x in dates]
         dates = list(map(str, dates))
 
         for instrument, values in data.items():
             for date in dates_days:
-                if not next((x for x in values if x['date'] == date), False):
-                    data[instrument].append({'length': 0, 'date': date})
-            data[instrument].sort(key=lambda k: k['date'])
+                if not next((x for x in values if x["date"] == date), False):
+                    data[instrument].append({"length": 0, "date": date})
+            data[instrument].sort(key=lambda k: k["date"])
 
         return PracticeGraphData(data, dates)
 
@@ -152,13 +169,17 @@ class Profile(models.Model):
     """
 
     def launch_task(self, name, description, *args, **kwargs):
-        export_practices.delay(self.pk, name, description, os=kwargs['os'], file_type=kwargs['file_type'])
+        export_practices.delay(
+            self.pk, name, description, os=kwargs["os"], file_type=kwargs["file_type"]
+        )
 
     def get_tasks_in_progress(self):
         return Task.objects.filter(profile_id=self.pk, complete=False).all()
 
     def get_task_in_progress(self, name):
-        return Task.objects.filter(name=name, profile_id=self.pk, complete=False).first()
+        return Task.objects.filter(
+            name=name, profile_id=self.pk, complete=False
+        ).first()
 
     """
     TOKENS
@@ -166,7 +187,7 @@ class Profile(models.Model):
 
     def generate_token(self, token_type: TokenType, expires_in=600) -> str:
         serializer = Serializer(SECRET_KEY, expires_in)
-        return serializer.dumps({token_type.value: self.user.pk}).decode('utf-8')
+        return serializer.dumps({token_type.value: self.user.pk}).decode("utf-8")
 
     @staticmethod
     def reset_password(token: str, new_password: str) -> bool:
@@ -191,7 +212,7 @@ class Profile(models.Model):
 def get_user_from_token(token: str, token_type: TokenType) -> User:
     try:
         serializer = Serializer(SECRET_KEY)
-        data = serializer.loads(token.encode('utf-8'))
+        data = serializer.loads(token.encode("utf-8"))
         user_pk = data.get(token_type.value)
         return User.objects.get(pk=user_pk) if user_pk else None
     except BadSignature:
@@ -204,7 +225,9 @@ def update_profile_signal(sender, instance, created, **kwargs):
         Profile.objects.create(user=instance)
         instance.email = instance.email.lower()
 
-        email_preferences = EmailPreferences.objects.create(features=True, practicing=True, promotions=True)
+        email_preferences = EmailPreferences.objects.create(
+            features=True, practicing=True, promotions=True
+        )
         instance.email_preferences = email_preferences
 
     instance.profile.save()

@@ -17,6 +17,11 @@
                 <div class="dropdown-container no-style">
                   {% include 'snippets/_form_field.html' with field=form.instrument %}
                 </div>
+                {% if is_practices_available %}
+                <label id="copy-previous-session-container" class="checkbox">
+                  {{ form.copy_previous_practice_checkbox }} {{ form.copy_previous_practice_checkbox.label }}
+                </label>
+                {% endif %}
               </div>
             </div>
             <button type="submit" class='button is-primary is-fullwidth'>Create</button>

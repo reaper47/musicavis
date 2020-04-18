@@ -4,15 +4,21 @@ from django.test import TestCase
 from django.urls import reverse
 
 from musicavis.settings import EXPORTS_DIR
-from app.tests.conftest import create_user, A_USERNAME, A_PASSWORD, is_user_index, is_anonymous_index, delete_users
+from app.tests.conftest import (
+    create_user,
+    A_USERNAME,
+    A_PASSWORD,
+    is_user_index,
+    is_anonymous_index,
+    delete_users,
+)
 
 
 class MainViewTests(TestCase):
-
     @classmethod
     def setUpClass(cls):
         cls.a_user = create_user()
-        cls.url_index = reverse('app:main.index')
+        cls.url_index = reverse("app:main.index")
 
     @classmethod
     def tearDownClass(cls):
@@ -53,10 +59,19 @@ class MainViewTests(TestCase):
         WHEN requesting the sitemap page
         THEN return the sitemap page
         """
-        response = self.client.get(reverse('app:main.sitemap'), follow=True)
+        response = self.client.get(reverse("app:main.sitemap"), follow=True)
 
-        data = ['Home', 'Features', 'Pricing', 'Our team', 'Contact us',
-                'Careers', 'News', 'Privacy Policy', 'Terms of Use']
+        data = [
+            "Home",
+            "Features",
+            "Pricing",
+            "Our team",
+            "Contact us",
+            "Careers",
+            "News",
+            "Privacy Policy",
+            "Terms of Use",
+        ]
         assert response.status_code == 200
         assert all([x.encode() in response.content for x in data])
 
@@ -71,21 +86,21 @@ class MainViewTests(TestCase):
         THEN return the notifications as a JSON payload
         """
         self.client.login(username=A_USERNAME, password=A_PASSWORD)
-        self.a_user.profile.add_notification('test1', {'test': 1})
-        self.a_user.profile.add_notification('test2', {'test': 2})
+        self.a_user.profile.add_notification("test1", {"test": 1})
+        self.a_user.profile.add_notification("test2", {"test": 2})
         payload_expected = {
-            'names': ['test1', 'test2'],
-            'data': [{'test': 1}, {'test': 2}],
+            "names": ["test1", "test2"],
+            "data": [{"test": 1}, {"test": 2}],
         }
 
-        response = self.client.get(reverse('app:main.notifications'))
+        response = self.client.get(reverse("app:main.notifications"))
         payload = json.loads(response.content)
-        payload['data'] = [json.loads(x) for x in payload['data']]
+        payload["data"] = [json.loads(x) for x in payload["data"]]
 
-        for field in ['names', 'data', 'timestamps']:
+        for field in ["names", "data", "timestamps"]:
             self.assertEqual(len(payload[field]), 2)
-        self.assertEqual(payload['names'], payload_expected['names'])
-        self.assertEqual(payload['data'], payload_expected['data'])
+        self.assertEqual(payload["names"], payload_expected["names"])
+        self.assertEqual(payload["data"], payload_expected["data"])
 
     """
     EXPORTS TESTS
@@ -97,13 +112,16 @@ class MainViewTests(TestCase):
         THEN file is sent to the user with the appropriate HTTP Headers
         """
         self.client.login(username=A_USERNAME, password=A_PASSWORD)
-        exported_file = export_file('test1.txt')
+        exported_file = export_file("test1.txt")
 
-        response = self.client.get(reverse('app:main.export', args=(exported_file,)))
+        response = self.client.get(reverse("app:main.export", args=(exported_file,)))
 
-        self.assertEqual(response._headers['content-type'][1], 'text/plain')
-        self.assertEqual(int(response._headers['content-length'][1]), 32)
-        self.assertEqual(response._headers['content-disposition'][1], f'attachment; filename={exported_file}')
+        self.assertEqual(response._headers["content-type"][1], "text/plain")
+        self.assertEqual(int(response._headers["content-length"][1]), 32)
+        self.assertEqual(
+            response._headers["content-disposition"][1],
+            f"attachment; filename={exported_file}",
+        )
 
     def test_exports_delete_notification(self):
         """
@@ -112,16 +130,18 @@ class MainViewTests(TestCase):
         THEN the user's notification is deleted
         """
         self.client.login(username=A_USERNAME, password=A_PASSWORD)
-        exported_file = export_file('test2.txt')
-        self.a_user.profile.add_notification(f"export_practice_task_{exported_file.split('.')[1]}",
-                                             {'task_id': 'wewedsdf-wewe', 'file_name': exported_file})
+        exported_file = export_file("test2.txt")
+        self.a_user.profile.add_notification(
+            f"export_practice_task_{exported_file.split('.')[1]}",
+            {"task_id": "wewedsdf-wewe", "file_name": exported_file},
+        )
 
-        self.client.get(reverse('app:main.export', args=(exported_file,)))
+        self.client.get(reverse("app:main.export", args=(exported_file,)))
 
         self.assertEqual(self.a_user.profile.notifications.count(), 0)
 
 
 def export_file(fname: str):
-    with open(f'{EXPORTS_DIR}/{fname}', 'w') as f:
-        f.write('This is a text of 32 characters\n')
+    with open(f"{EXPORTS_DIR}/{fname}", "w") as f:
+        f.write("This is a text of 32 characters\n")
     return fname

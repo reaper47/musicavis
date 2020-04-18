@@ -4,7 +4,6 @@ from app.backend.utils.instruments import gather_instruments
 
 
 class InstrumentsTests(TestCase):
-
     def test_gather_instruments(self):
         """
         WHEN the instruments are parsed

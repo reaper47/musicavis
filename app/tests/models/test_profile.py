@@ -14,25 +14,42 @@ from app.models.email_preferences import EmailPreferences
 from app.models.notification import Notification
 from app.backend.utils.enums import FileType, NewLine, TokenType
 from app.backend.dashboard.stats import PracticeStats
-from app.tests.conftest import (create_user, create_user_with_a_practice, add_instruments_to_database,
-                                create_task, create_complete_practice, A_USERNAME, A_PASSWORD,
-                                OTHER_PASSWORD, AN_EMAIL, OTHER_EMAIL, AN_INSTRUMENT, JobMock, delete_users)
+from app.tests.conftest import (
+    create_user,
+    create_user_with_a_practice,
+    add_instruments_to_database,
+    create_task,
+    create_complete_practice,
+    A_USERNAME,
+    A_PASSWORD,
+    OTHER_PASSWORD,
+    AN_EMAIL,
+    OTHER_EMAIL,
+    AN_INSTRUMENT,
+    JobMock,
+    delete_users,
+)
 
-instruments = ['Cello', 'Violin']
+instruments = ["Cello", "Violin"]
 instrument1 = Instrument(name=instruments[0])
 instrument2 = Instrument(name=instruments[1])
-exercises1 = [Exercise(name='C', bpm_start=80, bpm_end=75, minutes=40),
-              Exercise(name='D', bpm_start=80, bpm_end=75, minutes=20)]
-exercises2 = [Exercise(name='E', bpm_start=80, bpm_end=75, minutes=50),
-              Exercise(name='F', bpm_start=80, bpm_end=75, minutes=20)]
-exercises3 = [Exercise(name='G', bpm_start=80, bpm_end=75, minutes=40),
-              Exercise(name='H', bpm_start=80, bpm_end=75, minutes=60)]
+exercises1 = [
+    Exercise(name="C", bpm_start=80, bpm_end=75, minutes=40),
+    Exercise(name="D", bpm_start=80, bpm_end=75, minutes=20),
+]
+exercises2 = [
+    Exercise(name="E", bpm_start=80, bpm_end=75, minutes=50),
+    Exercise(name="F", bpm_start=80, bpm_end=75, minutes=20),
+]
+exercises3 = [
+    Exercise(name="G", bpm_start=80, bpm_end=75, minutes=40),
+    Exercise(name="H", bpm_start=80, bpm_end=75, minutes=60),
+]
 
 A_WEEK = 604800  # in seconds
 
 
 class ProfileModelTests(TestCase):
-
     @classmethod
     def setUpClass(cls):
         cls.a_user = create_user()
@@ -42,7 +59,7 @@ class ProfileModelTests(TestCase):
     def tearDownClass(cls):
         files = [f for f in os.listdir(EXPORTS_DIR)]
         for f in files:
-            os.remove(f'{EXPORTS_DIR}/{f}')
+            os.remove(f"{EXPORTS_DIR}/{f}")
         delete_users()
 
     """
@@ -61,7 +78,7 @@ class ProfileModelTests(TestCase):
         WHEN a user is created
         THEN it's email should be lowercase
         """
-        user = create_user(A_USERNAME + 'a', AN_EMAIL.upper(), A_PASSWORD)
+        user = create_user(A_USERNAME + "a", AN_EMAIL.upper(), A_PASSWORD)
 
         self.assertTrue(user.email.islower())
 
@@ -71,14 +88,14 @@ class ProfileModelTests(TestCase):
         THEN the password is hashed
         """
         self.assertTrue(self.a_user.profile.verify_password(A_PASSWORD))
-        self.assertFalse(self.a_user.profile.verify_password(A_PASSWORD + '1234'))
+        self.assertFalse(self.a_user.profile.verify_password(A_PASSWORD + "1234"))
 
     def test_salts_are_random(self):
         """
         WHEN two users register with the same password
         THEN the salts are different
         """
-        other_user = create_user('oh', OTHER_EMAIL, A_PASSWORD)
+        other_user = create_user("oh", OTHER_EMAIL, A_PASSWORD)
 
         self.assertNotEqual(self.a_user.password, other_user.password)
 
@@ -91,22 +108,32 @@ class ProfileModelTests(TestCase):
         before_practicing = self.a_user.profile.email_preferences.practicing
         before_promotions = self.a_user.profile.email_preferences.promotions
 
-        self.a_user.profile.update_email_preferences(accept_features=(not before_features),
-                                                     accept_practicing=(not before_practicing),
-                                                     accept_promotions=(not before_promotions))
+        self.a_user.profile.update_email_preferences(
+            accept_features=(not before_features),
+            accept_practicing=(not before_practicing),
+            accept_promotions=(not before_promotions),
+        )
 
         self.a_user.profile.email_preferences.refresh_from_db()
-        self.assertEqual(self.a_user.profile.email_preferences.features, not before_features)
-        self.assertEqual(self.a_user.profile.email_preferences.practicing, not before_practicing)
-        self.assertEqual(self.a_user.profile.email_preferences.promotions, not before_promotions)
+        self.assertEqual(
+            self.a_user.profile.email_preferences.features, not before_features
+        )
+        self.assertEqual(
+            self.a_user.profile.email_preferences.practicing, not before_practicing
+        )
+        self.assertEqual(
+            self.a_user.profile.email_preferences.promotions, not before_promotions
+        )
 
     def test_stringify_models(self):
         """
         WHEN the models related to User are stringified
         THEN the stringified models are as expected
         """
-        models = [(self.a_user, self.a_user.username),
-                  (EmailPreferences(features=1, practicing=1, promotions=1), '[1,1,1]')]
+        models = [
+            (self.a_user, self.a_user.username),
+            (EmailPreferences(features=1, practicing=1, promotions=1), "[1,1,1]"),
+        ]
 
         for model, expected_string in models:
             self.assertEqual(str(model), expected_string)
@@ -119,7 +146,8 @@ class ProfileModelTests(TestCase):
         actual_digest = self.a_user.profile.avatar(128)
 
         self.assertEqual(
-            actual_digest, 'https://www.gravatar.com/avatar/b682f93ed660ecda33e9adb4e514aa2f?d=identicon&s=128'
+            actual_digest,
+            "https://www.gravatar.com/avatar/b682f93ed660ecda33e9adb4e514aa2f?d=identicon&s=128",
         )
 
     def test_html_list_instruments_practiced_many_instruments(self):
@@ -128,11 +156,11 @@ class ProfileModelTests(TestCase):
         WHEN the instruments practiced are formatted as an HTML list
         THEN the list is formatted correctly
         """
-        name1, name2, name3 = 'red', 'green', 'blue'
+        name1, name2, name3 = "red", "green", "blue"
         for name in [name1, name2, name3]:
             instrument = Instrument.objects.create(name=name)
             self.a_user.profile.instruments_practiced.add(instrument)
-        format_expected = '- Red<br>- Green<br>- Blue'
+        format_expected = "- Red<br>- Green<br>- Blue"
 
         format_actual = self.a_user.profile.list_instruments_practiced_html()
 
@@ -144,7 +172,7 @@ class ProfileModelTests(TestCase):
         WHEN the instruments practiced are formatted as an HTML list
         THEN the list is formatted correctly
         """
-        format_expected = 'None'
+        format_expected = "None"
 
         format_actual = self.a_user.profile.list_instruments_practiced_html()
 
@@ -196,7 +224,9 @@ class ProfileModelTests(TestCase):
         """
         self.a_user.profile.new_practice(AN_INSTRUMENT)
 
-        self.a_user.profile.delete_practice(self.a_user_with_a_practice.profile.practices.all()[0])
+        self.a_user.profile.delete_practice(
+            self.a_user_with_a_practice.profile.practices.all()[0]
+        )
 
         self.assertEqual(self.a_user.profile.practices.count(), 1)
         self.assertEqual(self.a_user_with_a_practice.profile.practices.count(), 1)
@@ -251,7 +281,7 @@ class ProfileModelTests(TestCase):
         WHEN resetting the user's password
         THEN the second user's password remains the same
         """
-        token = self.a_user.profile.generate_token(TokenType.RESET) + 'a'
+        token = self.a_user.profile.generate_token(TokenType.RESET) + "a"
 
         is_password_changed = Profile.reset_password(token, OTHER_PASSWORD)
 
@@ -280,7 +310,7 @@ class ProfileModelTests(TestCase):
         WHEN the user confirms the account with the other user's token
         THEN the account is not confirmed
         """
-        other_user = create_user('Bob', OTHER_EMAIL, OTHER_PASSWORD)
+        other_user = create_user("Bob", OTHER_EMAIL, OTHER_PASSWORD)
         other_token = other_user.profile.generate_token(TokenType.CONFIRM, A_WEEK)
 
         is_account_confirmed = self.a_user.profile.confirm(other_token)
@@ -289,34 +319,6 @@ class ProfileModelTests(TestCase):
         self.assertFalse(is_account_confirmed)
         self.assertTrue(user.is_active)
 
-    """
-    PAGINATION
-    """
-    '''
-    def test_paginate_practices(a_user_with_4_practices):
-        """
-        GIVEN a user with 4 exercises each 1 day apart
-        WHEN the exercises are fetched, 3 exercises/page
-        THEN they are listed in descending order
-        """
-        num_practices_per_page = 3
-        practices = a_user_with_4_practices.paginate_practices(1, num_practices_per_page)
-
-        assert num_practices_per_page == len(practices.items)
-        assert practices.items[0].date > practices.items[-1].date
-
-
-    def test_paginate_practices_last_page(a_user_with_4_practices):
-        """
-        GIVEN a user with 4 exercises each 1 day apart
-        WHEN the second page of exercises is fetched
-        THEN there is one practice in the list
-        """
-        num_practices_per_page = 3
-        practices = a_user_with_4_practices.paginate_practices(2, num_practices_per_page)
-
-        assert len(practices.items) == 1
-    '''
     """
     EXPORTS
     """
@@ -327,9 +329,14 @@ class ProfileModelTests(TestCase):
         THEN return a file for every file type
         """
         username = self.a_user_with_a_practice.username
-        fnames_expected = [f'{username}_practices_{timezone.now():%d%m%y}.{x.value}' for x in FileType]
+        fnames_expected = [
+            f"{username}_practices_{timezone.now():%d%m%y}.{x.value}" for x in FileType
+        ]
 
-        fnames = [self.a_user_with_a_practice.profile.export_practices(NewLine.UNIX, x) for x in FileType]
+        fnames = [
+            self.a_user_with_a_practice.profile.export_practices(NewLine.UNIX, x)
+            for x in FileType
+        ]
 
         self.assertTrue(all([x == y for x, y in zip(fnames_expected, fnames)]))
 
@@ -361,22 +368,35 @@ class ProfileModelTests(TestCase):
         """
         now = timezone.now()
         date1, date2 = now - timedelta(days=3), now - timedelta(days=1)
-        practice1 = create_complete_practice(self.a_user, instrument1, date2, exercises1)
+        practice1 = create_complete_practice(
+            self.a_user, instrument1, date2, exercises1
+        )
         practice2 = create_complete_practice(self.a_user, instrument2, now, exercises2)
-        practice3 = create_complete_practice(self.a_user, instrument1, date1, exercises3)
+        practice3 = create_complete_practice(
+            self.a_user, instrument1, date1, exercises3
+        )
         for practice in [practice1, practice2, practice3]:
             self.a_user.profile.practices.add(practice)
         datasets_expected = {
             instruments[0]: [
-                {'length': 100, 'date': f'{date1:%Y%m%d}'}, {'length': 0, 'date': f'{now - timedelta(days=2):%Y%m%d}'},
-                {'length': 60, 'date': f'{date2:%Y%m%d}'}, {'length': 0, 'date': f'{now:%Y%m%d}'}
+                {"length": 100, "date": f"{date1:%Y%m%d}"},
+                {"length": 0, "date": f"{now - timedelta(days=2):%Y%m%d}"},
+                {"length": 60, "date": f"{date2:%Y%m%d}"},
+                {"length": 0, "date": f"{now:%Y%m%d}"},
             ],
             instruments[1]: [
-                {'length': 0, 'date': f'{date1:%Y%m%d}'}, {'length': 0, 'date': f'{now - timedelta(days=2):%Y%m%d}'},
-                {'length': 0, 'date': f'{date2:%Y%m%d}'}, {'length': 70, 'date': f'{now:%Y%m%d}'}
-            ]
+                {"length": 0, "date": f"{date1:%Y%m%d}"},
+                {"length": 0, "date": f"{now - timedelta(days=2):%Y%m%d}"},
+                {"length": 0, "date": f"{date2:%Y%m%d}"},
+                {"length": 70, "date": f"{now:%Y%m%d}"},
+            ],
         }
-        dates_expected = [f'{date1:%Y%m%d}', f'{date1 + timedelta(days=1):%Y%m%d}', f'{date2:%Y%m%d}', f'{now:%Y%m%d}']
+        dates_expected = [
+            f"{date1:%Y%m%d}",
+            f"{date1 + timedelta(days=1):%Y%m%d}",
+            f"{date2:%Y%m%d}",
+            f"{now:%Y%m%d}",
+        ]
 
         data = self.a_user.profile.practice_graph_data()
 
@@ -392,27 +412,27 @@ class ProfileModelTests(TestCase):
         WHEN a notification is added to the user
         THEN a notification of the same name is added to the database
         """
-        self.a_user.profile.add_notification('test', {'task_id': 1})
+        self.a_user.profile.add_notification("test", {"task_id": 1})
 
         self.assertEqual(Notification.objects.count(), 1)
-        self.assertEqual(Notification.objects.all()[0].name, 'test')
+        self.assertEqual(Notification.objects.all()[0].name, "test")
 
     def test_add_notification_multiple(self):
         """
         WHEN two notifications of the same name are added to the user
         THEN only the latest one is associated with the user
         """
-        self.a_user.profile.add_notification('test', {'task_id': 1})
-        self.a_user.profile.add_notification('test', {'task_id': 2})
+        self.a_user.profile.add_notification("test", {"task_id": 1})
+        self.a_user.profile.add_notification("test", {"task_id": 2})
 
         self.assertEqual(Notification.objects.count(), 1)
-        self.assertEqual(Notification.objects.all()[0].name, 'test')
+        self.assertEqual(Notification.objects.all()[0].name, "test")
 
     """
     TASKS
     """
 
-    @mock.patch('app.models.profile.export_practices')
+    @mock.patch("app.models.profile.export_practices")
     def test_launch_task_enqueue(self, mock_rq):
         """
         WHEN launching a task
@@ -420,7 +440,9 @@ class ProfileModelTests(TestCase):
         """
         mock_rq.delay.return_value = JobMock()
 
-        self.a_user.profile.launch_task('name', 'description', os='linux', file_type='pdf')
+        self.a_user.profile.launch_task(
+            "name", "description", os="linux", file_type="pdf"
+        )
 
         self.assertTrue(mock_rq.delay.called)
 
@@ -430,9 +452,11 @@ class ProfileModelTests(TestCase):
         WHEN getting tasks in progress
         THEN return the tasks in progress
         """
-        progress1 = create_task('ert', 'test1', 'testing1', self.a_user.profile)
-        progress2 = create_task('tre', 'test1', 'testing2', self.a_user.profile)
-        complete = create_task('tyu', 'test2', 'testing2', self.a_user.profile, True)  # noqa
+        progress1 = create_task("ert", "test1", "testing1", self.a_user.profile)
+        progress2 = create_task("tre", "test1", "testing2", self.a_user.profile)
+        complete = create_task(
+            "tyu", "test2", "testing2", self.a_user.profile, True
+        )  # noqa
 
         tasks = self.a_user.profile.get_tasks_in_progress()
 
@@ -445,10 +469,12 @@ class ProfileModelTests(TestCase):
         WHEN getting a task in progress
         THEN return the first task in progress
         """
-        progress1 = create_task('ert', 'test1', 'testing1', self.a_user.profile)
-        progress2 = create_task('tre', 'test1', 'testing2', self.a_user.profile)       # noqa
-        complete = create_task('tyu', 'test2', 'testing2', self.a_user.profile, True)  # noqa
+        progress1 = create_task("ert", "test1", "testing1", self.a_user.profile)
+        progress2 = create_task("tre", "test1", "testing2", self.a_user.profile)  # noqa
+        complete = create_task(
+            "tyu", "test2", "testing2", self.a_user.profile, True
+        )  # noqa
 
-        task = self.a_user.profile.get_task_in_progress('test1')
+        task = self.a_user.profile.get_task_in_progress("test1")
 
         self.assertEqual(task, progress1)

@@ -5,18 +5,34 @@ from django.urls import reverse
 from django.contrib.auth.models import User
 
 from app.models.email_preferences import EmailPreferences
-from app.tests.conftest import (create_user, A_USERNAME, AN_EMAIL, A_PASSWORD, OTHER_USERNAME, OTHER_EMAIL,
-                                OTHER_PASSWORD, is_user_index, is_login_form, is_signup_form, delete_users,
-                                is_password_reset_form, is_reset_password_form)
-from app.tests.app.backend.auth.utils import login_post, register_post, reset_post, reset_password_post
+from app.tests.conftest import (
+    create_user,
+    A_USERNAME,
+    AN_EMAIL,
+    A_PASSWORD,
+    OTHER_USERNAME,
+    OTHER_EMAIL,
+    OTHER_PASSWORD,
+    is_user_index,
+    is_login_form,
+    is_signup_form,
+    delete_users,
+    is_password_reset_form,
+    is_reset_password_form,
+)
+from app.tests.app.backend.auth.utils import (
+    login_post,
+    register_post,
+    reset_post,
+    reset_password_post,
+)
 from app.backend.utils.enums import TokenType
 
-MOCK_EMAIL = 'app.backend.auth.views.send_email_to_user'
-MOCK_LOGOUT = 'app.backend.auth.views.logout'
+MOCK_EMAIL = "app.backend.auth.views.send_email_to_user"
+MOCK_LOGOUT = "app.backend.auth.views.logout"
 
 
 class AuthViewsTests(TestCase):
-
     @classmethod
     def setUpClass(cls):
         cls.a_user = create_user()
@@ -34,7 +50,7 @@ class AuthViewsTests(TestCase):
         WHEN the login page is rendered
         THEN display the components of the login form
         """
-        response = self.client.get(reverse('app:auth.login'))
+        response = self.client.get(reverse("app:auth.login"))
 
         self.assertEqual(response.status_code, 200)
         self.assertTrue(is_login_form(response))
@@ -44,10 +60,10 @@ class AuthViewsTests(TestCase):
         WHEN a user logs in with the correct credentials
         THEN the user logs is successfully
         """
-        credentials = {'username': A_USERNAME, 'password': A_PASSWORD}
+        credentials = {"username": A_USERNAME, "password": A_PASSWORD}
         self.client.login(**credentials)
 
-        response = self.client.post(reverse('app:auth.login'), credentials, follow=True)
+        response = self.client.post(reverse("app:auth.login"), credentials, follow=True)
 
         self.assertEqual(response.status_code, 200)
         self.assertTrue(is_user_index(response))
@@ -57,10 +73,10 @@ class AuthViewsTests(TestCase):
         WHEN a user logs in with incorrect credentials
         THEN the user is not logged in
         """
-        response = login_post(self.client, A_USERNAME, 'whoops!')
+        response = login_post(self.client, A_USERNAME, "whoops!")
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.request['PATH_INFO'], reverse('app:auth.login'))
+        self.assertEqual(response.request["PATH_INFO"], reverse("app:auth.login"))
 
     def test_login_if_already_logged_in(self):
         """
@@ -69,10 +85,10 @@ class AuthViewsTests(TestCase):
         """
         self.client.login(username=A_USERNAME, password=A_PASSWORD)
 
-        response = self.client.get(reverse('app:auth.login'), follow=True)
+        response = self.client.get(reverse("app:auth.login"), follow=True)
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.request['PATH_INFO'], reverse('app:main.index'))
+        self.assertEqual(response.request["PATH_INFO"], reverse("app:main.index"))
 
     """
     SIGNUP TESTS
@@ -83,7 +99,7 @@ class AuthViewsTests(TestCase):
         WHEN one accesses the register page
         THEN the register form is displayed
         """
-        response = self.client.get(reverse('app:auth.signup'))
+        response = self.client.get(reverse("app:auth.signup"))
 
         self.assertEqual(response.status_code, 200)
         self.assertTrue(is_signup_form(response))
@@ -95,7 +111,14 @@ class AuthViewsTests(TestCase):
         THEN create a new account
         AND the user is logged in
         """
-        response = register_post(self.client, OTHER_USERNAME, OTHER_EMAIL, A_PASSWORD, A_PASSWORD, send_emails=False)
+        response = register_post(
+            self.client,
+            OTHER_USERNAME,
+            OTHER_EMAIL,
+            A_PASSWORD,
+            A_PASSWORD,
+            send_emails=False,
+        )
 
         self.assertEqual(response.status_code, 200)
         self.assertTrue(is_user_index(response))
@@ -105,10 +128,17 @@ class AuthViewsTests(TestCase):
         WHEN a user does not agree to the terms of use
         THEN the user cannot register
         """
-        response = register_post(self.client, OTHER_USERNAME, OTHER_EMAIL, A_PASSWORD, A_PASSWORD, agree_terms=False)
+        response = register_post(
+            self.client,
+            OTHER_USERNAME,
+            OTHER_EMAIL,
+            A_PASSWORD,
+            A_PASSWORD,
+            agree_terms=False,
+        )
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.request['PATH_INFO'], reverse('app:auth.signup'))
+        self.assertEqual(response.request["PATH_INFO"], reverse("app:auth.signup"))
 
     @mock.patch(MOCK_EMAIL)
     def test_register_disagree_emails(self, mock_email):
@@ -116,10 +146,19 @@ class AuthViewsTests(TestCase):
         WHEN a user does not agree to receiving emails
         THEN the user's email preferences are all null
         """
-        response = register_post(self.client, OTHER_USERNAME, 'boo@ah.oops', A_PASSWORD, A_PASSWORD, send_emails=False)
+        response = register_post(
+            self.client,
+            OTHER_USERNAME,
+            "boo@ah.oops",
+            A_PASSWORD,
+            A_PASSWORD,
+            send_emails=False,
+        )
 
         user = User.objects.get(username=OTHER_USERNAME)
-        email_preferences_expected = EmailPreferences(features=False, practicing=False, promotions=False)
+        email_preferences_expected = EmailPreferences(
+            features=False, practicing=False, promotions=False
+        )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(user.profile.email_preferences, email_preferences_expected)
 
@@ -129,10 +168,17 @@ class AuthViewsTests(TestCase):
         WHEN a new user registers
         THEN an account confirmation email is sent
         """
-        response = register_post(self.client, OTHER_USERNAME, 'boo@ah.oops', A_PASSWORD, A_PASSWORD, send_emails=False)
+        response = register_post(
+            self.client,
+            OTHER_USERNAME,
+            "boo@ah.oops",
+            A_PASSWORD,
+            A_PASSWORD,
+            send_emails=False,
+        )
 
         self.assertTrue(mock_email.called)
-        self.assertIn(b'account confirmation', response.content)
+        self.assertIn(b"account confirmation", response.content)
 
     def test_register_if_already_logged_in(self):
         """
@@ -141,10 +187,10 @@ class AuthViewsTests(TestCase):
         """
         self.client.login(username=A_USERNAME, password=A_PASSWORD)
 
-        response = self.client.get(reverse('app:auth.signup'))
+        response = self.client.get(reverse("app:auth.signup"))
 
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, reverse('app:main.index'))
+        self.assertEqual(response.url, reverse("app:main.index"))
 
     """
     LOGOUT TESTS
@@ -158,10 +204,10 @@ class AuthViewsTests(TestCase):
         """
         self.client.login(username=A_USERNAME, password=A_PASSWORD)
 
-        response = self.client.get(reverse('app:auth.logout'), follow=True)
+        response = self.client.get(reverse("app:auth.logout"), follow=True)
 
         self.assertEqual(response.status_code, 200)
-        self.assertIn(b'You have been logged out', response.content)
+        self.assertIn(b"You have been logged out", response.content)
         self.assertTrue(mock_logout.called)
 
     """
@@ -173,7 +219,7 @@ class AuthViewsTests(TestCase):
         WHEN an anonymous user requests the password reset form
         THEN display the password reset form
         """
-        response = self.client.get(reverse('app:auth.request_password_reset'))
+        response = self.client.get(reverse("app:auth.request_password_reset"))
 
         self.assertEqual(response.status_code, 200)
         self.assertTrue(is_password_reset_form(response))
@@ -185,10 +231,10 @@ class AuthViewsTests(TestCase):
         """
         self.client.login(username=A_USERNAME, password=A_PASSWORD)
 
-        response = self.client.get(reverse('app:auth.request_password_reset'))
+        response = self.client.get(reverse("app:auth.request_password_reset"))
 
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, reverse('app:main.index'))
+        self.assertEqual(response.url, reverse("app:main.index"))
 
     @mock.patch(MOCK_EMAIL)
     def test_password_reset_request_send_token(self, mock_email):
@@ -200,7 +246,7 @@ class AuthViewsTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertTrue(mock_email.called)
-        self.assertIn(b'an email with instructions', response.content.lower())
+        self.assertIn(b"an email with instructions", response.content.lower())
 
     @mock.patch(MOCK_EMAIL)
     def test_password_reset_request_go_to_login(self, mock_email):
@@ -208,7 +254,7 @@ class AuthViewsTests(TestCase):
         WHEN a reset request is sent to an email not in the database
         THEN the user is redirected to the login page
         """
-        response = reset_post(self.client, AN_EMAIL + 'nonexistant')
+        response = reset_post(self.client, AN_EMAIL + "nonexistant")
 
         self.assertEqual(response.status_code, 200)
         self.assertFalse(mock_email.called)
@@ -222,7 +268,9 @@ class AuthViewsTests(TestCase):
         """
         token = self.a_user.profile.generate_token(TokenType.RESET)
 
-        response = self.client.get(reverse('app:auth.password_reset', args=[token]), follow=True)
+        response = self.client.get(
+            reverse("app:auth.password_reset", args=[token]), follow=True
+        )
 
         self.assertEqual(response.status_code, 200)
         self.assertTrue(is_reset_password_form(response))
@@ -236,10 +284,12 @@ class AuthViewsTests(TestCase):
         """
         token = self.a_user.profile.generate_token(TokenType.RESET)
 
-        response = reset_password_post(self.client, token, OTHER_PASSWORD, OTHER_PASSWORD, False)
+        response = reset_password_post(
+            self.client, token, OTHER_PASSWORD, OTHER_PASSWORD, False
+        )
 
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, reverse('app:auth.login'))
+        self.assertEqual(response.url, reverse("app:auth.login"))
 
     def test_reset_password_invalid_token(self):
         """
@@ -249,10 +299,12 @@ class AuthViewsTests(TestCase):
         """
         token = self.a_user.profile.generate_token(TokenType.RESET, 1)
 
-        response = reset_password_post(self.client, token + 'a', OTHER_PASSWORD, OTHER_PASSWORD, False)
+        response = reset_password_post(
+            self.client, token + "a", OTHER_PASSWORD, OTHER_PASSWORD, False
+        )
 
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, reverse('app:main.index'))
+        self.assertEqual(response.url, reverse("app:main.index"))
 
     def test_reset_password_already_logged_in(self):
         """
@@ -262,14 +314,15 @@ class AuthViewsTests(TestCase):
         self.client.login(username=A_USERNAME, password=A_PASSWORD)
         token = self.a_user.profile.generate_token(TokenType.RESET)
 
-        response = self.client.get(reverse('app:auth.password_reset', args=[token]))
+        response = self.client.get(reverse("app:auth.password_reset", args=[token]))
 
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, reverse('app:main.index'))
+        self.assertEqual(response.url, reverse("app:main.index"))
 
     """
     CONFIRMATION EMAIL
     """
+
     @mock.patch(MOCK_EMAIL)
     def test_confirm_account_message_after_confirmation(self, mock_email):
         """
@@ -280,10 +333,12 @@ class AuthViewsTests(TestCase):
         self.client.login(username=A_USERNAME, password=A_PASSWORD)
         token = self.a_user.profile.generate_token(TokenType.CONFIRM)
 
-        response = self.client.get(reverse('app:auth.confirm', args=[token]), follow=True)
+        response = self.client.get(
+            reverse("app:auth.confirm", args=[token]), follow=True
+        )
 
         self.assertEqual(response.status_code, 200)
-        self.assertNotIn(b'not confirmed', response.content)
+        self.assertNotIn(b"not confirmed", response.content)
 
     @mock.patch(MOCK_EMAIL)
     def test_confirm_account_send_welcome_email(self, mock_email):
@@ -295,7 +350,7 @@ class AuthViewsTests(TestCase):
         self.client.login(username=A_USERNAME, password=A_PASSWORD)
         token = self.a_user.profile.generate_token(TokenType.CONFIRM)
 
-        self.client.get(reverse('app:auth.confirm', args=[token]))
+        self.client.get(reverse("app:auth.confirm", args=[token]))
 
         self.assertTrue(mock_email.called)
 
@@ -308,12 +363,12 @@ class AuthViewsTests(TestCase):
         """
         self.client.login(username=A_USERNAME, password=A_PASSWORD)
         token = self.a_user.profile.generate_token(TokenType.CONFIRM)
-        self.client.get(reverse('app:auth.confirm', args=[token]), follow=True)
+        self.client.get(reverse("app:auth.confirm", args=[token]), follow=True)
 
-        response = self.client.get(reverse('app:auth.confirm', args=[token]))
+        response = self.client.get(reverse("app:auth.confirm", args=[token]))
 
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, reverse('app:main.index'))
+        self.assertEqual(response.url, reverse("app:main.index"))
 
     def test_confirm_invalid_token(self):
         """
@@ -323,12 +378,14 @@ class AuthViewsTests(TestCase):
         AND the user is redirected to the index page
         """
         self.client.login(username=A_USERNAME, password=A_PASSWORD)
-        token = self.a_user.profile.generate_token(TokenType.CONFIRM) + 'a'
+        token = self.a_user.profile.generate_token(TokenType.CONFIRM) + "a"
 
-        response = self.client.get(reverse('app:auth.confirm', args=[token]), follow=True)
+        response = self.client.get(
+            reverse("app:auth.confirm", args=[token]), follow=True
+        )
 
         self.assertEqual(response.status_code, 200)
-        self.assertIn(b'link is invalid', response.content)
+        self.assertIn(b"link is invalid", response.content)
 
     @mock.patch(MOCK_EMAIL)
     def test_resend_confirm_account(self, mock_email):
@@ -340,11 +397,13 @@ class AuthViewsTests(TestCase):
         self.client.login(username=A_USERNAME, password=A_PASSWORD)
         token = self.a_user.profile.generate_token(TokenType.CONFIRM)
 
-        response = self.client.get(reverse('app:auth.resend_confirm', args=[token]), follow=True)
+        response = self.client.get(
+            reverse("app:auth.resend_confirm", args=[token]), follow=True
+        )
 
         self.assertEqual(response.status_code, 200)
         self.assertTrue(mock_email.called)
-        self.assertIn(b'new account confirmation', response.content)
+        self.assertIn(b"new account confirmation", response.content)
 
     @mock.patch(MOCK_EMAIL)
     def test_resend_confirm_already_confirmed(self, mock_email):
@@ -356,14 +415,16 @@ class AuthViewsTests(TestCase):
         """
         self.client.login(username=A_USERNAME, password=A_PASSWORD)
         token = self.a_user.profile.generate_token(TokenType.CONFIRM)
-        self.client.get(reverse('app:auth.confirm', args=[token]))
+        self.client.get(reverse("app:auth.confirm", args=[token]))
         mock_email.called = False
 
-        response = self.client.get(reverse('app:auth.resend_confirm', args=[token]), follow=True)
+        response = self.client.get(
+            reverse("app:auth.resend_confirm", args=[token]), follow=True
+        )
 
         self.assertEqual(response.status_code, 200)
         self.assertFalse(mock_email.called)
-        self.assertIn(b'already confirmed', response.content)
+        self.assertIn(b"already confirmed", response.content)
 
     @mock.patch(MOCK_EMAIL)
     def test_resend_confirm_invalid_token(self, mock_email):
@@ -373,13 +434,15 @@ class AuthViewsTests(TestCase):
         AND flash the link is invalid
         """
         self.client.login(username=A_USERNAME, password=A_PASSWORD)
-        token = self.a_user.profile.generate_token(TokenType.CONFIRM) + 'a'
+        token = self.a_user.profile.generate_token(TokenType.CONFIRM) + "a"
 
-        response = self.client.get(reverse('app:auth.resend_confirm', args=[token]), follow=True)
+        response = self.client.get(
+            reverse("app:auth.resend_confirm", args=[token]), follow=True
+        )
 
         self.assertEqual(response.status_code, 200)
         self.assertFalse(mock_email.called)
-        self.assertIn(b'link is invalid', response.content)
+        self.assertIn(b"link is invalid", response.content)
 
     """
     CONFIRMATION EMAIL
@@ -393,10 +456,14 @@ class AuthViewsTests(TestCase):
         self.client.login(username=A_USERNAME, password=A_PASSWORD)
         token = self.a_user.profile.generate_token(TokenType.UNSUBSCRIBE)
 
-        response = self.client.get(reverse('app:auth.unsubscribe', args=[token]), follow=True)
+        response = self.client.get(
+            reverse("app:auth.unsubscribe", args=[token]), follow=True
+        )
 
         self.a_user.refresh_from_db()
-        preferences_expected = EmailPreferences(features=False, promotions=False, practicing=False)
+        preferences_expected = EmailPreferences(
+            features=False, promotions=False, practicing=False
+        )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(self.a_user.profile.email_preferences, preferences_expected)
 
@@ -406,12 +473,16 @@ class AuthViewsTests(TestCase):
         THEN a unsubscribed failure message is displayed.
         """
         self.client.login(username=A_USERNAME, password=A_PASSWORD)
-        token = self.a_user.profile.generate_token(TokenType.UNSUBSCRIBE) + 'a'
+        token = self.a_user.profile.generate_token(TokenType.UNSUBSCRIBE) + "a"
 
-        response = self.client.get(reverse('app:auth.unsubscribe', args=[token]), follow=True)
+        response = self.client.get(
+            reverse("app:auth.unsubscribe", args=[token]), follow=True
+        )
 
         self.a_user.refresh_from_db()
-        preferences_expected = EmailPreferences(features=False, promotions=False, practicing=False)
+        preferences_expected = EmailPreferences(
+            features=False, promotions=False, practicing=False
+        )
         self.assertEqual(response.status_code, 200)
-        self.assertIn(b'link is invalid', response.content)
+        self.assertIn(b"link is invalid", response.content)
         self.assertNotEqual(self.a_user.profile.email_preferences, preferences_expected)

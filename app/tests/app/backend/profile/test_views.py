@@ -5,37 +5,54 @@ from django.test import TestCase, RequestFactory
 from django.urls import reverse
 from django.contrib.auth.models import User
 
-from app.backend.profile.views import export_practices_view, settings_profile_view, add_new_instrument_view
+from app.backend.profile.views import (
+    export_practices_view,
+    settings_profile_view,
+    add_new_instrument_view,
+)
 from app.models.practice import Instrument, Practice, Exercise
 from app.models.profile import EmailPreferences
 from app.backend.utils.instruments import populate_db
 from .utils import change_email, change_password, change_username, delete_post
-from app.tests.conftest import (create_user, delete_users, A_USERNAME, A_PASSWORD, OTHER_PASSWORD,
-                                OTHER_EMAIL, is_profile_page, is_settings_page, is_access_settings,
-                                is_profile_settings_page, AN_EMAIL, OTHER_USERNAME, is_practice_settings_page,
-                                SOME_INSTRUMENTS, MockUser, mockRequestWithBody)
+from app.tests.conftest import (
+    create_user,
+    delete_users,
+    A_USERNAME,
+    A_PASSWORD,
+    OTHER_PASSWORD,
+    OTHER_EMAIL,
+    is_profile_page,
+    is_settings_page,
+    is_access_settings,
+    is_profile_settings_page,
+    AN_EMAIL,
+    OTHER_USERNAME,
+    is_practice_settings_page,
+    SOME_INSTRUMENTS,
+    MockUser,
+    mockRequestWithBody,
+)
 
-MOCK_UPDATE_EMAIL = 'app.backend.profile.views.update_email'
-MOCK_MESSAGES = 'app.backend.profile.views.messages'
-MOCK_LOGOUT = 'app.backend.profile.views.logout'
+MOCK_UPDATE_EMAIL = "app.backend.profile.views.update_email"
+MOCK_MESSAGES = "app.backend.profile.views.messages"
+MOCK_LOGOUT = "app.backend.profile.views.logout"
 
 
 class ProfileViewsTests(TestCase):
-
     @classmethod
     def setUpClass(cls):
         cls.factory = RequestFactory()
         cls.a_user = create_user()
 
-        cls.url_profile = reverse('app:profile.profile')
-        cls.url_export_practices = reverse('app:profile.export_practices')
-        cls.url_settings = reverse('app:profile.settings')
-        cls.url_settings_access = reverse('app:profile.settings_access')
-        cls.url_settings_practice = reverse('app:profile.settings_practice')
-        cls.url_settings_profile = reverse('app:profile.settings_profile')
-        cls.url_add_instrument = reverse('app:profile.add_new_instrument')
-        cls.url_delete_account = reverse('app:profile.delete_account')
-        cls.url_practice_new = reverse('app:practice.new')
+        cls.url_profile = reverse("app:profile.profile")
+        cls.url_export_practices = reverse("app:profile.export_practices")
+        cls.url_settings = reverse("app:profile.settings")
+        cls.url_settings_access = reverse("app:profile.settings_access")
+        cls.url_settings_practice = reverse("app:profile.settings_practice")
+        cls.url_settings_profile = reverse("app:profile.settings_profile")
+        cls.url_add_instrument = reverse("app:profile.add_new_instrument")
+        cls.url_delete_account = reverse("app:profile.delete_account")
+        cls.url_practice_new = reverse("app:practice.new")
 
         populate_db()
 
@@ -55,13 +72,16 @@ class ProfileViewsTests(TestCase):
         """
         self.client.logout()
         endpoints = [
-            self.url_profile, self.url_settings, self.url_settings_access,
-            self.url_settings_practice, self.url_settings_profile
+            self.url_profile,
+            self.url_settings,
+            self.url_settings_access,
+            self.url_settings_practice,
+            self.url_settings_profile,
         ]
 
         responses = [self.client.get(x) for x in endpoints]
 
-        url_login = reverse('app:auth.login')
+        url_login = reverse("app:auth.login")
         for response in responses:
             self.assertEqual(response.status_code, 302)
             self.assertEqual(response.url[:7], url_login)
@@ -106,7 +126,9 @@ class ProfileViewsTests(TestCase):
         WHEN a user updates the password
         THEN the password is updated
         """
-        response = change_password(self.client, A_PASSWORD, OTHER_PASSWORD, OTHER_PASSWORD)
+        response = change_password(
+            self.client, A_PASSWORD, OTHER_PASSWORD, OTHER_PASSWORD
+        )
         self.a_user.refresh_from_db()
 
         self.assertEqual(response.status_code, 302)
@@ -119,7 +141,9 @@ class ProfileViewsTests(TestCase):
         """
         self.a_user.profile.update_password(A_PASSWORD)
 
-        response = change_password(self.client, OTHER_PASSWORD, OTHER_PASSWORD, OTHER_PASSWORD)
+        response = change_password(
+            self.client, OTHER_PASSWORD, OTHER_PASSWORD, OTHER_PASSWORD
+        )
         self.a_user.refresh_from_db()
 
         self.assertEqual(response.status_code, 302)
@@ -193,9 +217,11 @@ class ProfileViewsTests(TestCase):
         THEN all instruments played are displayed in the instruments area
         """
         selected_instruments = [x.lower() for x in SOME_INSTRUMENTS]
-        self.client.post(self.url_settings_practice,
-                         data=dict(instruments=selected_instruments),
-                         follow=True)
+        self.client.post(
+            self.url_settings_practice,
+            data=dict(instruments=selected_instruments),
+            follow=True,
+        )
 
         response = self.client.get(self.url_profile)
 
@@ -209,12 +235,14 @@ class ProfileViewsTests(TestCase):
         WHEN a new practice is requested
         THEN the instrument selection screen is skipped
         """
-        self.a_user.profile.update_instruments_practiced([Instrument.objects.all().first()])
+        self.a_user.profile.update_instruments_practiced(
+            [Instrument.objects.all().first()]
+        )
 
         response = self.client.get(self.url_practice_new, follow=True)
 
         self.assertEqual(response.status_code, 200)
-        self.assertNotIn(b'New Practice Session', response.content)
+        self.assertNotIn(b"New Practice Session", response.content)
 
     def test_select_instruments_practiced_new_practice_multiple_instrument(self):
         """
@@ -227,7 +255,7 @@ class ProfileViewsTests(TestCase):
         response = self.client.get(self.url_practice_new, follow=True)
 
         self.assertEqual(response.status_code, 200)
-        self.assertIn(b'New Practice Session', response.content)
+        self.assertIn(b"New Practice Session", response.content)
 
     """
     SETTINGS PROFILE TESTS
@@ -250,8 +278,10 @@ class ProfileViewsTests(TestCase):
         THEN they are updated
         """
         data = dict(practicing=False, promotions=False, features=False)
-        request = self.factory.post(self.url_export_practices, data=data, HTTP_USER_AGENT='linux')
-        request.user = MockUser(username='hello')
+        request = self.factory.post(
+            self.url_export_practices, data=data, HTTP_USER_AGENT="linux"
+        )
+        request.user = MockUser(username="hello")
 
         response = settings_profile_view(request)
 
@@ -282,7 +312,7 @@ class ProfileViewsTests(TestCase):
         """
         response = delete_post(self.client)
 
-        self.assertEqual(response.url, reverse('app:main.index'))
+        self.assertEqual(response.url, reverse("app:main.index"))
         self.assertTrue(mock_logout.called)
 
     def test_delete_account_account_deleted(self):
@@ -324,7 +354,7 @@ class ProfileViewsTests(TestCase):
         WHEN the user deletes his account
         THEN the practices tied to the account are deleted
         """
-        for instrument_name in ['one', 'two', 'three', 'four']:
+        for instrument_name in ["one", "two", "three", "four"]:
             self.a_user.profile.new_practice(instrument_name)
         num_practices = Practice.objects.count()
 
@@ -339,10 +369,18 @@ class ProfileViewsTests(TestCase):
         WHEN the user deletes his account
         THEN exercises are not deleted
         """
-        for instrument_name in ['one', 'two', 'three', 'four']:
+        for instrument_name in ["one", "two", "three", "four"]:
             self.a_user.profile.new_practice(instrument_name)
-        exercises = [('a', 60, 80, 5), ('b', 70, 80, 6), ('c', 90, 80, 7), ('d', 50, 60, 8)]
-        exercises = [Exercise.objects.create(name=a, bpm_start=b, bpm_end=c, minutes=d) for a, b, c, d in exercises]
+        exercises = [
+            ("a", 60, 80, 5),
+            ("b", 70, 80, 6),
+            ("c", 90, 80, 7),
+            ("d", 50, 60, 8),
+        ]
+        exercises = [
+            Exercise.objects.create(name=a, bpm_start=b, bpm_end=c, minutes=d)
+            for a, b, c, d in exercises
+        ]
         for practice, exercise in zip(self.a_user.profile.practices.all(), exercises):
             practice.exercises.add(exercise)
             practice.save()
@@ -363,14 +401,16 @@ class ProfileViewsTests(TestCase):
         WHEN the user requests to export the practices
         THEN a new task is launched
         """
-        data = dict(file_type='pdf')
-        request = self.factory.post(self.url_export_practices, data=data, HTTP_USER_AGENT='linux')
-        request.user = MockUser(username='hello')
-        request._body = json.dumps(data).encode('utf-8')
+        data = dict(file_type="pdf")
+        request = self.factory.post(
+            self.url_export_practices, data=data, HTTP_USER_AGENT="linux"
+        )
+        request.user = MockUser(username="hello")
+        request._body = json.dumps(data).encode("utf-8")
 
         response = export_practices_view(request)
 
-        self.assertEqual(response.content, b'')
+        self.assertEqual(response.content, b"")
         self.assertTrue(request.user.profile.is_launch_task_called)
 
     @mock.patch(MOCK_MESSAGES)
@@ -379,13 +419,17 @@ class ProfileViewsTests(TestCase):
         WHEN the user requests to export the practices
         THEN a new task is launched
         """
-        request = self.factory.post(self.url_export_practices, data=dict(file_type='pdf'), HTTP_USER_AGENT='linux')
-        request.user = MockUser(username='hello')
+        request = self.factory.post(
+            self.url_export_practices,
+            data=dict(file_type="pdf"),
+            HTTP_USER_AGENT="linux",
+        )
+        request.user = MockUser(username="hello")
         request.user.profile.set_get_task = True
 
         response = export_practices_view(request)
 
-        self.assertEqual(response.content, b'task in progress')
+        self.assertEqual(response.content, b"task in progress")
 
     """
     ADD NEW INSTRUMENT
@@ -398,7 +442,7 @@ class ProfileViewsTests(TestCase):
         THEN the instrument is not added
         """
         num_instruments_before = Instrument.objects.count()
-        request = mockRequestWithBody('', self.factory, self.url_add_instrument)
+        request = mockRequestWithBody("", self.factory, self.url_add_instrument)
 
         response = add_new_instrument_view(request)
 
@@ -411,9 +455,11 @@ class ProfileViewsTests(TestCase):
         WHEN adding a new instrument to the database
         THEN the instrument is added
         """
-        instrument = Instrument(name='an instrument that does not exist')
+        instrument = Instrument(name="an instrument that does not exist")
         num_instruments_before = Instrument.objects.count()
-        request = mockRequestWithBody(instrument.name, self.factory, self.url_add_instrument)
+        request = mockRequestWithBody(
+            instrument.name, self.factory, self.url_add_instrument
+        )
 
         response = add_new_instrument_view(request)
         instrument_after = Instrument.objects.filter(name=instrument.name).first()
@@ -428,9 +474,11 @@ class ProfileViewsTests(TestCase):
         WHEN adding a new instrument to the database
         THEN the instrument is not added
         """
-        instrument = Instrument.objects.create(name='test')
+        instrument = Instrument.objects.create(name="test")
         num_instruments_before = Instrument.objects.count()
-        request = mockRequestWithBody(instrument.name, self.factory, self.url_add_instrument)
+        request = mockRequestWithBody(
+            instrument.name, self.factory, self.url_add_instrument
+        )
 
         response = add_new_instrument_view(request)
 

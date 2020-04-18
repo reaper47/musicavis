@@ -2,17 +2,24 @@ import json
 
 from django.contrib.auth.models import User
 
-from app.models.practice import Practice, Instrument, Goal, Improvement, Positive, Exercise
+from app.models.practice import (
+    Practice,
+    Instrument,
+    Goal,
+    Improvement,
+    Positive,
+    Exercise,
+)
 from app.models.task import Task
 
-A_USERNAME = 'test'
-OTHER_USERNAME = 'PuertoRico'
-AN_EMAIL = 'test@test.ssh'
-OTHER_EMAIL = 'puertorico@test.ssh'
-A_PASSWORD = 'helloworld!'
-OTHER_PASSWORD = 'goodbyeworld!'
-SOME_INSTRUMENTS = ['Violin', 'Drums']
-AN_INSTRUMENT = 'Piano'
+A_USERNAME = "test"
+OTHER_USERNAME = "PuertoRico"
+AN_EMAIL = "test@test.ssh"
+OTHER_EMAIL = "puertorico@test.ssh"
+A_PASSWORD = "helloworld!"
+OTHER_PASSWORD = "goodbyeworld!"
+SOME_INSTRUMENTS = ["Violin", "Drums"]
+AN_INSTRUMENT = "Piano"
 
 
 """
@@ -47,11 +54,21 @@ def create_practice(user=None) -> Practice:
     return practice
 
 
-def create_complete_practice(user, instrument, date, exercises=None, goals=None,
-                             improvements=None, positives=None, notes=''):
+def create_complete_practice(
+    user,
+    instrument,
+    date,
+    exercises=None,
+    goals=None,
+    improvements=None,
+    positives=None,
+    notes="",
+):
     instrument.save()
 
-    practice = Practice.objects.create(user_profile=user.profile, date=date, instrument=instrument, notes=notes)
+    practice = Practice.objects.create(
+        user_profile=user.profile, date=date, instrument=instrument, notes=notes
+    )
 
     if exercises:
         for exercise in exercises:
@@ -102,7 +119,6 @@ TASKS
 
 
 class JobMock:
-
     def __init__(self):
         self.id = 1
 
@@ -111,7 +127,13 @@ class JobMock:
 
 
 def create_task(id, name, description, profile, complete=False):
-    return Task.objects.create(id=id, name=name, description=description, profile_id=profile.pk, complete=complete)
+    return Task.objects.create(
+        id=id,
+        name=name,
+        description=description,
+        profile_id=profile.pk,
+        complete=complete,
+    )
 
 
 """
@@ -120,39 +142,54 @@ VIEWS
 
 
 def is_user_index(response):
-    components = ['New Practice Session', 'Past Practice Sessions']
+    components = ["New Practice Session", "Past Practice Sessions"]
     return all_equal(response, components)
 
 
 def is_anonymous_index(response):
-    components = ['Musicavis']
+    components = ["Musicavis"]
     return all_equal(response, components)
 
 
 def is_login_form(response):
-    components = ['Username', 'Password', 'Remember Me', 'Log In', 'Forgot Password?', 'Create an Account']
+    components = [
+        "Username",
+        "Password",
+        "Remember Me",
+        "Log In",
+        "Forgot Password?",
+        "Create an Account",
+    ]
     return all_equal(response, components)
 
 
 def is_signup_form(response):
-    components = ['Username', 'Email', 'Password', 'Password confirmation', 'Sign Up',
-                  'emails', 'Terms of Use', 'Privacy Policy']
+    components = [
+        "Username",
+        "Email",
+        "Password",
+        "Password confirmation",
+        "Sign Up",
+        "emails",
+        "Terms of Use",
+        "Privacy Policy",
+    ]
     return all_equal(response, components)
 
 
 def is_password_reset_form(response):
-    components = ['Email', 'Reset Password', 'Password Reset Request']
+    components = ["Email", "Reset Password", "Password Reset Request"]
     return all_equal(response, components)
 
 
 def is_reset_password_form(response):
-    components = ['Reset Your Password', 'New Password', 'Confirm Password']
+    components = ["Reset Your Password", "New Password", "Confirm Password"]
     return all_equal(response, components)
 
 
 def is_contact_form(response, is_user_logged_in=True):
-    components = ['First name', 'Subject:', 'Message:', 'Send']
-    componentsNotLoggedIn = ['Email address']
+    components = ["First name", "Subject:", "Message:", "Send"]
+    componentsNotLoggedIn = ["Email address"]
     has_components = all_equal(response, components)
     has_other_components = all_equal(response, componentsNotLoggedIn)
 
@@ -162,39 +199,68 @@ def is_contact_form(response, is_user_logged_in=True):
 
 
 def is_profile_page(response):
-    components = ['Instruments Practiced', 'Settings', 'Export Practices']
-    return all_equal(response, components) and b'gravatar.com' in response.content
+    components = ["Instruments Practiced", "Settings", "Export Practices"]
+    return all_equal(response, components) and b"gravatar.com" in response.content
 
 
 def is_settings_page(response):
-    components = ['Access', 'Change email', 'Change password', 'Change username',
-                  'Practice', 'instruments practiced', 'Profile', 'Email preferences']
+    components = [
+        "Access",
+        "Change email",
+        "Change password",
+        "Change username",
+        "Practice",
+        "instruments practiced",
+        "Profile",
+        "Email preferences",
+    ]
     return all_equal(response, components)
 
 
 def is_access_settings(response):
-    components = ['Current password', 'New password', 'Repeat new password',
-                  'New email', 'Repeat email', 'Password', 'New username']
+    components = [
+        "Current password",
+        "New password",
+        "Repeat new password",
+        "New email",
+        "Repeat email",
+        "Password",
+        "New username",
+    ]
     return all_equal(response, components)
 
 
 def is_practice_settings_page(response):
-    components = ['instruments you practice', 'not listed', 'Save']
+    components = ["instruments you practice", "not listed", "Save"]
     return all_equal(response, components)
 
 
 def is_profile_settings_page(response):
-    components = ['Email Preferences', 'agree to receive', 'to practicing', 'Promotions', 'features']
+    components = [
+        "Email Preferences",
+        "agree to receive",
+        "to practicing",
+        "Promotions",
+        "features",
+    ]
     return all_equal(response, components)
 
 
 def is_new_practice_form(response):
-    components = ['Create', 'Instrument'] + SOME_INSTRUMENTS
+    components = ["Create", "Instrument"] + SOME_INSTRUMENTS
     return all_equal(response, components)
 
 
 def is_practice_session(response):
-    components = ['Practice Goals', 'Exercises', 'What Went Well', 'to Improve', 'Notes', 'Delete', 'Save changes']
+    components = [
+        "Practice Goals",
+        "Exercises",
+        "What Went Well",
+        "to Improve",
+        "Notes",
+        "Delete",
+        "Save changes",
+    ]
     return all_equal(response, components)
 
 
@@ -208,7 +274,6 @@ MOCKS
 
 
 class MockUser:
-
     def __init__(self, username):
         self.username = username
         self.is_authenticated = True
@@ -216,7 +281,6 @@ class MockUser:
 
 
 class MockProfile:
-
     def __init__(self):
         self.set_get_task = False
         self.is_launch_task_called = False
@@ -234,7 +298,6 @@ class MockProfile:
 
 
 class MockEmailPreferences:
-
     def __init__(self):
         self.features = True
         self.practicing = True
@@ -242,8 +305,8 @@ class MockEmailPreferences:
 
 
 def mockRequestWithBody(instrument_name, factory, url):
-    data = {'name': instrument_name}
-    request = factory.post(url, data=data, HTTP_USER_AGENT='linux')
-    request.user = MockUser(username='hello')
-    request._body = json.dumps(data).encode('utf-8')
+    data = {"name": instrument_name}
+    request = factory.post(url, data=data, HTTP_USER_AGENT="linux")
+    request.user = MockUser(username="hello")
+    request._body = json.dumps(data).encode("utf-8")
     return request

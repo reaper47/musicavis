@@ -12,8 +12,10 @@ class Task(models.Model):
         return hash(self.id)
 
     def __eq__(self, other):
-        return (self.id == other.id and
-                self.name == other.name and
-                self.description == other.description and
-                self.profile_id == other.profile_id and
-                self.complete == other.complete)
+        return (
+            self.id == other.id
+            and self.name == other.name
+            and self.description == other.description
+            and self.profile_id == other.profile_id
+            and self.complete == other.complete
+        )

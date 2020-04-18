@@ -2,41 +2,41 @@ from enum import Enum
 
 
 class TokenType(Enum):
-    RESET = 'reset'
-    CONFIRM = 'confirm'
-    UNSUBSCRIBE = 'unsubscribe'
+    RESET = "reset"
+    CONFIRM = "confirm"
+    UNSUBSCRIBE = "unsubscribe"
 
 
 class FileType(Enum):
-    PDF = 'pdf'
-    DOCX = 'docx'
-    XLSX = 'xlsx'
-    CSV = 'csv'
-    TXT = 'txt'
-    JSON = 'json'
-    XML = 'xml'
-    ODT = 'odt'
-    ODS = 'ods'
+    PDF = "pdf"
+    DOCX = "docx"
+    XLSX = "xlsx"
+    CSV = "csv"
+    TXT = "txt"
+    JSON = "json"
+    XML = "xml"
+    ODT = "odt"
+    ODS = "ods"
 
     @staticmethod
     def from_string(filetype):
-        if filetype == 'pdf':
+        if filetype == "pdf":
             return FileType.PDF
-        elif filetype == 'docx':
+        elif filetype == "docx":
             return FileType.DOCX
-        elif filetype == 'xlsx':
+        elif filetype == "xlsx":
             return FileType.XLSX
-        elif filetype == 'csv':
+        elif filetype == "csv":
             return FileType.CSV
-        elif filetype == 'txt':
+        elif filetype == "txt":
             return FileType.TXT
-        elif filetype == 'json':
+        elif filetype == "json":
             return FileType.JSON
-        elif filetype == 'xml':
+        elif filetype == "xml":
             return FileType.XML
-        elif filetype == 'odt':
+        elif filetype == "odt":
             return FileType.ODT
-        elif filetype == 'ods':
+        elif filetype == "ods":
             return FileType.ODS
         else:
             raise NotImplementedError
@@ -44,34 +44,34 @@ class FileType(Enum):
     @staticmethod
     def description(filetype):
         if filetype == FileType.PDF:
-            return 'Portable Document Format (.pdf)'
+            return "Portable Document Format (.pdf)"
         elif filetype == FileType.DOCX:
-            return 'Microsoft Word (.docx)'
+            return "Microsoft Word (.docx)"
         elif filetype == FileType.XLSX:
-            return 'Microsoft Excel (.xlsx)'
+            return "Microsoft Excel (.xlsx)"
         elif filetype == FileType.CSV:
-            return 'Comma-Separated Values (.csv)'
+            return "Comma-Separated Values (.csv)"
         elif filetype == FileType.TXT:
-            return 'Text (.txt)'
+            return "Text (.txt)"
         elif filetype == FileType.JSON:
-            return 'JavaScript Object Notation (.json)'
+            return "JavaScript Object Notation (.json)"
         elif filetype == FileType.XML:
-            return 'Extensible Markup Language (.xml)'
+            return "Extensible Markup Language (.xml)"
         elif filetype == FileType.ODT:
-            return 'ODF Text Document (.odt)'
+            return "ODF Text Document (.odt)"
         elif filetype == FileType.ODS:
-            return 'ODF Spreadsheet Document (.ods)'
+            return "ODF Spreadsheet Document (.ods)"
         else:
             raise NotImplementedError
 
 
 class NewLine(Enum):
-    UNIX = '\n'
-    WINDOWS = '\r\n'
+    UNIX = "\n"
+    WINDOWS = "\r\n"
 
     @staticmethod
     def from_string(os):
-        if any(k in os.lower() for k in ['linux', 'mac', 'x11']):
+        if any(k in os.lower() for k in ["linux", "mac", "x11"]):
             return NewLine.UNIX
         else:
             return NewLine.WINDOWS
@@ -85,10 +85,10 @@ class FormType(Enum):
 
     @staticmethod
     def get_form_type(keys):
-        if 'new_password' in keys:
+        if "new_password" in keys:
             return FormType.CHANGE_PASSWORD
-        elif 'new_email' in keys:
+        elif "new_email" in keys:
             return FormType.CHANGE_EMAIL
-        elif 'new_username' in keys:
+        elif "new_username" in keys:
             return FormType.CHANGE_USERNAME
         return FormType.NONE
