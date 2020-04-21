@@ -115,12 +115,24 @@ class Profile(models.Model):
     PRACTICE
     """
 
-    def new_practice(self, instrument_name: str) -> Practice:
+    def new_practice(
+        self, instrument_name: str, copy_previous_session=False
+    ) -> Practice:
         instrument = Instrument.objects.filter(name=instrument_name).first()
         if instrument is None:
             instrument = Instrument.objects.create(name=instrument_name)
 
-        practice = Practice.objects.create(user_profile=self, instrument=instrument)
+        if copy_previous_session and self.practices.count() >= 1:
+            previous_practice = self.practices.filter(instrument=instrument).last()
+            practice = Practice.objects.create(user_profile=self, instrument=instrument)
+            practice.goals.set(previous_practice.goals.all())
+            practice.exercises.set(previous_practice.exercises.all())
+            practice.improvements.set(previous_practice.improvements.all())
+            practice.positives.set(previous_practice.positives.all())
+            practice.notes = previous_practice.notes
+        else:
+            practice = Practice.objects.create(user_profile=self, instrument=instrument)
+
         self.practices.add(practice)
         return practice
 

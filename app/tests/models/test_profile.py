@@ -8,7 +8,7 @@ from django.test import TestCase
 from django.contrib.auth.models import User
 
 from musicavis.settings import EXPORTS_DIR
-from app.models.practice import Instrument, Exercise
+from app.models.practice import Instrument, Exercise, Goal, Improvement, Positive
 from app.models.profile import Profile
 from app.models.email_preferences import EmailPreferences
 from app.models.notification import Notification
@@ -143,12 +143,11 @@ class ProfileModelTests(TestCase):
         WHEN a user's gravatar url is assembled
         THEN the url generated is correct
         """
-        actual_digest = self.a_user.profile.avatar(128)
+        digest_actual = self.a_user.profile.avatar(128)
 
-        self.assertEqual(
-            actual_digest,
-            "https://www.gravatar.com/avatar/b682f93ed660ecda33e9adb4e514aa2f?d=identicon&s=128",
-        )
+        digest_expected = ("https://www.gravatar.com/avatar/"
+                           "b682f93ed660ecda33e9adb4e514aa2f?d=identicon&s=128")
+        self.assertEqual(digest_actual, digest_expected)
 
     def test_html_list_instruments_practiced_many_instruments(self):
         """
@@ -182,7 +181,7 @@ class ProfileModelTests(TestCase):
     PRACTICE
     """
 
-    def test_add_new_practice_session(self):
+    def test_new_practice_session(self):
         """
         WHEN a practice session is created
         THEN add the new session to the user's list of practices
@@ -194,7 +193,7 @@ class ProfileModelTests(TestCase):
 
         self.assertEqual(self.a_user.profile.practices.count(), npractices_before + 2)
 
-    def test_add_new_practice_session_instrument_field(self):
+    def test_new_practice_session_instrument_field(self):
         """
         WHEN a practice session is created
         THEN ensure the correct instrument is tied to the session
@@ -203,6 +202,43 @@ class ProfileModelTests(TestCase):
         practice = self.a_user_with_a_practice.profile.practices.first()
 
         self.assertEqual(practice.instrument_id, instrument.id)
+
+    def test_new_practice_session_copy_previous_session(self):
+        """
+        GIVEN a user with two practice sessions, each for a different instrument
+        WHEN a practice session is created
+        AND the user wants the previous session copied over for an instrument
+        THEN the content of the previous session is copied correctly
+        """
+        instrument1.save()
+        instrument2.save()
+        self.a_user.profile.new_practice(instrument1)
+        practice = self.a_user.profile.new_practice(instrument2)
+        practice.goals.set([Goal.objects.create(name="Test")])
+        practice.exercises.set(
+            [Exercise.objects.create(name="C", bpm_start=80, bpm_end=75, minutes=40)]
+        )
+        practice.improvements.set([Improvement.objects.create(name="Improvement1")])
+        practice.positives.set([Positive.objects.create(name="Positive1")])
+        practice.notes = "some notes..."
+
+        self.a_user.profile.new_practice(instrument2, True)
+        practice_actual = self.a_user.profile.practices.filter(
+            instrument=instrument2
+        ).last()
+
+        self.assertNotEqual(practice_actual.date, practice.date)
+        self.assertEqual(list(practice_actual.goals.all()), list(practice.goals.all()))
+        self.assertEqual(
+            list(practice_actual.exercises.all()), list(practice.exercises.all())
+        )
+        self.assertListEqual(
+            list(practice_actual.improvements.all()), list(practice.improvements.all())
+        )
+        self.assertListEqual(
+            list(practice_actual.positives.all()), list(practice.positives.all())
+        )
+        self.assertEqual(practice.notes, practice.notes)
 
     def test_delete_practice_session_good_user(self):
         """
@@ -454,9 +490,6 @@ class ProfileModelTests(TestCase):
         """
         progress1 = create_task("ert", "test1", "testing1", self.a_user.profile)
         progress2 = create_task("tre", "test1", "testing2", self.a_user.profile)
-        complete = create_task(
-            "tyu", "test2", "testing2", self.a_user.profile, True
-        )  # noqa
 
         tasks = self.a_user.profile.get_tasks_in_progress()
 
@@ -471,9 +504,6 @@ class ProfileModelTests(TestCase):
         """
         progress1 = create_task("ert", "test1", "testing1", self.a_user.profile)
         progress2 = create_task("tre", "test1", "testing2", self.a_user.profile)  # noqa
-        complete = create_task(
-            "tyu", "test2", "testing2", self.a_user.profile, True
-        )  # noqa
 
         task = self.a_user.profile.get_task_in_progress("test1")
 

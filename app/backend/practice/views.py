@@ -33,7 +33,9 @@ def new_view(request):
         data = request.POST.copy()
         form = NewPracticeForm(choices=choices, data=data)
         if form.is_valid():
-            practice = request.user.profile.new_practice(data["instrument"].lower())
+            practice = request.user.profile.new_practice(
+                data["instrument"].lower(), "copy_previous_practice_checkbox" in data
+            )
             return redirect(reverse("app:practice.session", args=[practice.id]))
 
     args = dict(
@@ -60,10 +62,9 @@ def session_view(request, practice_id):
             )
         return JsonResponse({"status_code": 400, "toast": "Error saving changes."})
     elif request.method == "DELETE":
-        messages.info(
-            request,
-            f"[{practice.instrument.name.title()}] Practice #{practice.pk} successfully deleted.",
-        )
+        instrument = practice.instrument.name.title()
+        msg = f"[{instrument}] Practice #{practice.pk} successfully deleted."
+        messages.info(request, msg)
         practice.delete()
         return HttpResponseRedirect(reverse("app:practice.list_past_practices"))
 
