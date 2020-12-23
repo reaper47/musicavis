@@ -7,7 +7,7 @@
   "author": "Marc-André Charland",
   "license": "MIT",
   "scripts": {
-    "it": "yarn install && python3 -m venv venv && . venv/bin/activate && pip3 install --upgrade pip && pip3 install --no-cache-dir -vvv -r requirements.txt",
+    "it": "yarn install && python3 -m venv venv && . venv/bin/activate && python3 -m pip install -U pip && pip3 install -r requirements.txt",
     "rq": "rq worker musicavis-tasks",
     "it-pkgs": "rm -rf ./node_modules && yarn install",
     "build": "webpack --config webpack.config.js --progress --colors",
