@@ -10,19 +10,6 @@ class Main {
         this.initBurgers();
     }
 
-    cookieNotice() {
-        const gdprNotice = this.document.getElementById('gdpr-notice');
-        if (!this.getCookie('gdpr')) {
-            gdprNotice.style.display = 'block';
-            this.document.getElementById('gdpr-button').addEventListener('click', () => {
-                this.createCookie('gdpr', true, 31);
-                gdprNotice.classList.add('animated', 'bounceOutLeft');
-            });
-        } else {
-            gdprNotice.style.display = 'none';
-        }
-    }
-
     getCookie(name) {
         if (this.document.cookie.length > 0) {
             const cookies = this.document.cookie.split(';').map(x => x.trim())
