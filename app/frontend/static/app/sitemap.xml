@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<url>
+  <loc>https://www.musicavis.ca/</loc>
+  <lastmod>2019-04-25</lastmod>
+  <changefreq>monthly</changefreq>
+  <priority>1.00</priority>
+</url>
+<url>
+  <loc>https://www.musicavis.ca/signup</loc>
+  <lastmod>2019-04-25</lastmod>
+  <changefreq>yearly</changefreq>
+  <priority>0.50</priority>
+</url>
+<url>
+  <loc>https://www.musicavis.ca/login</loc>
+  <lastmod>2019-04-25</lastmod>
+  <changefreq>yearly</changefreq>
+  <priority>0.50</priority>
+</url>
+<url>
+  <loc>https://www.musicavis.ca/contact-us</loc>
+  <lastmod>2019-04-25</lastmod>
+  <changefreq>monthly</changefreq>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://www.musicavis.ca/sitemap</loc>
+  <lastmod>2019-11-15</lastmod>
+  <changefreq>monthly</changefreq>
+  <priority>0.70</priority>
+</url>
+<url>
+  <loc>https://www.musicavis.ca/privacy</loc>
+  <lastmod>2019-11-14</lastmod>
+  <changefreq>monthly</changefreq>
+  <priority>0.90</priority>
+</url>
+<url>
+  <loc>https://www.musicavis.ca/terms</loc>
+  <lastmod>2019-11-15</lastmod>
+  <changefreq>monthly</changefreq>
+  <priority>0.90</priority>
+</url>
+</urlset>
